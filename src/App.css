@@ -51,13 +51,18 @@
 .h1 {
   font-family: "Nunito", sans-serif;
   font-optical-sizing: auto;
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
 }
 
 .button {
   font-family: "Nunito", sans-serif;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 200;
   font-style: normal;
+  color: white;
+  padding: 12px;
+  background-color: #2acacf;
+  border-radius: 5px;
+  border-color: #2acacf;
 }
