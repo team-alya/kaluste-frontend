@@ -74,7 +74,7 @@ function FurniConfirmPage() {
           <Typography align="left" variant="body1">
             Valitse kunto
           </Typography>
-          {/* Condition Input */}
+          {/* Condition Selection */}
           <Select
             labelId="condition-label"
             value={condition}
@@ -82,9 +82,11 @@ function FurniConfirmPage() {
             size="small"
             style={{ width: "300px" }}
           >
+            {/* Condition Label Text */}
             <MenuItem value="" disabled>
               Valitse kunto
             </MenuItem>
+            {/* Condtion Selection Variations */}
             <MenuItem value="excellent">Erinomainen</MenuItem>
             <MenuItem value="good">Hyvä</MenuItem>
             <MenuItem value="fair">Kohtalainen</MenuItem>
