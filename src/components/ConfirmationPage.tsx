@@ -1,13 +1,22 @@
 import { useState } from "react";
-import { Box, Button, FormControl, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 function FurniConfirmPage() {
-  const [furnitureModel, setFurnitureModel] = useState<string>();
-  const [condition, setCondition] = useState<string>();
-  const [measures, setMeasures] = useState<string>();
-  const [materials, setMaterials] = useState<string>();
-  const [color, setColor] = useState<string>();
-  const [description, setDescription] = useState<string>();
+  const [furnitureModel, setFurnitureModel] = useState<string>("");
+  const [condition, setCondition] = useState<string>("");
+  const [measures, setMeasures] = useState<string>("");
+  const [materials, setMaterials] = useState<string>("");
+  const [color, setColor] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,6 +62,7 @@ function FurniConfirmPage() {
             onChange={(e) => setFurnitureModel(e.target.value)}
             margin="normal"
             size="small"
+            style={{ width: "300px" }}
           />
         </FormControl>
       </Box>
@@ -62,15 +72,25 @@ function FurniConfirmPage() {
         <FormControl>
           {/* Condition Title */}
           <Typography align="left" variant="body1">
-            Kunto
+            Valitse kunto
           </Typography>
           {/* Condition Input */}
-          <TextField
-            name="condition"
+          <Select
+            labelId="condition-label"
+            value={condition}
             onChange={(e) => setCondition(e.target.value)}
-            margin="normal"
             size="small"
-          />
+            style={{ width: "300px" }}
+          >
+            <MenuItem value="" disabled>
+              Valitse kunto
+            </MenuItem>
+            <MenuItem value="excellent">Erinomainen</MenuItem>
+            <MenuItem value="good">Hyvä</MenuItem>
+            <MenuItem value="fair">Kohtalainen</MenuItem>
+            <MenuItem value="poor">Huono</MenuItem>
+            <MenuItem value="unknown">Tuntematon</MenuItem>
+          </Select>
         </FormControl>
       </Box>
 
@@ -87,6 +107,7 @@ function FurniConfirmPage() {
             onChange={(e) => setMeasures(e.target.value)}
             margin="normal"
             size="small"
+            style={{ width: "300px" }}
           />
         </FormControl>
       </Box>
@@ -104,6 +125,7 @@ function FurniConfirmPage() {
             onChange={(e) => setMaterials(e.target.value)}
             margin="normal"
             size="small"
+            style={{ width: "300px" }}
           />
         </FormControl>
       </Box>
@@ -121,6 +143,7 @@ function FurniConfirmPage() {
             onChange={(e) => setColor(e.target.value)}
             margin="normal"
             size="small"
+            style={{ width: "300px" }}
           />
         </FormControl>
       </Box>
@@ -138,13 +161,14 @@ function FurniConfirmPage() {
             onChange={(e) => setDescription(e.target.value)}
             margin="normal"
             size="small"
+            style={{ width: "300px" }}
           />
         </FormControl>
       </Box>
 
       {/* Submit Button Box */}
       <Box margin="30px">
-        <Button type="submit" variant="contained">
+        <Button type="submit" variant="contained" style={{ width: "150px" }}>
           Hyväksy
         </Button>
       </Box>
