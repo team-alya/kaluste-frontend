@@ -6,6 +6,7 @@ const ImageUploadPage = () => {
     const camera = useRef(null);
     const [image, setImage] = useState(null);
     const [takeImage, setTakeImage] = useState(false);
+    const [cameraError, setCameraError] = useState(null || String);
 
     return (
         <>
@@ -13,25 +14,37 @@ const ImageUploadPage = () => {
 
             <p className="text">Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy kuvassa.</p>
 
-            <button className='button' onClick={() => setTakeImage(true)}>OTA KUVA</button>
-
-            {takeImage &&
-            <div>
-                    <button className='button' onClick={() => setImage(camera.current.takePhoto())}>
-                        Ota kuva
+            {!takeImage && (
+                <>
+                    <button className='button' onClick={() => setTakeImage(true)}>
+                        OTA KUVA
                     </button>
-
-                    <button className='button' onClick={() => setTakeImage(false)}>
-                        Sulje kamera
+                    <button className='button'>
+                        GALLERIA
                     </button>
-            </div>
-}
+                </>
+            )}
+            {takeImage && (
+                <>
+                <button className='button' onClick={() => setImage(camera.current.takePhoto())}>
+                    Ota kuva
+                </button>
+                <button className='button' onClick={() => setTakeImage(false)}>
+                    Sulje kamera
+                </button>
 
-            {takeImage &&
-            <div className="camera-container">
-                <Camera ref={camera} />
-            </div>
-            }
+                <div>
+                    <div className="camera-container">
+                        <Camera 
+                            ref={camera} 
+                            facingMode="environment"    // Prefer the back camera on mobile devices
+                        />
+                        
+                    </div>
+
+                </div>
+            </>
+            )}
                 
                 {image && (
                     <div>
@@ -40,8 +53,6 @@ const ImageUploadPage = () => {
                         <button onClick={() => setImage(null)}>POISTA KUVA</button>
                     </div>
                 )}   
-            
-            <button className='button'>GALLERIA</button>
         </>
     )
 }
