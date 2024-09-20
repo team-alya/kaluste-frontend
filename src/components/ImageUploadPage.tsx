@@ -6,10 +6,9 @@ const ImageUploadPage = () => {
     const camera = useRef(null);
     const [image, setImage] = useState(null);
     const [takeImage, setTakeImage] = useState(false);
-    const [cameraError, setCameraError] = useState(null || String);
 
     return (
-        <>
+        <div className="container">
             <h1 className='h1'>Lataa kuva</h1>
 
             <p className="text">Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy kuvassa.</p>
@@ -26,34 +25,36 @@ const ImageUploadPage = () => {
             )}
             {takeImage && (
                 <>
-                <button className='button' onClick={() => setImage(camera.current.takePhoto())}>
+                <button className='button' onClick={() => {
+                    setImage(camera.current.takePhoto());
+                    setTakeImage(false);
+                }}>
                     Ota kuva
                 </button>
                 <button className='button' onClick={() => setTakeImage(false)}>
                     Sulje kamera
                 </button>
 
-                <div>
                     <div className="camera-container">
                         <Camera 
                             ref={camera} 
-                            facingMode="environment"    // Prefer the back camera on mobile devices
+                            facingMode="environment"
+                            aspectRatio={16 / 9}
                         />
                         
                     </div>
 
-                </div>
             </>
             )}
                 
                 {image && (
-                    <div>
+                    <div className="image-container">
                         <h2>Kuva otettu:</h2>
-                        <img src={image} alt='Taken' />
+                        <img src={image} style={{width: "auto", height: "auto", objectFit: "contain"}} alt='Taken' />
                         <button onClick={() => setImage(null)}>POISTA KUVA</button>
                     </div>
                 )}   
-        </>
+        </div>
     )
 }
 
