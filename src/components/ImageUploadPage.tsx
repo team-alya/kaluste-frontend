@@ -39,7 +39,7 @@ const ImageUploadPage = () => {
                         <Camera 
                             ref={camera} 
                             facingMode="environment"
-                            aspectRatio={16 / 9}
+                            aspectRatio={4 / 3}
                         />
                         
                     </div>
@@ -50,7 +50,7 @@ const ImageUploadPage = () => {
                 {image && (
                     <div className="image-container">
                         <h2>Kuva otettu:</h2>
-                        <img src={image} style={{width: "auto", height: "auto", objectFit: "contain"}} alt='Taken' />
+                        <img src={image} alt='Taken' />
                         <button onClick={() => setImage(null)}>POISTA KUVA</button>
                     </div>
                 )}   
