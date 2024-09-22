@@ -1,0 +1,26 @@
+.mainBox {
+    text-align: center;
+}
+
+.headingBox {
+    margin: 30px;
+}
+
+.instructionBox {
+    margin: 30px;
+}
+.inputBox {
+    margin: 10px;
+}
+
+.inputTextFiels {
+    width: 300px;
+}
+
+.submitButtonBox {
+    margin: 30px;
+}
+
+.submitButton {
+    width: 150px;
+}
