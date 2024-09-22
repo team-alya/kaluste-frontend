@@ -1,7 +1,8 @@
 import "./App.css";
+import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
 
 function App() {
-  return <div></div>;
+  return <FurniConfirmPage />;
 }
 
 export default App;
