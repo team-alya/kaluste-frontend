@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import "./ConfirmationPage.css";
 
 function FurniConfirmPage() {
   const [furnitureModel, setFurnitureModel] = useState<string>("");
@@ -33,13 +34,13 @@ function FurniConfirmPage() {
 
   return (
     // Main Box for the page
-    <Box component="form" onSubmit={handleSubmit}>
-      <Box margin="30px">
+    <Box className="mainBox" component="form" onSubmit={handleSubmit}>
+      <Box className="headingBox">
         {/* Heading */}
         <Typography variant="h5">Tietojejn tarkistus</Typography>
       </Box>
 
-      <Box margin="30px">
+      <Box className="instructionBox">
         {/* Confirmation message with instructions. */}
         <Typography variant="body1">
           Kalusteen tunnistaminen onnistui.
@@ -49,7 +50,7 @@ function FurniConfirmPage() {
       </Box>
 
       {/* First Input Box: Model */}
-      <Box>
+      <Box className="inputBox">
         <FormControl>
           {/* Model Title */}
           <Typography align="left" variant="body1">
@@ -61,13 +62,13 @@ function FurniConfirmPage() {
             onChange={(e) => setFurnitureModel(e.target.value)}
             margin="normal"
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
 
       {/* Second Input Box: Condition */}
-      <Box margin="10px">
+      <Box className="inputBox">
         <FormControl>
           {/* Condition Title */}
           <Typography align="left" variant="body1">
@@ -79,7 +80,7 @@ function FurniConfirmPage() {
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           >
             {/* Condition Label Text */}
             <MenuItem value="" disabled>
@@ -96,7 +97,7 @@ function FurniConfirmPage() {
       </Box>
 
       {/* Third Input Box: Measures */}
-      <Box margin="10px">
+      <Box className="inputBox">
         <FormControl>
           {/* Measures Title */}
           <Typography align="left" variant="body1">
@@ -108,13 +109,13 @@ function FurniConfirmPage() {
             onChange={(e) => setMeasures(e.target.value)}
             margin="normal"
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
 
       {/* Fourth Input Box: Materials */}
-      <Box margin="10px">
+      <Box className="inputBox">
         <FormControl>
           {/* Materials Title */}
           <Typography align="left" variant="body1">
@@ -126,13 +127,13 @@ function FurniConfirmPage() {
             onChange={(e) => setMaterials(e.target.value)}
             margin="normal"
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
 
       {/* Fifth Input Box: Color */}
-      <Box margin="10px">
+      <Box className="inputBox">
         <FormControl>
           {/* Color Title */}
           <Typography align="left" variant="body1">
@@ -144,13 +145,13 @@ function FurniConfirmPage() {
             onChange={(e) => setColor(e.target.value)}
             margin="normal"
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
 
       {/* Sixth Input Box: Description */}
-      <Box margin="10px">
+      <Box className="inputBox">
         <FormControl>
           {/* Description Title */}
           <Typography align="left" variant="body1">
@@ -162,14 +163,14 @@ function FurniConfirmPage() {
             onChange={(e) => setDescription(e.target.value)}
             margin="normal"
             size="small"
-            style={{ width: "300px" }}
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
 
       {/* Submit Button Box */}
-      <Box margin="30px">
-        <Button type="submit" variant="contained" style={{ width: "150px" }}>
+      <Box className="submitButtonBox">
+        <Button type="submit" variant="contained" className="submitButton">
           Hyväksy
         </Button>
       </Box>
