@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import {Camera} from "react-camera-pro";
-import '../App.css';
+import './ImageUploadPage.css';
 
 const ImageUploadPage = () => {
     const camera = useRef(null);
@@ -37,10 +37,14 @@ const ImageUploadPage = () => {
 
                     <div className="camera-container">
                         <Camera 
-                            ref={camera} 
+                            ref={camera}
                             facingMode="environment"
-                            aspectRatio={4 / 3}
-                        />
+                            aspectRatio={4 / 3} errorMessages={{
+                                noCameraAccessible: undefined,
+                                permissionDenied: undefined,
+                                switchCamera: undefined,
+                                canvas: undefined
+                            }}                        />
                         
                     </div>
 

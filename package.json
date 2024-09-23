@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.0",
+    "kaluste-frontend": "file:",
     "react": "^18.3.1",
     "react-camera-pro": "^1.4.0",
     "react-dom": "^18.3.1"
