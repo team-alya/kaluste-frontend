@@ -1,15 +1,16 @@
 import React, { useState, useRef } from "react";
 import { Camera } from "react-camera-pro";
 import './ImageUploadPage.css';
+import stockchair from './stockchair.jpg'
 
 const ImageUploadPage = () => {
     const camera = useRef(null);
-    const fileInputRef = useRef(null); // Create a ref for the file input
+    const fileInputRef = useRef(null);
     const [image, setImage] = useState(null);
     const [takeImage, setTakeImage] = useState(false);
 
     function handleFileInputClick() {
-        fileInputRef.current.click(); // Programmatically click the file input
+        fileInputRef.current.click();
     }
 
     function handleChange(e) {
@@ -25,6 +26,10 @@ const ImageUploadPage = () => {
 
                     <p className="text">Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy kuvassa.</p>
 
+                    {!takeImage && (
+                        <img src={stockchair} className="stock-image" alt="stock-photo-chair" />
+                    )}
+
                     {!takeImage ? (
                         <div className="button-container">
                             <button className='button' onClick={() => setTakeImage(true)}>
@@ -35,14 +40,13 @@ const ImageUploadPage = () => {
                                 GALLERIA
                             </button>
 
-                            {/* Hidden file input */}
                             <input
                                 type="file"
                                 id="file-input"
                                 className="file-input"
                                 ref={fileInputRef}
                                 onChange={handleChange}
-                                style={{ display: 'none' }} // Hide the input element
+                                style={{ display: 'none' }}
                             />
                         </div>
                     ) : (
@@ -53,6 +57,7 @@ const ImageUploadPage = () => {
                             }}>
                                 Ota kuva
                             </button>
+
                             <button className='button' onClick={() => setTakeImage(false)}>
                                 Sulje kamera
                             </button>
@@ -76,8 +81,11 @@ const ImageUploadPage = () => {
             ) : (
                 <div className="image-container">
                     <h1 className="h1">Kalusteen tunnistus</h1>
+
                     <p className="text">Onko kuvassa kalusteesi?</p>
+
                     <img src={image} alt='Taken' />
+
                     <div className="button-container">
                         <button className="button">KYLLÄ</button>
                         <button className="button" onClick={() => setImage(null)}>EI</button>
