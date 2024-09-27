@@ -1,11 +1,21 @@
 import React, { useState, useRef } from "react";
-import {Camera} from "react-camera-pro";
+import { Camera } from "react-camera-pro";
 import './ImageUploadPage.css';
 
 const ImageUploadPage = () => {
     const camera = useRef(null);
+    const fileInputRef = useRef(null); // Create a ref for the file input
     const [image, setImage] = useState(null);
     const [takeImage, setTakeImage] = useState(false);
+
+    function handleFileInputClick() {
+        fileInputRef.current.click(); // Programmatically click the file input
+    }
+
+    function handleChange(e) {
+        console.log(e.target.files);
+        setImage(URL.createObjectURL(e.target.files[0]));
+    }
 
     return (
         <div className="container">
@@ -15,13 +25,27 @@ const ImageUploadPage = () => {
 
             {!takeImage && (
                 <>
+                <div className="button-container">
                     <button className='button' onClick={() => setTakeImage(true)}>
                         OTA KUVA
                     </button>
-                    <button className='button'>
+                    
+                    <button className="button" onClick={handleFileInputClick}>
                         GALLERIA
                     </button>
-                </>
+                    
+                    {/* Hidden file input */}
+                    <input
+                        type="file"
+                        id="file-input"
+                        className="file-input"
+                        ref={fileInputRef}
+                        onChange={handleChange}
+                        style={{ display: 'none' }} // Hide the input element
+                    />
+                </div>
+            </>
+            
             )}
             {takeImage && (
                 <>
@@ -53,14 +77,12 @@ const ImageUploadPage = () => {
                 
                 {image && (
                     <div className="image-container">
-                        <h2>Kuva otettu:</h2>
                         <img src={image} alt='Taken' />
-                        <button onClick={() => setImage(null)}>POISTA KUVA</button>
+                        <button className="button" onClick={() => setImage(null)}>POISTA KUVA</button>
                     </div>
                 )}   
         </div>
-    )
+    );
 }
 
 export default ImageUploadPage;
-
