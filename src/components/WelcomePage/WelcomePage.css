@@ -1,0 +1,36 @@
+/* General styling for the page */
+.welcome-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+.content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Styling for the logo */
+.logo {
+  width: 200px;  
+  height: auto;  
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.description,
+.steps {
+  margin-bottom: 20px;
+}
+
+.start-button {
+  margin-top: 20px;
+}
