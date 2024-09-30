@@ -4,7 +4,7 @@ import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
 import WelcomePage from "./components/WelcomePage";
 
 function App() {
-  return <WelcomePage />;
+  return <FurniConfirmPage />;
 }
 
 export default App;
