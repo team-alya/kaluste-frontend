@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Camera } from "react-camera-pro";
 import './ImageUploadPage.css';
 import stockchair from './stockchair.jpg';
@@ -8,9 +8,24 @@ const ImageUploadPage = () => {
     const fileInputRef = useRef(null);
     const [image, setImage] = useState(null); // For displaying the image
     const [imageBlob, setImageBlob] = useState(null);  // Store the Blob or File for upload
-    const [takeImage, setTakeImage] = useState(false);
+    const [takeImage, setTakeImage] = useState(false); //For opening the camera
+    const [furnitureResult, setFurnitureResult] = useState({
+        age: 0,
+        brand: "",
+        color: "",
+        condition: "",
+        dimensions: {
+            height: 0,
+            length: 0,
+            width: 0
+        },
+        model: "",
+        type: ""
+    })
 
     // Convert Base64 to Blob for camera images
+    // Since the react-camera-pro transforms images automatically to base64
+    // And the backend expects an image
     const base64ToBlob = (base64) => {
         const byteString = atob(base64.split(',')[1]);
         const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
@@ -34,61 +49,39 @@ const ImageUploadPage = () => {
         setImageBlob(file);  // Store the File object for upload
     }
 
-    // Handle upload for file input (device images)
-/*const handleDeviceImageUpload = async () => {
-    console.log('Device image upload triggered');
-    if (!imageBlob) {
-        console.log('No image Blob found for upload');
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('image', imageBlob);  // Use 'image' as the field name expected by the backend
-
-        const response = await fetch('http://localhost:3000/api/image', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            console.error('Failed to upload image. Status:', response.status);
-        } else {
-            const result = await response.json();
-            console.log('Image uploaded successfully!', result);
-        }
-    } catch (error) {
-        console.error('Error uploading image:', error);
-    }
-}; */
-
     // Handle upload for images
-const handleImageUpload = async () => {
-    console.log('Camera image upload triggered');
-    if (!imageBlob) {
-        console.log('No image Blob found for upload');
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('image', imageBlob);
-
-        const response = await fetch('http://localhost:3000/api/image', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            console.error('Failed to upload camera image. Status:', response.status);
-        } else {
-            const result = await response.json();
-            console.log('Camera image uploaded successfully!', result);
+    const handleImageUpload = async () => {
+        console.log('Camera image upload triggered');
+        if (!imageBlob) {
+            console.log('No image Blob found for upload');
+            return;
         }
-    } catch (error) {
-        console.error('Error uploading camera image:', error);
-    }
-};
+
+        try {
+            const formData = new FormData();
+            formData.append('image', imageBlob);
+
+            const response = await fetch('http://localhost:3000/api/image', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                console.error('Failed to upload camera image. Status:', response.status);
+            } else {
+                const result = await response.json();
+                console.log('Camera image uploaded successfully!', result);
+                setFurnitureResult(result.result)
+            }
+        } catch (error) {
+            console.error('Error uploading camera image:', error);
+        }
+    };
+
+    useEffect(() => {
+        console.log('Updated furniture result:', furnitureResult);
+        console.log('Furniture color:', furnitureResult.color); // This should now correctly log "Brown"
+    }, [furnitureResult]);
 
 
     return (
