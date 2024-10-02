@@ -11,10 +11,10 @@
 }
 
 .nav-link {
-  text-decoration: none;
+  text-decoration: underline;
   font-size: 1.2rem;
   font-weight: bold;
-  color:blue;
+  color:rgb(0, 204, 255);
 }
 
 .nav-link:hover {

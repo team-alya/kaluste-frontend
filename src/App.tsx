@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { ThemeProvider, createTheme, Theme } from "@mui/material/styles";
-import { CssBaseline, Button, Box } from "@mui/material";
+import { CssBaseline, FormControlLabel, Box, Switch } from "@mui/material";
 import { Link, Route, Routes } from "react-router-dom";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
 import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
-import { themeOptions, newThemeOptions } from "./theme"; // Import themes
+import { themeOptions, newThemeOptions } from "./theme";
 
 import "./App.css"; // Custom styles for navigation bar
 
@@ -40,15 +40,12 @@ function App() {
             </Link>
           </div>
           <div className="toggle">
-            {/* Button to toggle theme */}
+            {/* Switch to toggle theme */}
             <Box textAlign="center" margin={2}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={toggleTheme}
-              >
-                {darkMode ? "Switch theme" : "Switch theme"}
-              </Button>
+              <FormControlLabel
+                control={<Switch checked={darkMode} onChange={toggleTheme} />}
+                label={darkMode ? "Theme 2" : "Theme 1"}
+              />
             </Box>
           </div>
         </nav>
