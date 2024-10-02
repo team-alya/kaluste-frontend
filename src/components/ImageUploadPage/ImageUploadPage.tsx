@@ -1,99 +1,148 @@
 import React, { useState, useRef } from "react";
 import { Camera } from "react-camera-pro";
-import './ImageUploadPage.css';
-import stockchair from './stockchair.jpg'
+import "./ImageUploadPage.css";
+import stockchair from "./stockchair.jpg";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 const ImageUploadPage = () => {
-    const camera = useRef(null);
-    const fileInputRef = useRef(null);
-    const [image, setImage] = useState(null);
-    const [takeImage, setTakeImage] = useState(false);
+  const camera = useRef(null);
+  const fileInputRef = useRef(null);
+  const [image, setImage] = useState(null);
+  const [takeImage, setTakeImage] = useState(false);
 
-    function handleFileInputClick() {
-        fileInputRef.current.click();
-    }
+  function handleFileInputClick() {
+    fileInputRef.current.click();
+  }
 
-    function handleChange(e) {
-        console.log(e.target.files);
-        setImage(URL.createObjectURL(e.target.files[0]));
-    }
+  function handleChange(e) {
+    console.log(e.target.files);
+    setImage(URL.createObjectURL(e.target.files[0]));
+  }
 
-    return (
-        <div className="container">
-            {!image ? (
-                <>
-                    <h1 className='h1'>Lataa kuva</h1>
+  const navigate = useNavigate();
 
-                    <p className="text">Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy kuvassa.</p>
+  const handleYesClick = () => {
+    navigate("/confirmation");
+  };
 
-                    {!takeImage && (
-                        <img src={stockchair} className="stock-image" alt="stock-photo-chair" />
-                    )}
+  return (
+    <div className="container">
+      {!image ? (
+        <>
+          <h1 className="h1">Lataa kuva</h1>
 
-                    {!takeImage ? (
-                        <div className="button-container">
-                            <button className='button' onClick={() => setTakeImage(true)}>
-                                OTA KUVA
-                            </button>
+          <p className="text">
+            Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
+            kuvassa.
+          </p>
 
-                            <button className="button" onClick={handleFileInputClick}>
-                                GALLERIA
-                            </button>
+          {!takeImage && (
+            <img
+              src={stockchair}
+              className="stock-image"
+              alt="stock-photo-chair"
+            />
+          )}
 
-                            <input
-                                type="file"
-                                id="file-input"
-                                className="file-input"
-                                ref={fileInputRef}
-                                onChange={handleChange}
-                                style={{ display: 'none' }}
-                            />
-                        </div>
-                    ) : (
-                        <>
-                            <button className='button' onClick={() => {
-                                setImage(camera.current.takePhoto());
-                                setTakeImage(false);
-                            }}>
-                                Ota kuva
-                            </button>
+          {!takeImage ? (
+            <div className="button-container">
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => setTakeImage(true)}
+              >
+                OTA KUVA
+              </Button>
 
-                            <button className='button' onClick={() => setTakeImage(false)}>
-                                Sulje kamera
-                            </button>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={handleFileInputClick}
+              >
+                GALLERIA
+              </Button>
 
-                            <div className="camera-container">
-                                <Camera
-                                    ref={camera}
-                                    facingMode="environment"
-                                    aspectRatio={4 / 3}
-                                    errorMessages={{
-                                        noCameraAccessible: undefined,
-                                        permissionDenied: undefined,
-                                        switchCamera: undefined,
-                                        canvas: undefined
-                                    }}
-                                />
-                            </div>
-                        </>
-                    )}
-                </>
-            ) : (
-                <div className="image-container">
-                    <h1 className="h1">Kalusteen tunnistus</h1>
+              <input
+                type="file"
+                id="file-input"
+                className="file-input"
+                ref={fileInputRef}
+                onChange={handleChange}
+                style={{ display: "none" }}
+              />
+            </div>
+          ) : (
+            <>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setImage(camera.current.takePhoto());
+                  setTakeImage(false);
+                }}
+              >
+                Ota kuva
+              </Button>
 
-                    <p className="text">Onko kuvassa kalusteesi?</p>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => setTakeImage(false)}
+              >
+                Sulje kamera
+              </Button>
 
-                    <img src={image} alt='Taken' />
+              <div className="camera-container">
+                <Camera
+                  ref={camera}
+                  facingMode="environment"
+                  aspectRatio={4 / 3}
+                  errorMessages={{
+                    noCameraAccessible: undefined,
+                    permissionDenied: undefined,
+                    switchCamera: undefined,
+                    canvas: undefined,
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <div className="image-container">
+          <h1 className="h1">Kalusteen tunnistus</h1>
 
-                    <div className="button-container">
-                        <button className="button">KYLLÄ</button>
-                        <button className="button" onClick={() => setImage(null)}>EI</button>
-                    </div>
-                </div>
-            )}
+          <p className="text">Onko kuvassa kalusteesi?</p>
+
+          <img src={image} alt="Taken" />
+
+          <div className="button-container">
+            <Button
+              className="button"
+              variant="contained"
+              color="primary"
+              onClick={handleYesClick}
+            >
+              KYLLÄ
+            </Button>
+            <Button
+              className="button"
+              variant="contained"
+              color="primary"
+              onClick={() => setImage(null)}
+            >
+              EI
+            </Button>
+          </div>
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
 
 export default ImageUploadPage;

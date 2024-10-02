@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Typography, Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook
+import { useNavigate } from "react-router-dom";
 import "./WelcomePage.css";
 import skyImage from "./sky.png";
 

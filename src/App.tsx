@@ -1,38 +1,68 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Import Router components
-import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
-import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
+import { ThemeProvider, createTheme, Theme } from "@mui/material/styles";
+import { CssBaseline, Button, Box } from "@mui/material";
+import { Link, Route, Routes } from "react-router-dom";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
-import { Button } from "@mui/material";
-import "./App.css";
+import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
+import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
+import { themeOptions, newThemeOptions } from "./theme"; // Import themes
+
+import "./App.css"; // Custom styles for navigation bar
 
 function App() {
-  const [darkTheme, setDarkTheme] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // State to manage theme mode
+
+  const theme: Theme = createTheme(darkMode ? newThemeOptions : themeOptions);
 
   const toggleTheme = () => {
-    setDarkTheme(!darkTheme);
+    setDarkMode(!darkMode); // Toggle between light and dark mode
   };
 
   return (
-    <Router>
-      <div className={darkTheme ? "app dark-theme" : "app light-theme"}>
-        <Button
-          variant="contained"
-          color="primary"
-          className="theme-toggle-button"
-          onClick={toggleTheme}
-        >
-          Vaihda Teemaa
-        </Button>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Applies global styles for current theme */}
+      <div>
+        {/* Navigation Bar */}
+        <nav className="navbar">
+          <div className="nav-item">
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+          </div>
+          <div className="nav-item">
+            <Link to="/upload" className="nav-link">
+              Upload Image
+            </Link>
+          </div>
+          <div className="nav-item">
+            <Link to="/confirmation" className="nav-link">
+              Confirmation
+            </Link>
+          </div>
+          <div className="toggle">
+            {/* Button to toggle theme */}
+            <Box textAlign="center" margin={2}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={toggleTheme}
+              >
+                {darkMode ? "Switch theme" : "Switch theme"}
+              </Button>
+            </Box>
+          </div>
+        </nav>
 
-        {/* Define Routes */}
-        <Routes>
-          <Route path="/" element={<WelcomePage />} /> {/* Home route */}
-          <Route path="/upload" element={<ImageUploadPage />} />{" "}
-          <Route path="/confirmation" element={<FurniConfirmPage />} />{" "}
-        </Routes>
+        {/* Routes */}
+        <div>
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/upload" element={<ImageUploadPage />} />
+            <Route path="/confirmation" element={<FurniConfirmPage />} />
+          </Routes>
+        </div>
       </div>
-    </Router>
+    </ThemeProvider>
   );
 }
 
