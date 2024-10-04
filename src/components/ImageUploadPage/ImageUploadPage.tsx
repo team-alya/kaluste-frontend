@@ -80,7 +80,7 @@ const ImageUploadPage = () => {
 
     useEffect(() => {
         console.log('Updated furniture result:', furnitureResult);
-        console.log('Furniture color:', furnitureResult.color); // This should now correctly log "Brown"
+        console.log('Furniture color:', furnitureResult.color);
     }, [furnitureResult]);
 
 
