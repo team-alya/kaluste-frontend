@@ -37,7 +37,7 @@ function FurniConfirmPage() {
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
       <Box className="headingBox">
         {/* Heading */}
-        <Typography variant="h5">Tietojejn tarkistus</Typography>
+        <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>
 
       <Box className="instructionBox">

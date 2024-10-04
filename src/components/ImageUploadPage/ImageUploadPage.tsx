@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Camera } from "react-camera-pro";
-import './ImageUploadPage.css';
-import stockchair from './stockchair.jpg';
+import "./ImageUploadPage.css";
+import stockchair from "./stockchair.jpg";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 const ImageUploadPage = () => {
     const camera = useRef(null);
@@ -38,9 +40,9 @@ const ImageUploadPage = () => {
         return new Blob([byteArray], { type: mimeString });
     };
 
-    function handleFileInputClick() {
-        fileInputRef.current.click();
-    }
+  function handleFileInputClick() {
+    fileInputRef.current.click();
+  }
 
     // Handle file input change
     function handleChange(e) {
@@ -84,27 +86,44 @@ const ImageUploadPage = () => {
     }, [furnitureResult]);
 
 
-    return (
-        <div className="container">
-            {!image ? (
-                <>
-                    <h1 className='h1'>Lataa kuva</h1>
+  return (
+    <div className="container">
+      {!image ? (
+        <>
+          <h1 className="h1">Lataa kuva</h1>
 
-                    <p className="text">Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy kuvassa.</p>
+          <p className="text">
+            Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
+            kuvassa.
+          </p>
 
-                    {!takeImage && (
-                        <img src={stockchair} className="stock-image" alt="stock-photo-chair" />
-                    )}
+          {!takeImage && (
+            <img
+              src={stockchair}
+              className="stock-image"
+              alt="stock-photo-chair"
+            />
+          )}
 
-                    {!takeImage ? (
-                        <div className="button-container">
-                            <button className='button' onClick={() => setTakeImage(true)}>
-                                OTA KUVA
-                            </button>
+          {!takeImage ? (
+            <div className="button-container">
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => setTakeImage(true)}
+              >
+                OTA KUVA
+              </Button>
 
-                            <button className="button" onClick={handleFileInputClick}>
-                                GALLERIA
-                            </button>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={handleFileInputClick}
+              >
+                GALLERIA
+              </Button>
 
                             <input
                                 type="file"
@@ -117,56 +136,70 @@ const ImageUploadPage = () => {
                         </div>
                     ) : (
                         <>
-                            <button className='button' onClick={() => {
-                                const capturedImage = camera.current.takePhoto();
-                                console.log('Captured Image (Base64):', capturedImage);  // Log Base64
-
-                                const blob = base64ToBlob(capturedImage);  // Convert Base64 to Blob
-                                setImageBlob(blob);  // Store Blob for upload
-                                setImage(capturedImage);  // Set Base64 image for display
-                                setTakeImage(false);
+                            <Button 
+                                className='button' 
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
+                                    const capturedImage = camera.current.takePhoto();
+                                    console.log('Captured Image (Base64):', capturedImage);  // Log Base64
+    
+                                    const blob = base64ToBlob(capturedImage);  // Convert Base64 to Blob
+                                    setImageBlob(blob);  // Store Blob for upload
+                                    setImage(capturedImage);  // Set Base64 image for display
+                                    setTakeImage(false);
                             }}>
                                 Ota kuva
-                            </button>
+                            </Button>
 
-                            <button className='button' onClick={() => setTakeImage(false)}>
-                                Sulje kamera
-                            </button>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => setTakeImage(false)}
+              >
+                Sulje kamera
+              </Button>
 
-                            <div className="camera-container">
-                                <Camera
-                                    ref={camera}
-                                    facingMode="environment"
-                                    aspectRatio={4 / 3}
-                                    errorMessages={{
-                                        noCameraAccessible: undefined,
-                                        permissionDenied: undefined,
-                                        switchCamera: undefined,
-                                        canvas: undefined
-                                    }}
-                                />
-                            </div>
-                        </>
-                    )}
-                </>
-            ) : (
-                <div className="image-container">
-                    <h1 className="h1">Kalusteen tunnistus</h1>
+              <div className="camera-container">
+                <Camera
+                  ref={camera}
+                  facingMode="environment"
+                  aspectRatio={4 / 3}
+                  errorMessages={{
+                    noCameraAccessible: undefined,
+                    permissionDenied: undefined,
+                    switchCamera: undefined,
+                    canvas: undefined,
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <div className="image-container">
+          <h1 className="h1">Kalusteen tunnistus</h1>
 
-                    <p className="text">Onko kuvassa kalusteesi?</p>
+          <p className="text">Onko kuvassa kalusteesi?</p>
 
                     <img src={image} alt='Taken Image' />
 
                     <div className="button-container">
-                        <button className="button" onClick={handleImageUpload}>
-                            KYLLÄ
-                        </button>
-                        <button className="button" onClick={() => setImage(null)}>EI</button>
+                        <button className="button">KYLLÄ</button>
+                        <Button
+                    className="button"
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setImage(null)}
+                    >
+              EI
+            </Button>
                     </div>
                 </div>
             )}
         </div>
     );
-};
+}
 
 export default ImageUploadPage;

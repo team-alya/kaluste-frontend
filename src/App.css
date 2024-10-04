@@ -1,0 +1,27 @@
+
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Ensure items are spread between left and right */
+  align-items: center;
+  padding: 1rem;
+}
+
+.nav-item {
+  margin: 0 1rem;
+}
+
+.nav-link {
+  text-decoration: underline;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color:rgb(0, 204, 255);
+}
+
+.nav-link:hover {
+  color: cadetblue;
+  text-decoration: underline;
+}
+
+.toggle {
+  margin-left: auto; /* This will push the button to the right side */
+}
