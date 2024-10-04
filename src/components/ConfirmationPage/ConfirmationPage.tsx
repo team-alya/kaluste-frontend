@@ -9,14 +9,18 @@ import {
   Typography,
 } from "@mui/material";
 import "./ConfirmationPage.css";
+import { useLocation } from "react-router-dom";
 
 function FurniConfirmPage() {
-  const [furnitureModel, setFurnitureModel] = useState<string>("");
-  const [condition, setCondition] = useState<string>("");
-  const [measures, setMeasures] = useState<string>("");
-  const [materials, setMaterials] = useState<string>("");
-  const [color, setColor] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const location = useLocation();
+  const {furnitureResult} = location.state || {furnitureResult: null};
+
+  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.model || "");
+  const [condition, setCondition] = useState(furnitureResult?.condition || "");
+  const [measures, setMeasures] = useState(`${furnitureResult?.dimensions?.length}x${furnitureResult?.dimensions?.height}x${furnitureResult?.dimensions?.width}` || "");
+  const [materials, setMaterials] = useState(furnitureResult?.type || "");
+  const [color, setColor] = useState(furnitureResult?.color || "");
+  const [description, setDescription] = useState("");
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,6 +63,7 @@ function FurniConfirmPage() {
           {/* Model Input */}
           <TextField
             name="furnitureModel"
+            value={furnitureModel}
             onChange={(e) => setFurnitureModel(e.target.value)}
             margin="normal"
             size="small"
@@ -106,6 +111,7 @@ function FurniConfirmPage() {
           {/* Measures Input */}
           <TextField
             name="measures"
+            value={measures}
             onChange={(e) => setMeasures(e.target.value)}
             margin="normal"
             size="small"
@@ -124,6 +130,7 @@ function FurniConfirmPage() {
           {/* Materials Input */}
           <TextField
             name="materials"
+            value={materials}
             onChange={(e) => setMaterials(e.target.value)}
             margin="normal"
             size="small"
@@ -142,6 +149,7 @@ function FurniConfirmPage() {
           {/* Color Input */}
           <TextField
             name="color"
+            value={color}
             onChange={(e) => setColor(e.target.value)}
             margin="normal"
             size="small"
@@ -160,6 +168,7 @@ function FurniConfirmPage() {
           {/* Description Input */}
           <TextField
             name="description"
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
             margin="normal"
             size="small"

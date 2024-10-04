@@ -12,18 +12,20 @@ const ImageUploadPage = () => {
     const [imageBlob, setImageBlob] = useState(null);  // Store the Blob or File for upload
     const [takeImage, setTakeImage] = useState(false); //For opening the camera
     const [furnitureResult, setFurnitureResult] = useState({
-        age: 0,
-        brand: "",
-        color: "",
-        condition: "",
+        age: 1,
+        brand: "testi",
+        color: "punainen",
+        condition: "good",
         dimensions: {
-            height: 0,
-            length: 0,
-            width: 0
+            height: 1,
+            length: 2,
+            width: 3
         },
-        model: "",
-        type: ""
+        model: "malli",
+        type: "tyyppi"
     })
+
+    const navigate = useNavigate();
 
     // Convert Base64 to Blob for camera images
     // Since the react-camera-pro transforms images automatically to base64
@@ -58,27 +60,29 @@ const ImageUploadPage = () => {
             console.log('No image Blob found for upload');
             return;
         }
-
+    
         try {
             const formData = new FormData();
             formData.append('image', imageBlob);
-
+    
             const response = await fetch('http://localhost:3000/api/image', {
                 method: 'POST',
                 body: formData,
             });
-
+    
             if (!response.ok) {
                 console.error('Failed to upload camera image. Status:', response.status);
             } else {
                 const result = await response.json();
                 console.log('Camera image uploaded successfully!', result);
-                setFurnitureResult(result.result)
+                navigate("/confirmation", { state: { furnitureResult: furnitureResult } });
             }
         } catch (error) {
             console.error('Error uploading camera image:', error);
+            navigate("/confirmation", { state: { furnitureResult: furnitureResult } });
         }
     };
+    
 
     useEffect(() => {
         console.log('Updated furniture result:', furnitureResult);
@@ -125,32 +129,32 @@ const ImageUploadPage = () => {
                 GALLERIA
               </Button>
 
-                            <input
-                                type="file"
-                                id="file-input"
-                                className="file-input"
-                                ref={fileInputRef}
-                                onChange={handleChange}
-                                style={{ display: 'none' }}
-                            />
-                        </div>
+                <input
+                    type="file"
+                    id="file-input"
+                    className="file-input"
+                    ref={fileInputRef}
+                    onChange={handleChange}
+                    style={{ display: 'none' }}
+                />
+            </div>
                     ) : (
-                        <>
-                            <Button 
-                                className='button' 
-                                variant="contained"
-                                color="primary"
-                                onClick={() => {
-                                    const capturedImage = camera.current.takePhoto();
-                                    console.log('Captured Image (Base64):', capturedImage);  // Log Base64
-    
-                                    const blob = base64ToBlob(capturedImage);  // Convert Base64 to Blob
-                                    setImageBlob(blob);  // Store Blob for upload
-                                    setImage(capturedImage);  // Set Base64 image for display
-                                    setTakeImage(false);
-                            }}>
-                                Ota kuva
-                            </Button>
+                    <>
+                    <Button 
+                        className='button' 
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            const capturedImage = camera.current.takePhoto();
+                            console.log('Captured Image (Base64):', capturedImage);  // Log Base64
+
+                            const blob = base64ToBlob(capturedImage);  // Convert Base64 to Blob
+                            setImageBlob(blob);  // Store Blob for upload
+                            setImage(capturedImage);  // Set Base64 image for display
+                            setTakeImage(false);
+                    }}>
+                        Ota kuva
+                    </Button>
 
               <Button
                 className="button"
@@ -186,15 +190,22 @@ const ImageUploadPage = () => {
                     <img src={image} alt='Taken Image' />
 
                     <div className="button-container">
-                        <button className="button">KYLLÄ</button>
+                        <Button 
+                            className="button"
+                            variant="contained"
+                            color="primary"
+                            onClick={handleImageUpload}
+                        >
+                        KYLLÄ
+                        </Button>
                         <Button
-                    className="button"
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setImage(null)}
-                    >
-              EI
-            </Button>
+                            className="button"
+                            variant="contained"
+                            color="primary"
+                            onClick={() => setImage(null)}
+                        >
+                        EI
+                        </Button>
                     </div>
                 </div>
             )}
