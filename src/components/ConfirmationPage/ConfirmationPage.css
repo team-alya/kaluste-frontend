@@ -17,10 +17,23 @@
     width: 300px;
 }
 
-.submitButtonBox {
+.submitChatButtonsStack {
     margin: 30px;
+    justify-content: center;
+    align-items: center;
 }
 
-.submitButton {
+.submitChatButtons {
     width: 150px;
+    height: 50px;
+}
+
+.submitRetryButtonStack  {
+    justify-content: center;
+    align-items: center;
+}
+
+.submitRetryButton {
+    width: 300px;
+    height: 50px;
 }

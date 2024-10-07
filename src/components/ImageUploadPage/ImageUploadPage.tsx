@@ -46,6 +46,7 @@ const ImageUploadPage = () => {
     fileInputRef.current.click();
   }
 
+
     // Handle file input change
     function handleChange(e) {
         const file = e.target.files[0];
@@ -95,12 +96,28 @@ const ImageUploadPage = () => {
       {!image ? (
         <>
           <h1 className="h1">Lataa kuva</h1>
+  return (
+    <div className="container">
+      {!image ? (
+        <>
+          <h1 className="h1">Lataa kuva</h1>
 
           <p className="text">
             Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
             kuvassa.
           </p>
+          <p className="text">
+            Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
+            kuvassa.
+          </p>
 
+          {!takeImage && (
+            <img
+              src={stockchair}
+              className="stock-image"
+              alt="stock-photo-chair"
+            />
+          )}
           {!takeImage && (
             <img
               src={stockchair}
@@ -184,7 +201,27 @@ const ImageUploadPage = () => {
       ) : (
         <div className="image-container">
           <h1 className="h1">Kalusteen tunnistus</h1>
+              <div className="camera-container">
+                <Camera
+                  ref={camera}
+                  facingMode="environment"
+                  aspectRatio={4 / 3}
+                  errorMessages={{
+                    noCameraAccessible: undefined,
+                    permissionDenied: undefined,
+                    switchCamera: undefined,
+                    canvas: undefined,
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <div className="image-container">
+          <h1 className="h1">Kalusteen tunnistus</h1>
 
+          <p className="text">Onko kuvassa kalusteesi?</p>
           <p className="text">Onko kuvassa kalusteesi?</p>
 
                     <img src={image} alt='Taken Image' />
