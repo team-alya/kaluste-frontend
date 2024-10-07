@@ -6,118 +6,96 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
 const ImageUploadPage = () => {
-    const camera = useRef(null);
-    const fileInputRef = useRef(null);
-    const [image, setImage] = useState(null); // For displaying the image
-    const [imageBlob, setImageBlob] = useState(null);  // Store the Blob or File for upload
-    const [takeImage, setTakeImage] = useState(false); //For opening the camera
-    const [furnitureResult, setFurnitureResult] = useState({
-        age: 0 ,
-        brand: "",
-        color: "",
-        condition: "",
-        dimensions: {
-            height: 0,
-            length: 0,
-            width: 0
-        },
-        model: "",
-        type: ""
-    })
+  const camera = useRef(null);
+  const fileInputRef = useRef(null);
+  const [image, setImage] = useState(null); // For displaying the image
+  const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
+  const [takeImage, setTakeImage] = useState(false); // For opening the camera
+  const [furnitureResult, setFurnitureResult] = useState({
+    age: 0,
+    brand: "",
+    color: "",
+    condition: "",
+    dimensions: {
+      height: 0,
+      length: 0,
+      width: 0,
+    },
+    model: "",
+    type: "",
+  });
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    // Convert Base64 to Blob for camera images
-    // Since the react-camera-pro transforms images automatically to base64
-    // And the backend expects an image
-    const base64ToBlob = (base64) => {
-        const byteString = atob(base64.split(',')[1]);
-        const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
-        const byteArray = new Uint8Array(byteString.length);
+  // Convert Base64 to Blob for camera images
+  const base64ToBlob = (base64) => {
+    const byteString = atob(base64.split(",")[1]);
+    const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
+    const byteArray = new Uint8Array(byteString.length);
 
-        for (let i = 0; i < byteString.length; i++) {
-            byteArray[i] = byteString.charCodeAt(i);
-        }
-
-        return new Blob([byteArray], { type: mimeString });
-    };
-
-  function handleFileInputClick() {
-    fileInputRef.current.click();
-  }
-
-
-    // Handle file input change
-    function handleChange(e) {
-        const file = e.target.files[0];
-        setImage(URL.createObjectURL(file));  // For displaying the image
-        setImageBlob(file);  // Store the File object for upload
+    for (let i = 0; i < byteString.length; i++) {
+      byteArray[i] = byteString.charCodeAt(i);
     }
 
-    // Handle upload for images
-    const handleImageUpload = async () => {
-        console.log('Camera image upload triggered');
-        if (!imageBlob) {
-            console.log('No image Blob found for upload');
-            return;
-        }
-    
-        try {
-            const formData = new FormData();
-            formData.append('image', imageBlob);
-    
-            const response = await fetch('http://localhost:3000/api/image', {
-                method: 'POST',
-                body: formData,
-            });
-    
-            if (!response.ok) {
-                console.error('Failed to upload camera image. Status:', response.status);
-            } else {
-                const result = await response.json();
-                console.log('Camera image uploaded successfully!', result);
-                navigate("/confirmation", { state: { furnitureResult: result.result } });
-            }
-        } catch (error) {
-            console.error('Error uploading camera image:', error);
-            navigate("/confirmation", { state: { furnitureResult: furnitureResult } });
-        }
-    };
-    
+    return new Blob([byteArray], { type: mimeString });
+  };
 
-    useEffect(() => {
-        console.log('Updated furniture result:', furnitureResult);
-        console.log('Furniture color:', furnitureResult.color);
-    }, [furnitureResult]);
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
 
+  // Handle file input change
+  const handleChange = (e) => {
+    const file = e.target.files[0];
+    setImage(URL.createObjectURL(file)); // For displaying the image
+    setImageBlob(file); // Store the File object for upload
+  };
+
+  // Handle upload for images
+  const handleImageUpload = async () => {
+    console.log("Camera image upload triggered");
+    if (!imageBlob) {
+      console.log("No image Blob found for upload");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("image", imageBlob);
+
+      const response = await fetch("http://localhost:3000/api/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        console.error("Failed to upload camera image. Status:", response.status);
+      } else {
+        const result = await response.json();
+        console.log("Camera image uploaded successfully!", result);
+        navigate("/confirmation", { state: { furnitureResult: result.result } });
+      }
+    } catch (error) {
+      console.error("Error uploading camera image:", error);
+      navigate("/confirmation", { state: { furnitureResult } });
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated furniture result:", furnitureResult);
+    console.log("Furniture color:", furnitureResult.color);
+  }, [furnitureResult]);
 
   return (
     <div className="container">
       {!image ? (
         <>
           <h1 className="h1">Lataa kuva</h1>
-  return (
-    <div className="container">
-      {!image ? (
-        <>
-          <h1 className="h1">Lataa kuva</h1>
-
-          <p className="text">
-            Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
-            kuvassa.
-          </p>
           <p className="text">
             Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
             kuvassa.
           </p>
 
-          {!takeImage && (
-            <img
-              src={stockchair}
-              className="stock-image"
-              alt="stock-photo-chair"
-            />
-          )}
           {!takeImage && (
             <img
               src={stockchair}
@@ -146,32 +124,33 @@ const ImageUploadPage = () => {
                 GALLERIA
               </Button>
 
-                <input
-                    type="file"
-                    id="file-input"
-                    className="file-input"
-                    ref={fileInputRef}
-                    onChange={handleChange}
-                    style={{ display: 'none' }}
-                />
+              <input
+                type="file"
+                id="file-input"
+                className="file-input"
+                ref={fileInputRef}
+                onChange={handleChange}
+                style={{ display: "none" }}
+              />
             </div>
-                    ) : (
-                    <>
-                    <Button 
-                        className='button' 
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            const capturedImage = camera.current.takePhoto();
-                            console.log('Captured Image (Base64):', capturedImage);  // Log Base64
+          ) : (
+            <>
+              <Button
+                className="button"
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  const capturedImage = camera.current.takePhoto();
+                  console.log("Captured Image (Base64):", capturedImage); // Log Base64
 
-                            const blob = base64ToBlob(capturedImage);  // Convert Base64 to Blob
-                            setImageBlob(blob);  // Store Blob for upload
-                            setImage(capturedImage);  // Set Base64 image for display
-                            setTakeImage(false);
-                    }}>
-                        Ota kuva
-                    </Button>
+                  const blob = base64ToBlob(capturedImage); // Convert Base64 to Blob
+                  setImageBlob(blob); // Store Blob for upload
+                  setImage(capturedImage); // Set Base64 image for display
+                  setTakeImage(false);
+                }}
+              >
+                Ota kuva
+              </Button>
 
               <Button
                 className="button"
@@ -201,53 +180,33 @@ const ImageUploadPage = () => {
       ) : (
         <div className="image-container">
           <h1 className="h1">Kalusteen tunnistus</h1>
-              <div className="camera-container">
-                <Camera
-                  ref={camera}
-                  facingMode="environment"
-                  aspectRatio={4 / 3}
-                  errorMessages={{
-                    noCameraAccessible: undefined,
-                    permissionDenied: undefined,
-                    switchCamera: undefined,
-                    canvas: undefined,
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </>
-      ) : (
-        <div className="image-container">
-          <h1 className="h1">Kalusteen tunnistus</h1>
 
           <p className="text">Onko kuvassa kalusteesi?</p>
-          <p className="text">Onko kuvassa kalusteesi?</p>
 
-                    <img src={image} alt='Taken Image' />
+          <img src={image} alt="Taken Image" />
 
-                    <div className="button-container">
-                        <Button 
-                            className="button"
-                            variant="contained"
-                            color="primary"
-                            onClick={handleImageUpload}
-                        >
-                        KYLLÄ
-                        </Button>
-                        <Button
-                            className="button"
-                            variant="contained"
-                            color="primary"
-                            onClick={() => setImage(null)}
-                        >
-                        EI
-                        </Button>
-                    </div>
-                </div>
-            )}
+          <div className="button-container">
+            <Button
+              className="button"
+              variant="contained"
+              color="primary"
+              onClick={handleImageUpload}
+            >
+              KYLLÄ
+            </Button>
+            <Button
+              className="button"
+              variant="contained"
+              color="primary"
+              onClick={() => setImage(null)}
+            >
+              EI
+            </Button>
+          </div>
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
 
 export default ImageUploadPage;
