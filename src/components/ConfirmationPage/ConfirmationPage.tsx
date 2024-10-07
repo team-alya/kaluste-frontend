@@ -5,6 +5,7 @@ import {
   FormControl,
   MenuItem,
   Select,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -168,12 +169,33 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Submit Button Box */}
-      <Box className="submitButtonBox">
-        <Button type="submit" variant="contained" className="submitButton">
-          Hyväksy
+      {/* Chat Submit Buttons with directory to Chat Pages */}
+      <Stack
+        direction="row"
+        spacing={{ xs: 1, sm: 2 }}
+        useFlexGap
+        sx={{ flexWrap: "wrap" }}
+        className="submitChatButtonsStack"
+      >
+        <Button type="submit" variant="contained" className="submitChatButtons">
+          Myynti
         </Button>
-      </Box>
+        <Button type="submit" variant="contained" className="submitChatButtons">
+          Lahjoitus
+        </Button>
+        <Button type="submit" variant="contained" className="submitChatButtons">
+          Kierrätys
+        </Button>
+        <Button type="submit" variant="contained" className="submitChatButtons">
+          Kunnostus
+        </Button>
+      </Stack>
+
+      <Stack className="submitRetryButtonStack">
+        <Button type="submit" variant="contained" className="submitRetryButton">
+          Uudestaan
+        </Button>
+      </Stack>
     </Box>
   );
 }
