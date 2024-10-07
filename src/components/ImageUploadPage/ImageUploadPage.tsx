@@ -12,17 +12,17 @@ const ImageUploadPage = () => {
     const [imageBlob, setImageBlob] = useState(null);  // Store the Blob or File for upload
     const [takeImage, setTakeImage] = useState(false); //For opening the camera
     const [furnitureResult, setFurnitureResult] = useState({
-        age: 1,
-        brand: "testi",
-        color: "punainen",
-        condition: "good",
+        age: 0 ,
+        brand: "",
+        color: "",
+        condition: "",
         dimensions: {
-            height: 1,
-            length: 2,
-            width: 3
+            height: 0,
+            length: 0,
+            width: 0
         },
-        model: "malli",
-        type: "tyyppi"
+        model: "",
+        type: ""
     })
 
     const navigate = useNavigate();
@@ -75,7 +75,7 @@ const ImageUploadPage = () => {
             } else {
                 const result = await response.json();
                 console.log('Camera image uploaded successfully!', result);
-                navigate("/confirmation", { state: { furnitureResult: furnitureResult } });
+                navigate("/confirmation", { state: { furnitureResult: result.result } });
             }
         } catch (error) {
             console.error('Error uploading camera image:', error);

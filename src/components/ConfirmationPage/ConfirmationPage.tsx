@@ -92,11 +92,11 @@ function FurniConfirmPage() {
               Valitse kunto
             </MenuItem>
             {/* Condtion Selection Variations */}
-            <MenuItem value="excellent">Erinomainen</MenuItem>
-            <MenuItem value="good">Hyvä</MenuItem>
-            <MenuItem value="fair">Kohtalainen</MenuItem>
-            <MenuItem value="poor">Huono</MenuItem>
-            <MenuItem value="unknown">Tuntematon</MenuItem>
+            <MenuItem value="Excellent">Erinomainen</MenuItem>
+            <MenuItem value="Good">Hyvä</MenuItem>
+            <MenuItem value="Fair">Kohtalainen</MenuItem>
+            <MenuItem value="Poor">Huono</MenuItem>
+            <MenuItem value="Unknown">Tuntematon</MenuItem>
           </Select>
         </FormControl>
       </Box>
