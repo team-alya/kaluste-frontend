@@ -16,11 +16,11 @@ function FurniConfirmPage() {
   const location = useLocation();
   const {furnitureResult} = location.state || {furnitureResult: null};
 
-  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.model || "");
-  const [condition, setCondition] = useState(furnitureResult?.condition || "");
-  const [measures, setMeasures] = useState(`${furnitureResult?.dimensions?.length}x${furnitureResult?.dimensions?.height}x${furnitureResult?.dimensions?.width}` || "");
-  const [materials, setMaterials] = useState(furnitureResult?.type || "");
-  const [color, setColor] = useState(furnitureResult?.color || "");
+  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.malli || "");
+  const [condition, setCondition] = useState(furnitureResult?.kunto || "");
+  const [measures, setMeasures] = useState(`${furnitureResult?.mitat?.pituus}x${furnitureResult?.mitat?.korkeus}x${furnitureResult?.mitat?.leveys}` || "");
+  const [materials, setMaterials] = useState(furnitureResult?.materiaalit || "");
+  const [color, setColor] = useState(furnitureResult?.väri || "");
   const [description, setDescription] = useState("");
 
   // Handle form submission
@@ -93,11 +93,11 @@ function FurniConfirmPage() {
               Valitse kunto
             </MenuItem>
             {/* Condtion Selection Variations */}
-            <MenuItem value="Excellent">Erinomainen</MenuItem>
-            <MenuItem value="Good">Hyvä</MenuItem>
-            <MenuItem value="Fair">Kohtalainen</MenuItem>
-            <MenuItem value="Poor">Huono</MenuItem>
-            <MenuItem value="Unknown">Tuntematon</MenuItem>
+            <MenuItem value="Erinomainen">Erinomainen</MenuItem>
+            <MenuItem value="Hyvä">Hyvä</MenuItem>
+            <MenuItem value="Kohtalainen">Kohtalainen</MenuItem>
+            <MenuItem value="Huono">Huono</MenuItem>
+            <MenuItem value="Tuntematon">Tuntematon</MenuItem>
           </Select>
         </FormControl>
       </Box>

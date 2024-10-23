@@ -12,17 +12,16 @@ const ImageUploadPage = () => {
   const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
   const [takeImage, setTakeImage] = useState(false); // For opening the camera
   const [furnitureResult, setFurnitureResult] = useState({
-    age: 0,
-    brand: "",
-    color: "",
-    condition: "",
-    dimensions: {
-      height: 0,
-      length: 0,
-      width: 0,
+    merkki: "",
+    väri: "",
+    kunto: "",
+    mitat: {
+      pituus: 0,
+      korkeus: 0,
+      leveys: 0,
     },
-    model: "",
-    type: "",
+    malli: "",
+    materiaalit: []
   });
 
   const navigate = useNavigate();
@@ -36,7 +35,7 @@ const ImageUploadPage = () => {
     for (let i = 0; i < byteString.length; i++) {
       byteArray[i] = byteString.charCodeAt(i);
     }
-
+    console.log("Blob for upload:", imageBlob);
     return new Blob([byteArray], { type: mimeString });
   };
 
@@ -73,7 +72,8 @@ const ImageUploadPage = () => {
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
-        navigate("/confirmation", { state: { furnitureResult: result.result } });
+        setFurnitureResult(result.result.gemini);
+        navigate("/confirmation", { state: { furnitureResult: result.result.gemini } });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
@@ -83,7 +83,7 @@ const ImageUploadPage = () => {
 
   useEffect(() => {
     console.log("Updated furniture result:", furnitureResult);
-    console.log("Furniture color:", furnitureResult.color);
+    console.log("Furniture color:", furnitureResult.väri);
   }, [furnitureResult]);
 
   return (
