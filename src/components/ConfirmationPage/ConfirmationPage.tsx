@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import "./ConfirmationPage.css";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
@@ -22,6 +23,8 @@ function FurniConfirmPage() {
   const [materials, setMaterials] = useState(furnitureResult?.materiaalit || "");
   const [color, setColor] = useState(furnitureResult?.väri || "");
   const [description, setDescription] = useState("");
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -178,33 +181,14 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Chat Submit Buttons with directory to Chat Pages */}
-      <Stack
-        direction="row"
-        spacing={{ xs: 1, sm: 2 }}
-        useFlexGap
-        sx={{ flexWrap: "wrap" }}
-        className="submitChatButtonsStack"
-      >
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Myynti
+        <Button 
+          type="submit"
+          variant="contained" 
+          className="submitRetryButton"
+          onClick={() => navigate("/chatbotpage")}
+          >
+          Hyväksy
         </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Lahjoitus
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kierrätys
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kunnostus
-        </Button>
-      </Stack>
-
-      <Stack className="submitRetryButtonStack">
-        <Button type="submit" variant="contained" className="submitRetryButton">
-          Uudestaan
-        </Button>
-      </Stack>
     </Box>
   );
 }

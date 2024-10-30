@@ -62,7 +62,7 @@ const ImageUploadPage = () => {
       const formData = new FormData();
       formData.append("image", imageBlob);
 
-      const response = await fetch("https://3778-2001-14ba-a0d3-e000-ccb3-1707-a92b-8f15.ngrok-free.app/api/image", {
+      const response = await fetch("http://localhost:3000/api/image", {
         method: "POST",
         body: formData,
       });
