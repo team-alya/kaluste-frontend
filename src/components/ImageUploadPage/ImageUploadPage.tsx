@@ -60,6 +60,7 @@ const ImageUploadPage = () => {
 
     try {
       const formData = new FormData();
+      console.log(imageBlob)
       formData.append("image", imageBlob);
 
       const response = await fetch("http://localhost:3000/api/image", {
@@ -73,18 +74,13 @@ const ImageUploadPage = () => {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
         setFurnitureResult(result.result.gemini);
-        navigate("/confirmation", { state: { furnitureResult: result.result.gemini } });
+        navigate("/confirmation", { state: { furnitureResult: result.result.gemini, imageBlob } });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
       navigate("/confirmation", { state: { furnitureResult } });
     }
   };
-
-  useEffect(() => {
-    console.log("Updated furniture result:", furnitureResult);
-    console.log("Furniture color:", furnitureResult.väri);
-  }, [furnitureResult]);
 
   return (
     <div className="container">

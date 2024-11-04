@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { Tabs, Tab, Typography, Box, Button, Stack } from '@mui/material';
+import React, { useState } from "react";
+import { Tabs, Tab, Typography, Box, Button, Stack } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const location = useLocation();
+  const { furnitureResult, priceAnalysis } = location.state || { furnitureResult: null, priceAnalysis: null };
 
-  // Chatbot messages for each tab
+  // Chatbot messages with dynamic price information
   const messages = {
     Myynti: [
-      "Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti 50-100 euroa.",
-      "Suosittelen seuraavia myyntikanavia: Tori, Mjuk",
+      `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
+      `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
       "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?"
     ],
     Lahjoitus: [
@@ -26,6 +29,7 @@ const ChatbotPage = () => {
       "Voit kunnostaa itse tai hyödyntää paikallisia kunnostuspalveluja.",
       "Tarvitsetko vinkkejä kunnostamiseen tai kunnostuspalvelujen löytämiseen?"
     ],
+    // Other tabs (Lahjoitus, Kierrätys, Kunnostus)...
   };
 
   // Handle tab change
@@ -37,14 +41,14 @@ const ChatbotPage = () => {
   const renderMessages = () => {
     const currentTab = Object.keys(messages)[selectedTab];
     return messages[currentTab].map((message, index) => (
-      <Typography key={index} variant="body1" style={{ marginBottom: '10px' }}>
+      <Typography key={index} variant="body1" style={{ marginBottom: "10px" }}>
         {message}
       </Typography>
     ));
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, margin: 'auto', textAlign: 'center' }}>
+    <Box sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}>
       <Typography variant="h6" gutterBottom>
         KalusteArvioBotti
       </Typography>
@@ -58,9 +62,7 @@ const ChatbotPage = () => {
       </Tabs>
 
       {/* Chatbot Messages */}
-      <Box sx={{ padding: '20px', textAlign: 'left' }}>
-        {renderMessages()}
-      </Box>
+      <Box sx={{ padding: "20px", textAlign: "left" }}>{renderMessages()}</Box>
 
       {/* Buttons */}
       <Stack direction="row" spacing={2} justifyContent="center">
