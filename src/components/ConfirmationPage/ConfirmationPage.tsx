@@ -11,17 +11,20 @@ import {
 } from "@mui/material";
 import "./ConfirmationPage.css";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
   const {furnitureResult} = location.state || {furnitureResult: null};
 
-  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.model || "");
-  const [condition, setCondition] = useState(furnitureResult?.condition || "");
-  const [measures, setMeasures] = useState(`${furnitureResult?.dimensions?.length}x${furnitureResult?.dimensions?.height}x${furnitureResult?.dimensions?.width}` || "");
-  const [materials, setMaterials] = useState(furnitureResult?.type || "");
-  const [color, setColor] = useState(furnitureResult?.color || "");
+  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.malli || "");
+  const [condition, setCondition] = useState(furnitureResult?.kunto || "");
+  const [measures, setMeasures] = useState(`${furnitureResult?.mitat?.pituus}x${furnitureResult?.mitat?.korkeus}x${furnitureResult?.mitat?.leveys}` || "");
+  const [materials, setMaterials] = useState(furnitureResult?.materiaalit || "");
+  const [color, setColor] = useState(furnitureResult?.väri || "");
   const [description, setDescription] = useState("");
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -93,11 +96,11 @@ function FurniConfirmPage() {
               Valitse kunto
             </MenuItem>
             {/* Condtion Selection Variations */}
-            <MenuItem value="Excellent">Erinomainen</MenuItem>
-            <MenuItem value="Good">Hyvä</MenuItem>
-            <MenuItem value="Fair">Kohtalainen</MenuItem>
-            <MenuItem value="Poor">Huono</MenuItem>
-            <MenuItem value="Unknown">Tuntematon</MenuItem>
+            <MenuItem value="Erinomainen">Erinomainen</MenuItem>
+            <MenuItem value="Hyvä">Hyvä</MenuItem>
+            <MenuItem value="Kohtalainen">Kohtalainen</MenuItem>
+            <MenuItem value="Huono">Huono</MenuItem>
+            <MenuItem value="Tuntematon">Tuntematon</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -178,33 +181,14 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Chat Submit Buttons with directory to Chat Pages */}
-      <Stack
-        direction="row"
-        spacing={{ xs: 1, sm: 2 }}
-        useFlexGap
-        sx={{ flexWrap: "wrap" }}
-        className="submitChatButtonsStack"
-      >
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Myynti
+        <Button 
+          type="submit"
+          variant="contained" 
+          className="submitRetryButton"
+          onClick={() => navigate("/chatbotpage")}
+          >
+          Hyväksy
         </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Lahjoitus
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kierrätys
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kunnostus
-        </Button>
-      </Stack>
-
-      <Stack className="submitRetryButtonStack">
-        <Button type="submit" variant="contained" className="submitRetryButton">
-          Uudestaan
-        </Button>
-      </Stack>
     </Box>
   );
 }

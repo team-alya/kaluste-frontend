@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-.navbar {
-  display: flex;
-  justify-content: space-between; /* Ensure items are spread between left and right */
-  align-items: center;
-  padding: 1rem;
-}
-
-=======
 
 .navbar {
   display: flex;
@@ -15,7 +6,6 @@
   padding: 1rem;
 }
 
->>>>>>> c67b38d615e0aedd4d74048cb57518495aa03d0b
 .nav-item {
   margin: 0 1rem;
 }
