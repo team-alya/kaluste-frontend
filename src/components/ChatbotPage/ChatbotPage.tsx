@@ -44,7 +44,7 @@ const ChatbotPage = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 400, margin: 'auto', textAlign: 'center' }}>
+    <Box sx={{ width: '100%', maxWidth: 500, margin: 'auto', textAlign: 'center' }}>
       <Typography variant="h6" gutterBottom>
         KalusteArvioBotti
       </Typography>
