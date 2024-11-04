@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ThemeProvider, createTheme, Theme } from "@mui/material/styles";
 import { CssBaseline, FormControlLabel, Box, Switch } from "@mui/material";
 import { Link, Route, Routes } from "react-router-dom";
