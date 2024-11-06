@@ -9,7 +9,6 @@ import ChatbotPage from "./components/ChatbotPage/ChatbotPage";
 import { themeOptions, newThemeOptions } from "./theme";
 
 import "./App.css"; // Custom styles for navigation bar
-import PriceChat from "./components/ChatbotPage/PriceChat/PriceChat";
 
 function App() {
   const [darkMode, setDarkMode] = useState(true); // State to manage theme mode
@@ -60,7 +59,7 @@ function App() {
         {/* Routes */}
         <div>
           <Routes>
-            <Route path="/" element={<PriceChat />} />
+            <Route path="/" element={<WelcomePage />} />
             <Route path="/upload" element={<ImageUploadPage />} />
             <Route path="/confirmation" element={<FurniConfirmPage />} />
             <Route path="/chatbotpage" element={<ChatbotPage />} />
