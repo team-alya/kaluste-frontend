@@ -12,7 +12,7 @@ const ChatbotPage = () => {
     Myynti: [
       `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
       `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
-      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?"
+      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
     ],
     Lahjoitus: [
       "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa."
@@ -41,7 +41,9 @@ const ChatbotPage = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}>
+    <Box
+      sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}
+    >
       <Typography variant="h6" gutterBottom>
         KalusteArvioBotti
       </Typography>

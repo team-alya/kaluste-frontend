@@ -13,7 +13,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
-  const { furnitureResult, imageBlob } = location.state || { furnitureResult: null, imageBlob: null };
+  const { furnitureResult, imageBlob } = location.state || {
+    furnitureResult: null,
+    imageBlob: null,
+  };
 
   // Initialize furnitureDetails state object
   const [furnitureDetails, setFurnitureDetails] = useState({
@@ -120,7 +123,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleInputChange("merkki", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -136,7 +139,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleInputChange("malli", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -151,7 +154,7 @@ const handleSubmit = async (e) => {
             value={furnitureDetails.kunto}
             onChange={(e) => handleInputChange("kunto", e.target.value)}
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           >
             <MenuItem value="" disabled>
               Valitse kunto
@@ -177,7 +180,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleMitatChange("pituus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="korkeus"
@@ -186,7 +189,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleMitatChange("korkeus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="leveys"
@@ -195,7 +198,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleMitatChange("leveys", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -211,7 +214,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleInputChange("materiaalit", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -227,7 +230,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleInputChange("väri", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -243,7 +246,7 @@ const handleSubmit = async (e) => {
             onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
