@@ -5,6 +5,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
 import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
+import ChatbotPage from "./components/ChatbotPage/ChatbotPage";
 import { themeOptions, newThemeOptions } from "./theme";
 
 import "./App.css"; // Custom styles for navigation bar
@@ -39,6 +40,11 @@ function App() {
               Confirmation
             </Link>
           </div>
+          <div className="nav-item">
+            <Link to="/chatbotpage" className="nav-link">
+              Chatbot
+            </Link>
+          </div>
           <div className="toggle">
             {/* Switch to toggle theme */}
             <Box textAlign="center" margin={2}>
@@ -56,6 +62,7 @@ function App() {
             <Route path="/" element={<WelcomePage />} />
             <Route path="/upload" element={<ImageUploadPage />} />
             <Route path="/confirmation" element={<FurniConfirmPage />} />
+            <Route path="/chatbotpage" element={<ChatbotPage />} />
           </Routes>
         </div>
       </div>
