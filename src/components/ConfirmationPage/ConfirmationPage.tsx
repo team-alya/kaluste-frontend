@@ -17,16 +17,17 @@ function FurniConfirmPage() {
 
   // Initialize furnitureDetails state object
   const [furnitureDetails, setFurnitureDetails] = useState({
+    id: furnitureResult?.id || "",
     merkki: furnitureResult?.merkki || "",
-    kunto: furnitureResult?.kunto || "",
     malli: furnitureResult?.malli || "",
+    väri: furnitureResult?.väri || "",
     mitat: {
       pituus: furnitureResult?.mitat?.pituus || "",
       korkeus: furnitureResult?.mitat?.korkeus || "",
       leveys: furnitureResult?.mitat?.leveys || "",
     },
     materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
-    väri: furnitureResult?.väri || ""
+    kunto: furnitureResult?.kunto || ""
   });
 
   const navigate = useNavigate();
@@ -51,67 +52,47 @@ function FurniConfirmPage() {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    try {
-      const formData = new FormData();
-  
-      // Convert furnitureDetails to JSON and add to formData
-      const furnitureDetailsPayload = {
-        ...furnitureDetails,
-        mitat: {
-          pituus: Number(furnitureDetails.mitat.pituus),
-          korkeus: Number(furnitureDetails.mitat.korkeus),
-          leveys: Number(furnitureDetails.mitat.leveys)
-        },
-        materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
-      };
-      formData.append("furnitureDetails", JSON.stringify(furnitureDetailsPayload));
-  
-      if (imageBlob) {
-        formData.append("image", imageBlob);
-      }
-  
-      console.log("furnitureDetails:", formData.get("furnitureDetails"));
-      console.log("image:", formData.get("image"));
-  
-      // First API Call: Price Estimate
-      const priceResponse = await fetch("http://localhost:3000/api/price", {
-        method: "POST",
-        body: formData,
-      });
-  
-      let priceData;
-      if (priceResponse.ok) {
-        priceData = await priceResponse.json();
-        console.log("Price analysis:", priceData);
-      } else {
-        console.error("Failed to fetch price analysis. Status:", priceResponse.status);
-      }
-  
-      // Second API Call: Repair Estimate
-      const repairResponse = await fetch("http://localhost:3000/api/repair", {
-        method: "POST",
-        body: formData,
-      });
-  
-      let repairData;
-      if (repairResponse.ok) {
-        repairData = await repairResponse.json();
-        console.log("Repair analysis:", repairData);
-      } else {
-        console.error("Failed to fetch repair analysis. Status:", repairResponse.status);
-      }
-  
-      // Navigate with the results if both calls are successful
-      if (priceData && repairData) {
-        navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData, repairAnalysis: repairData } });
-      }
-    } catch (error) {
-      console.error("Error during form submission:", error);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // Create furnitureDetails payload in the expected format
+    const furnitureDetailsPayload = {
+      id: furnitureDetails.id,
+      merkki: furnitureDetails.merkki,
+      malli: furnitureDetails.malli,
+      väri: furnitureDetails.väri,
+      mitat: {
+        pituus: Number(furnitureDetails.mitat.pituus),
+        leveys: Number(furnitureDetails.mitat.leveys),
+        korkeus: Number(furnitureDetails.mitat.korkeus),
+      },
+      materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
+      kunto: furnitureDetails.kunto,
+    };
+
+    // Make POST request with JSON body
+    const priceResponse = await fetch("http://localhost:3000/api/price", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
+    });
+
+    if (priceResponse.ok) {
+      const priceData = await priceResponse.json();
+      console.log("Price analysis:", priceData);
+      navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData } });
+    } else {
+      console.error("Failed to fetch price analysis. Status:", priceResponse.status);
     }
-  };
+  } catch (error) {
+    console.error("Error during form submission:", error);
+  }
+};
+
+
 
   return (
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
