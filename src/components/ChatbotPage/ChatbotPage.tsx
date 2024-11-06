@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Tabs, Tab, Typography, Box, Button, Stack } from '@mui/material';
+import React, { useState } from "react";
+import { Tabs, Tab, Typography, Box, Button, Stack } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const location = useLocation();
+  const { furnitureResult, priceAnalysis, repairAnalysis } = location.state || {
+    furnitureResult: null,
+    priceAnalysis: null,
+    repairAnalysis: null,
+  };
 
-  // Chatbot messages for each tab
+  // Chatbot messages with dynamic price information
   const messages = {
     Myynti: [
-      "Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti 50-100 euroa.",
-      "Suosittelen seuraavia myyntikanavia: Tori, Mjuk",
-      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?"
+      `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
+      `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
+      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
     ],
     Lahjoitus: [
       "Voit lahjoittaa kalusteen useisiin hyväntekeväisyysjärjestöihin.",
       "Esimerkiksi, Punainen Risti, Hope, tai paikalliset kierrätyskeskukset.",
-      "Haluatko, että laadin sinulle lahjoitusilmoituksen pohjan?"
+      "Haluatko, että laadin sinulle lahjoitusilmoituksen pohjan?",
     ],
-    Kierrätys: [
-      "Kierrättämällä kalusteen autat ympäristöä.",
-      "Suosittelemme viemään kalusteen lähimpään kierrätyskeskukseen.",
-      "Tarvitsetko apua kierrätyskeskuksen löytämisessä?"
-    ],
-    Kunnostus: [
-      "Kunnostamalla kalusteen voit pidentää sen käyttöikää.",
-      "Voit kunnostaa itse tai hyödyntää paikallisia kunnostuspalveluja.",
-      "Tarvitsetko vinkkejä kunnostamiseen tai kunnostuspalvelujen löytämiseen?"
-    ],
+    Kierrätys: [`${repairAnalysis.result.kierrätys_ohjeet}`],
+    Kunnostus: [`${repairAnalysis.result.korjaus_ohjeet}`],
+    // Other tabs (Lahjoitus, Kierrätys, Kunnostus)...
   };
 
   // Handle tab change
@@ -37,14 +37,16 @@ const ChatbotPage = () => {
   const renderMessages = () => {
     const currentTab = Object.keys(messages)[selectedTab];
     return messages[currentTab].map((message, index) => (
-      <Typography key={index} variant="body1" style={{ marginBottom: '10px' }}>
+      <Typography key={index} variant="body1" style={{ marginBottom: "10px" }}>
         {message}
       </Typography>
     ));
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 400, margin: 'auto', textAlign: 'center' }}>
+    <Box
+      sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}
+    >
       <Typography variant="h6" gutterBottom>
         KalusteArvioBotti
       </Typography>
@@ -58,9 +60,7 @@ const ChatbotPage = () => {
       </Tabs>
 
       {/* Chatbot Messages */}
-      <Box sx={{ padding: '20px', textAlign: 'left' }}>
-        {renderMessages()}
-      </Box>
+      <Box sx={{ padding: "20px", textAlign: "left" }}>{renderMessages()}</Box>
 
       {/* Buttons */}
       <Stack direction="row" spacing={2} justifyContent="center">

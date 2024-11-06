@@ -21,7 +21,7 @@ const ImageUploadPage = () => {
       leveys: 0,
     },
     malli: "",
-    materiaalit: []
+    materiaalit: [],
   });
 
   const navigate = useNavigate();
@@ -60,6 +60,7 @@ const ImageUploadPage = () => {
 
     try {
       const formData = new FormData();
+      console.log(imageBlob);
       formData.append("image", imageBlob);
 
       const response = await fetch("http://localhost:3000/api/image", {
@@ -68,23 +69,23 @@ const ImageUploadPage = () => {
       });
 
       if (!response.ok) {
-        console.error("Failed to upload camera image. Status:", response.status);
+        console.error(
+          "Failed to upload camera image. Status:",
+          response.status
+        );
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
         setFurnitureResult(result.result.gemini);
-        navigate("/confirmation", { state: { furnitureResult: result.result.gemini } });
+        navigate("/confirmation", {
+          state: { furnitureResult: result.result.gemini, imageBlob },
+        });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
       navigate("/confirmation", { state: { furnitureResult } });
     }
   };
-
-  useEffect(() => {
-    console.log("Updated furniture result:", furnitureResult);
-    console.log("Furniture color:", furnitureResult.väri);
-  }, [furnitureResult]);
 
   return (
     <div className="container">
