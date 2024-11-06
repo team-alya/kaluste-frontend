@@ -13,7 +13,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
-  const { furnitureResult, imageBlob } = location.state || { furnitureResult: null, imageBlob: null };
+  const { furnitureResult, imageBlob } = location.state || {
+    furnitureResult: null,
+    imageBlob: null,
+  };
 
   // Initialize furnitureDetails state object
   const [furnitureDetails, setFurnitureDetails] = useState({
@@ -26,7 +29,7 @@ function FurniConfirmPage() {
       leveys: furnitureResult?.mitat?.leveys || "",
     },
     materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
-    väri: furnitureResult?.väri || ""
+    väri: furnitureResult?.väri || "",
   });
 
   const navigate = useNavigate();
@@ -53,60 +56,77 @@ function FurniConfirmPage() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const formData = new FormData();
-  
+
       // Convert furnitureDetails to JSON and add to formData
       const furnitureDetailsPayload = {
         ...furnitureDetails,
         mitat: {
           pituus: Number(furnitureDetails.mitat.pituus),
           korkeus: Number(furnitureDetails.mitat.korkeus),
-          leveys: Number(furnitureDetails.mitat.leveys)
+          leveys: Number(furnitureDetails.mitat.leveys),
         },
-        materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
+        materiaalit: furnitureDetails.materiaalit
+          .split(",")
+          .map((material) => material.trim()),
       };
-      formData.append("furnitureDetails", JSON.stringify(furnitureDetailsPayload));
-  
+      formData.append(
+        "furnitureDetails",
+        JSON.stringify(furnitureDetailsPayload)
+      );
+
       if (imageBlob) {
         formData.append("image", imageBlob);
       }
-  
+
       console.log("furnitureDetails:", formData.get("furnitureDetails"));
       console.log("image:", formData.get("image"));
-  
+
       // First API Call: Price Estimate
       const priceResponse = await fetch("http://localhost:3000/api/price", {
         method: "POST",
         body: formData,
       });
-  
+
       let priceData;
       if (priceResponse.ok) {
         priceData = await priceResponse.json();
         console.log("Price analysis:", priceData);
       } else {
-        console.error("Failed to fetch price analysis. Status:", priceResponse.status);
+        console.error(
+          "Failed to fetch price analysis. Status:",
+          priceResponse.status
+        );
       }
-  
+
       // Second API Call: Repair Estimate
       const repairResponse = await fetch("http://localhost:3000/api/repair", {
         method: "POST",
         body: formData,
       });
-  
+
       let repairData;
       if (repairResponse.ok) {
         repairData = await repairResponse.json();
         console.log("Repair analysis:", repairData);
       } else {
-        console.error("Failed to fetch repair analysis. Status:", repairResponse.status);
+        console.error(
+          "Failed to fetch repair analysis. Status:",
+          repairResponse.status
+        );
       }
-  
+
       // Navigate with the results if both calls are successful
       if (priceData && repairData) {
-        navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData, repairAnalysis: repairData } });
+        navigate("/chatbotpage", {
+          state: {
+            furnitureResult,
+            priceAnalysis: priceData,
+            repairAnalysis: repairData,
+          },
+        });
       }
     } catch (error) {
       console.error("Error during form submission:", error);
@@ -139,7 +159,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("merkki", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -155,7 +175,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("malli", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -170,7 +190,7 @@ function FurniConfirmPage() {
             value={furnitureDetails.kunto}
             onChange={(e) => handleInputChange("kunto", e.target.value)}
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           >
             <MenuItem value="" disabled>
               Valitse kunto
@@ -196,7 +216,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("pituus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="korkeus"
@@ -205,7 +225,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("korkeus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="leveys"
@@ -214,7 +234,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("leveys", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -230,7 +250,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("materiaalit", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -246,7 +266,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("väri", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -262,7 +282,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>

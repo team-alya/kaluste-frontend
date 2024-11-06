@@ -5,26 +5,26 @@ import { useLocation } from "react-router-dom";
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const location = useLocation();
-  const { furnitureResult, priceAnalysis, repairAnalysis } = location.state || { furnitureResult: null, priceAnalysis: null, repairAnalysis: null };
+  const { furnitureResult, priceAnalysis, repairAnalysis } = location.state || {
+    furnitureResult: null,
+    priceAnalysis: null,
+    repairAnalysis: null,
+  };
 
   // Chatbot messages with dynamic price information
   const messages = {
     Myynti: [
       `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
       `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
-      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?"
+      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
     ],
     Lahjoitus: [
       "Voit lahjoittaa kalusteen useisiin hyväntekeväisyysjärjestöihin.",
       "Esimerkiksi, Punainen Risti, Hope, tai paikalliset kierrätyskeskukset.",
-      "Haluatko, että laadin sinulle lahjoitusilmoituksen pohjan?"
+      "Haluatko, että laadin sinulle lahjoitusilmoituksen pohjan?",
     ],
-    Kierrätys: [
-      `${repairAnalysis.result.kierrätys_ohjeet}`
-    ],
-    Kunnostus: [
-      `${repairAnalysis.result.korjaus_ohjeet}`
-    ],
+    Kierrätys: [`${repairAnalysis.result.kierrätys_ohjeet}`],
+    Kunnostus: [`${repairAnalysis.result.korjaus_ohjeet}`],
     // Other tabs (Lahjoitus, Kierrätys, Kunnostus)...
   };
 
@@ -44,7 +44,9 @@ const ChatbotPage = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}>
+    <Box
+      sx={{ width: "100%", maxWidth: 500, margin: "auto", textAlign: "center" }}
+    >
       <Typography variant="h6" gutterBottom>
         KalusteArvioBotti
       </Typography>
