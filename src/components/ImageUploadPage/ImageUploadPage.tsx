@@ -76,9 +76,9 @@ const ImageUploadPage = () => {
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
-        setFurnitureResult(result.result.gemini);
+        setFurnitureResult(result.result);
         navigate("/confirmation", {
-          state: { furnitureResult: result.result.gemini, imageBlob },
+          state: { furnitureResult: result.result, imageBlob },
         });
       }
     } catch (error) {
