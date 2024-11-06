@@ -5,11 +5,7 @@ import { useLocation } from "react-router-dom";
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const location = useLocation();
-  const { furnitureResult, priceAnalysis, repairAnalysis } = location.state || {
-    furnitureResult: null,
-    priceAnalysis: null,
-    repairAnalysis: null,
-  };
+  const { furnitureResult, priceAnalysis } = location.state || { furnitureResult: null, priceAnalysis: null};
 
   // Chatbot messages with dynamic price information
   const messages = {
@@ -19,13 +15,14 @@ const ChatbotPage = () => {
       "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
     ],
     Lahjoitus: [
-      "Voit lahjoittaa kalusteen useisiin hyväntekeväisyysjärjestöihin.",
-      "Esimerkiksi, Punainen Risti, Hope, tai paikalliset kierrätyskeskukset.",
-      "Haluatko, että laadin sinulle lahjoitusilmoituksen pohjan?",
+      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa."
     ],
-    Kierrätys: [`${repairAnalysis.result.kierrätys_ohjeet}`],
-    Kunnostus: [`${repairAnalysis.result.korjaus_ohjeet}`],
-    // Other tabs (Lahjoitus, Kierrätys, Kunnostus)...
+    Kierrätys: [
+      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja."
+    ],
+    Kunnostus: [
+      "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita."
+    ],
   };
 
   // Handle tab change
