@@ -159,7 +159,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("merkki", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -175,7 +175,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("malli", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -190,7 +190,7 @@ function FurniConfirmPage() {
             value={furnitureDetails.kunto}
             onChange={(e) => handleInputChange("kunto", e.target.value)}
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           >
             <MenuItem value="" disabled>
               Valitse kunto
@@ -216,7 +216,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("pituus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="korkeus"
@@ -225,7 +225,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("korkeus", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
           <TextField
             name="leveys"
@@ -234,7 +234,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleMitatChange("leveys", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -250,7 +250,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("materiaalit", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -266,7 +266,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("väri", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
@@ -282,7 +282,7 @@ function FurniConfirmPage() {
             onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
-            className="inputTextField"
+            className="inputTextFiels"
           />
         </FormControl>
       </Box>
