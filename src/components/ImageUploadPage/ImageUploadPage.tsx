@@ -12,6 +12,7 @@ const ImageUploadPage = () => {
   const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
   const [takeImage, setTakeImage] = useState(false); // For opening the camera
   const [furnitureResult, setFurnitureResult] = useState({
+    id: "",
     merkki: "",
     väri: "",
     kunto: "",
@@ -21,7 +22,7 @@ const ImageUploadPage = () => {
       leveys: 0,
     },
     malli: "",
-    materiaalit: []
+    materiaalit: [],
   });
 
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const ImageUploadPage = () => {
 
     try {
       const formData = new FormData();
-      console.log(imageBlob)
+      console.log(imageBlob);
       formData.append("image", imageBlob);
 
       const response = await fetch("http://localhost:3000/api/image", {
@@ -69,12 +70,15 @@ const ImageUploadPage = () => {
       });
 
       if (!response.ok) {
-        console.error("Failed to upload camera image. Status:", response.status);
+        console.error(
+          "Failed to upload camera image. Status:",
+          response.status
+        );
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
-        setFurnitureResult(result.result.gemini);
-        navigate("/confirmation", { state: { furnitureResult: result.result.gemini, imageBlob } });
+        setFurnitureResult(result.result);
+        navigate("/confirmation", { state: { furnitureResult: result.result, imageBlob } });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
