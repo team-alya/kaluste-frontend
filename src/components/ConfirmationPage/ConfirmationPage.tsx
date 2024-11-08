@@ -20,7 +20,7 @@ function FurniConfirmPage() {
 
   // Initialize furnitureDetails state object
   const [furnitureDetails, setFurnitureDetails] = useState({
-    id: furnitureResult?.id || "",
+    requestId: furnitureResult?.requestId || "",
     merkki: furnitureResult?.merkki || "",
     malli: furnitureResult?.malli || "",
     väri: furnitureResult?.väri || "",
@@ -61,7 +61,7 @@ const handleSubmit = async (e) => {
   try {
     // Create furnitureDetails payload in the expected format
     const furnitureDetailsPayload = {
-      id: furnitureDetails.id,
+      requestId: furnitureDetails.requestId,
       merkki: furnitureDetails.merkki,
       malli: furnitureDetails.malli,
       väri: furnitureDetails.väri,

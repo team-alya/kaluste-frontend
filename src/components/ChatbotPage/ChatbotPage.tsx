@@ -47,12 +47,46 @@ const ChatbotPage = () => {
     setShowInputField(false); // Hide the input field when switching tabs
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (userMessage.trim()) {
-      setChatMessages([...chatMessages, { sender: "user", text: userMessage }]);
-      setUserMessage(""); // Clear input field after sending
+      // Add the user message to chat messages
+      setChatMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "user", text: userMessage }
+      ]);
+  
+      try {
+        // Make the API call to send userMessage and furnitureResult.requestId
+        const response = await fetch("http://localhost:3000/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            requestId: furnitureResult.requestId,
+            question: userMessage,
+          }),
+        });
+  
+        if (response.ok) {
+          console.log("AI is generating answer")
+          setUserMessage("");
+          const data = await response.json();
+          // Assuming the API response has the AI's message in data.message
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { sender: "bot", text: data.answer },
+          ]);
+        } else {
+          console.error("Failed to fetch AI response. Status:", response.status);
+        }
+      } catch (error) {
+        console.error("Error during message send:", error);
+      }
+
     }
   };
+  
 
   const handleButtonClick = (response) => {
     setShowInputField(true); // Show the input field after button click
