@@ -54,6 +54,8 @@ const ChatbotPage = () => {
         ...prevMessages,
         { sender: "user", text: userMessage }
       ]);
+
+      setUserMessage("");
   
       try {
         // Make the API call to send userMessage and furnitureResult.requestId
@@ -70,7 +72,6 @@ const ChatbotPage = () => {
   
         if (response.ok) {
           console.log("AI is generating answer")
-          setUserMessage("");
           const data = await response.json();
           // Assuming the API response has the AI's message in data.message
           setChatMessages((prevMessages) => [
@@ -88,10 +89,48 @@ const ChatbotPage = () => {
   };
   
 
-  const handleButtonClick = (response) => {
-    setShowInputField(true); // Show the input field after button click
-    setChatMessages([...chatMessages, { sender: "user", text: response }]);
+  const handleButtonClick = async (response) => {
+    const message = "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
+    
+    // Show the input field without setting a predefined message
+    setShowInputField(true);
+  
+    // Directly add the message to chatMessages
+    setChatMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "user", text: message }
+    ]);
+  
+    // Send the message to the backend
+    try {
+      const response = await fetch("http://localhost:3000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requestId: furnitureResult.requestId,
+          question: message,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        // Assuming the API response has the AI's message in data.answer
+        setChatMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: "bot", text: data.answer },
+        ]);
+      } else {
+        console.error("Failed to fetch AI response. Status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error during message send:", error);
+    }
   };
+  
+  
+  
 
   const renderMessages = () => {
     const currentTab = Object.keys(messages)[selectedTab];
