@@ -12,7 +12,7 @@ const ImageUploadPage = () => {
   const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
   const [takeImage, setTakeImage] = useState(false); // For opening the camera
   const [furnitureResult, setFurnitureResult] = useState({
-    id: "",
+    requestId: "",
     merkki: "",
     väri: "",
     kunto: "",
