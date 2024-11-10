@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Tabs,
   Tab,
@@ -8,22 +8,35 @@ import {
   Stack,
   Paper,
   TextField,
-  useTheme,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
+
+// Define the type for a chat message
+interface ChatMessage {
+  sender: string;
+  text: string;
+}
 
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [userMessage, setUserMessage] = useState(""); // State for input field
-  const [chatMessages, setChatMessages] = useState([]); // State to hold chat messages
+  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
+    [], // Myynti chat history
+    [], // Lahjoitus chat history
+    [], // Kierrätys chat history
+    [], // Kunnostus chat history
+  ]); // Array to hold chat messages for each tab
+
   const [showInputField, setShowInputField] = useState(false); // State to show input field
-  const theme = useTheme();
   const location = useLocation();
   const { furnitureResult, priceAnalysis } = location.state || {
     furnitureResult: null,
     priceAnalysis: null,
   };
 
+  const chatContainerRef = useRef<HTMLDivElement>(null); // Reference for the chat container
+
+  // The predefined messages for each tab
   const messages = {
     Myynti: [
       `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
@@ -41,24 +54,31 @@ const ChatbotPage = () => {
     ],
   };
 
-  const handleChange = (event, newValue) => {
+  // Handle tab change
+  const handleChange = (
+    _event: any,
+    newValue: React.SetStateAction<number>
+  ) => {
     setSelectedTab(newValue);
-    setChatMessages([]); // Clear chat messages when switching tabs
     setShowInputField(false); // Hide the input field when switching tabs
   };
 
+  // Handle sending message
   const handleSendMessage = async () => {
     if (userMessage.trim()) {
-      // Add the user message to chat messages
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: "user", text: userMessage }
-      ]);
+      // Optimistically update the state
+      setChatMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages[selectedTab] = [
+          ...updatedMessages[selectedTab],
+          { sender: "user", text: userMessage },
+        ];
+        return updatedMessages;
+      });
 
-      setUserMessage("");
-  
+      setUserMessage(""); // Clear the input field
+
       try {
-        // Make the API call to send userMessage and furnitureResult.requestId
         const response = await fetch("http://localhost:3000/api/chat", {
           method: "POST",
           headers: {
@@ -69,39 +89,48 @@ const ChatbotPage = () => {
             question: userMessage,
           }),
         });
-  
+
         if (response.ok) {
-          console.log("AI is generating answer")
           const data = await response.json();
-          // Assuming the API response has the AI's message in data.message
-          setChatMessages((prevMessages) => [
-            ...prevMessages,
-            { sender: "bot", text: data.answer },
-          ]);
+
+          // Add the response from the bot to the chat
+          setChatMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages[selectedTab] = [
+              ...updatedMessages[selectedTab],
+              { sender: "bot", text: data.answer },
+            ];
+            return updatedMessages;
+          });
         } else {
-          console.error("Failed to fetch AI response. Status:", response.status);
+          console.error(
+            "Failed to fetch AI response. Status:",
+            response.status
+          );
         }
       } catch (error) {
         console.error("Error during message send:", error);
       }
-
     }
   };
-  
 
-  const handleButtonClick = async (response) => {
-    const message = "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
-    
-    // Show the input field without setting a predefined message
-    setShowInputField(true);
-  
-    // Directly add the message to chatMessages
-    setChatMessages((prevMessages) => [
-      ...prevMessages,
-      { sender: "user", text: message }
-    ]);
-  
-    // Send the message to the backend
+  // Handle predefined response buttons (KYLLÄ, EI KIITOS)
+  const handleButtonClick = async (_response: string) => {
+    const message =
+      "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
+
+    setShowInputField(true); // Show the input field for further typing
+
+    // Optimistically add the predefined message to the chat
+    setChatMessages((prevMessages) => {
+      const updatedMessages = [...prevMessages];
+      updatedMessages[selectedTab] = [
+        ...updatedMessages[selectedTab],
+        { sender: "user", text: message },
+      ];
+      return updatedMessages;
+    });
+
     try {
       const response = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
@@ -113,14 +142,19 @@ const ChatbotPage = () => {
           question: message,
         }),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        // Assuming the API response has the AI's message in data.answer
-        setChatMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: "bot", text: data.answer },
-        ]);
+
+        // Add the response from the bot to the chat
+        setChatMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          updatedMessages[selectedTab] = [
+            ...updatedMessages[selectedTab],
+            { sender: "bot", text: data.answer },
+          ];
+          return updatedMessages;
+        });
       } else {
         console.error("Failed to fetch AI response. Status:", response.status);
       }
@@ -128,18 +162,18 @@ const ChatbotPage = () => {
       console.error("Error during message send:", error);
     }
   };
-  
-  
-  
 
+  // Render the chat messages for the current tab
   const renderMessages = () => {
-    const currentTab = Object.keys(messages)[selectedTab];
-    const allMessages = [
-      ...messages[currentTab].map((text) => ({ sender: "bot", text })),
-      ...chatMessages,
+    const currentTabMessages = [
+      ...messages[Object.keys(messages)[selectedTab]].map((text: any) => ({
+        sender: "bot",
+        text,
+      })),
+      ...chatMessages[selectedTab],
     ];
 
-    return allMessages.map((message, index) => (
+    return currentTabMessages.map((message, index) => (
       <Box
         key={index}
         sx={{
@@ -165,6 +199,14 @@ const ChatbotPage = () => {
     ));
   };
 
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
   return (
     <Box
       sx={{
@@ -180,7 +222,7 @@ const ChatbotPage = () => {
         KalusteArvioBotti
       </Typography>
 
-      {/* Tabs */}
+      {/* Tabs for navigation */}
       <Tabs value={selectedTab} onChange={handleChange} centered>
         <Tab label="Myynti" />
         <Tab label="Lahjoitus" />
@@ -190,6 +232,7 @@ const ChatbotPage = () => {
 
       {/* Chatbot Messages */}
       <Box
+        ref={chatContainerRef}
         sx={{
           padding: "20px",
           textAlign: "left",
@@ -205,7 +248,7 @@ const ChatbotPage = () => {
         {renderMessages()}
       </Box>
 
-      {/* Kyllä ja Ei Kiitos napit */}
+      {/* Predefined buttons */}
       {!showInputField && (
         <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
           <Button
@@ -229,14 +272,15 @@ const ChatbotPage = () => {
       {showInputField && (
         <Stack
           direction="row"
-          spacing={1}
-          alignItems="center"
-          sx={{ mt: 2, width: "100%" }}
+          spacing={2}
+          justifyContent="center"
+          mt={2}
+          sx={{ width: "100%" }}
         >
           <TextField
-            fullWidth
+            label="Write your message"
             variant="outlined"
-            placeholder="Type your message..."
+            fullWidth
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
           />
