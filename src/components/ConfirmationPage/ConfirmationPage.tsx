@@ -5,48 +5,105 @@ import {
   FormControl,
   MenuItem,
   Select,
-  Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import "./ConfirmationPage.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
-  const {furnitureResult} = location.state || {furnitureResult: null};
-
-  const [furnitureModel, setFurnitureModel] = useState(furnitureResult?.model || "");
-  const [condition, setCondition] = useState(furnitureResult?.condition || "");
-  const [measures, setMeasures] = useState(`${furnitureResult?.dimensions?.length}x${furnitureResult?.dimensions?.height}x${furnitureResult?.dimensions?.width}` || "");
-  const [materials, setMaterials] = useState(furnitureResult?.type || "");
-  const [color, setColor] = useState(furnitureResult?.color || "");
-  const [description, setDescription] = useState("");
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Form submission logic implementation here
-    console.log({
-      furnitureModel,
-      condition,
-      measures,
-      materials,
-      color,
-      description,
-    });
+  const { furnitureResult, imageBlob } = location.state || {
+    furnitureResult: null,
+    imageBlob: null,
   };
 
+  // Initialize furnitureDetails state object
+  const [furnitureDetails, setFurnitureDetails] = useState({
+    requestId: furnitureResult?.requestId || "",
+    merkki: furnitureResult?.merkki || "",
+    malli: furnitureResult?.malli || "",
+    väri: furnitureResult?.väri || "",
+    mitat: {
+      pituus: furnitureResult?.mitat?.pituus || "",
+      korkeus: furnitureResult?.mitat?.korkeus || "",
+      leveys: furnitureResult?.mitat?.leveys || "",
+    },
+    materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
+    kunto: furnitureResult?.kunto || ""
+  });
+
+  const navigate = useNavigate();
+
+  // Generic change handler for input fields
+  const handleInputChange = (field, value) => {
+    setFurnitureDetails((prevDetails) => ({
+      ...prevDetails,
+      [field]: value,
+    }));
+  };
+
+  // Change handler for nested mitat fields
+  const handleMitatChange = (dimension, value) => {
+    setFurnitureDetails((prevDetails) => ({
+      ...prevDetails,
+      mitat: {
+        ...prevDetails.mitat,
+        [dimension]: value,
+      },
+    }));
+  };
+
+  // Handle form submission
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // Create furnitureDetails payload in the expected format
+    const furnitureDetailsPayload = {
+      requestId: furnitureDetails.requestId,
+      merkki: furnitureDetails.merkki,
+      malli: furnitureDetails.malli,
+      väri: furnitureDetails.väri,
+      mitat: {
+        pituus: Number(furnitureDetails.mitat.pituus),
+        leveys: Number(furnitureDetails.mitat.leveys),
+        korkeus: Number(furnitureDetails.mitat.korkeus),
+      },
+      materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
+      kunto: furnitureDetails.kunto,
+    };
+
+    // Make POST request with JSON body
+    const priceResponse = await fetch("http://localhost:3000/api/price", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
+    });
+
+    if (priceResponse.ok) {
+      const priceData = await priceResponse.json();
+      console.log("Price analysis:", priceData);
+      navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData } });
+    } else {
+      console.error("Failed to fetch price analysis. Status:", priceResponse.status);
+    }
+  } catch (error) {
+    console.error("Error during form submission:", error);
+  }
+};
+
+
+
   return (
-    // Main Box for the page
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
       <Box className="headingBox">
-        {/* Heading */}
         <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>
 
       <Box className="instructionBox">
-        {/* Confirmation message with instructions. */}
         <Typography variant="body1">
           Kalusteen tunnistaminen onnistui.
           <br />
@@ -54,18 +111,16 @@ function FurniConfirmPage() {
         </Typography>
       </Box>
 
-      {/* First Input Box: Model */}
+      {/* Form Fields */}
       <Box className="inputBox">
         <FormControl>
-          {/* Model Title */}
           <Typography align="left" variant="body1">
-            Kalusteen merkki/malli
+            Kalusteen merkki
           </Typography>
-          {/* Model Input */}
           <TextField
             name="furnitureModel"
-            value={furnitureModel}
-            onChange={(e) => setFurnitureModel(e.target.value)}
+            value={furnitureDetails.merkki}
+            onChange={(e) => handleInputChange("merkki", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
@@ -73,47 +128,74 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Second Input Box: Condition */}
       <Box className="inputBox">
         <FormControl>
-          {/* Condition Title */}
+          <Typography align="left" variant="body1">
+            Kalusteen malli
+          </Typography>
+          <TextField
+            name="furnitureModel"
+            value={furnitureDetails.malli}
+            onChange={(e) => handleInputChange("malli", e.target.value)}
+            margin="normal"
+            size="small"
+            className="inputTextFiels"
+          />
+        </FormControl>
+      </Box>
+
+      <Box className="inputBox">
+        <FormControl>
           <Typography align="left" variant="body1">
             Valitse kunto
           </Typography>
-          {/* Condition Selection */}
           <Select
             labelId="condition-label"
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
+            value={furnitureDetails.kunto}
+            onChange={(e) => handleInputChange("kunto", e.target.value)}
             size="small"
             className="inputTextFiels"
           >
-            {/* Condition Label Text */}
             <MenuItem value="" disabled>
               Valitse kunto
             </MenuItem>
-            {/* Condtion Selection Variations */}
-            <MenuItem value="Excellent">Erinomainen</MenuItem>
-            <MenuItem value="Good">Hyvä</MenuItem>
-            <MenuItem value="Fair">Kohtalainen</MenuItem>
-            <MenuItem value="Poor">Huono</MenuItem>
-            <MenuItem value="Unknown">Tuntematon</MenuItem>
+            <MenuItem value="Erinomainen">Erinomainen</MenuItem>
+            <MenuItem value="Hyvä">Hyvä</MenuItem>
+            <MenuItem value="Kohtalainen">Kohtalainen</MenuItem>
+            <MenuItem value="Huono">Huono</MenuItem>
+            <MenuItem value="Tuntematon">Tuntematon</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      {/* Third Input Box: Measures */}
       <Box className="inputBox">
         <FormControl>
-          {/* Measures Title */}
           <Typography align="left" variant="body1">
             Mitat (LxKxS)
           </Typography>
-          {/* Measures Input */}
           <TextField
-            name="measures"
-            value={measures}
-            onChange={(e) => setMeasures(e.target.value)}
+            name="pituus"
+            placeholder="Pituus"
+            value={furnitureDetails.mitat.pituus}
+            onChange={(e) => handleMitatChange("pituus", e.target.value)}
+            margin="normal"
+            size="small"
+            className="inputTextFiels"
+          />
+          <TextField
+            name="korkeus"
+            placeholder="Korkeus"
+            value={furnitureDetails.mitat.korkeus}
+            onChange={(e) => handleMitatChange("korkeus", e.target.value)}
+            margin="normal"
+            size="small"
+            className="inputTextFiels"
+          />
+          <TextField
+            name="leveys"
+            placeholder="Leveys"
+            value={furnitureDetails.mitat.leveys}
+            onChange={(e) => handleMitatChange("leveys", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
@@ -121,18 +203,15 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Fourth Input Box: Materials */}
       <Box className="inputBox">
         <FormControl>
-          {/* Materials Title */}
           <Typography align="left" variant="body1">
             Materiaalit
           </Typography>
-          {/* Materials Input */}
           <TextField
             name="materials"
-            value={materials}
-            onChange={(e) => setMaterials(e.target.value)}
+            value={furnitureDetails.materiaalit}
+            onChange={(e) => handleInputChange("materiaalit", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
@@ -140,18 +219,15 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Fifth Input Box: Color */}
       <Box className="inputBox">
         <FormControl>
-          {/* Color Title */}
           <Typography align="left" variant="body1">
             Väri
           </Typography>
-          {/* Color Input */}
           <TextField
             name="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
+            value={furnitureDetails.väri}
+            onChange={(e) => handleInputChange("väri", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
@@ -159,18 +235,15 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Sixth Input Box: Description */}
       <Box className="inputBox">
         <FormControl>
-          {/* Description Title */}
           <Typography align="left" variant="body1">
             Kuvaile vikoja
           </Typography>
-          {/* Description Input */}
           <TextField
             name="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={furnitureDetails.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
@@ -178,33 +251,9 @@ function FurniConfirmPage() {
         </FormControl>
       </Box>
 
-      {/* Chat Submit Buttons with directory to Chat Pages */}
-      <Stack
-        direction="row"
-        spacing={{ xs: 1, sm: 2 }}
-        useFlexGap
-        sx={{ flexWrap: "wrap" }}
-        className="submitChatButtonsStack"
-      >
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Myynti
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Lahjoitus
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kierrätys
-        </Button>
-        <Button type="submit" variant="contained" className="submitChatButtons">
-          Kunnostus
-        </Button>
-      </Stack>
-
-      <Stack className="submitRetryButtonStack">
-        <Button type="submit" variant="contained" className="submitRetryButton">
-          Uudestaan
-        </Button>
-      </Stack>
+      <Button type="submit" variant="contained" className="submitRetryButton">
+        Hyväksy
+      </Button>
     </Box>
   );
 }

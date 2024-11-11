@@ -12,17 +12,17 @@ const ImageUploadPage = () => {
   const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
   const [takeImage, setTakeImage] = useState(false); // For opening the camera
   const [furnitureResult, setFurnitureResult] = useState({
-    age: 0,
-    brand: "",
-    color: "",
-    condition: "",
-    dimensions: {
-      height: 0,
-      length: 0,
-      width: 0,
+    requestId: "",
+    merkki: "",
+    väri: "",
+    kunto: "",
+    mitat: {
+      pituus: 0,
+      korkeus: 0,
+      leveys: 0,
     },
-    model: "",
-    type: "",
+    malli: "",
+    materiaalit: [],
   });
 
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const ImageUploadPage = () => {
     for (let i = 0; i < byteString.length; i++) {
       byteArray[i] = byteString.charCodeAt(i);
     }
-
+    console.log("Blob for upload:", imageBlob);
     return new Blob([byteArray], { type: mimeString });
   };
 
@@ -61,6 +61,7 @@ const ImageUploadPage = () => {
 
     try {
       const formData = new FormData();
+      console.log(imageBlob);
       formData.append("image", imageBlob);
 
       const response = await fetch("http://localhost:3000/api/image", {
@@ -69,22 +70,23 @@ const ImageUploadPage = () => {
       });
 
       if (!response.ok) {
-        console.error("Failed to upload camera image. Status:", response.status);
+        console.error(
+          "Failed to upload camera image. Status:",
+          response.status
+        );
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
-        navigate("/confirmation", { state: { furnitureResult: result.result } });
+        setFurnitureResult(result.result);
+        navigate("/confirmation", {
+          state: { furnitureResult: result.result, imageBlob },
+        });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
       navigate("/confirmation", { state: { furnitureResult } });
     }
   };
-
-  useEffect(() => {
-    console.log("Updated furniture result:", furnitureResult);
-    console.log("Furniture color:", furnitureResult.color);
-  }, [furnitureResult]);
 
   return (
     <div className="container">
