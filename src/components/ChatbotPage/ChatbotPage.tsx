@@ -211,7 +211,7 @@ const ChatbotPage = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 500,
+        maxWidth: 800,
         margin: "auto",
         display: "flex",
         flexDirection: "column",
@@ -240,7 +240,7 @@ const ChatbotPage = () => {
           flexDirection: "column",
           gap: "10px",
           width: "100%",
-          maxHeight: "300px",
+          maxHeight: "325px",
           overflowY: "auto",
           mt: 2,
         }}
