@@ -19,10 +19,7 @@ interface ChatMessage {
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [userMessage, setUserMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
-    [], [], [], []
-  ]);
-
+  
   // Separate state for each tab's buttons and input field visibility
   const [tabStates, setTabStates] = useState([
     { showInputField: false, isButtonsUsed: false }, // Myynti
@@ -37,26 +34,33 @@ const ChatbotPage = () => {
     priceAnalysis: null,
   };
 
+  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
+    [{sender: "bot", text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
+      Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
+      Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa."}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja."}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita."}]
+  ]);
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const messages = {
     Myynti: [
-      `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
-      `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
-      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
+      
     ],
     Lahjoitus: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.",
+      
     ],
     Kierrätys: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.",
+      
     ],
     Kunnostus: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.",
+      
     ],
   };
 
-  const handleChange = (_event: any, newValue: React.SetStateAction<number>) => {
+  const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
   };
 
@@ -104,10 +108,20 @@ const ChatbotPage = () => {
       } catch (error) {
         console.error("Error during message send:", error);
       }
+      
     }
   };
 
-  const handleButtonClick = async (_response: string) => {
+  const handleButtonClick = async (response: string) => {
+    if (response === "EI KIITOS") {
+      // Just hide the buttons without sending any message
+      setTabStates((prevStates) => {
+        const updatedStates = [...prevStates];
+        updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
+        return updatedStates;
+      });
+      return;
+    }
     const message =
       "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
 
@@ -234,7 +248,7 @@ const ChatbotPage = () => {
         {renderMessages()}
       </Box>
 
-      {!tabStates[selectedTab].showInputField && selectedTab === 0 && chatMessages[selectedTab].length === 0 && !tabStates[selectedTab].isButtonsUsed && (
+      {!tabStates[selectedTab].showInputField && selectedTab === 0 && chatMessages[selectedTab].length === 1 && !tabStates[selectedTab].isButtonsUsed && (
         <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
           <Button variant="contained" color="primary" onClick={() => handleButtonClick("KYLLÄ")}>
             KYLLÄ
