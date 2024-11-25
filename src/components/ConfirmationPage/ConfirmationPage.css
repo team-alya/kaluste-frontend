@@ -1,0 +1,39 @@
+.mainBox {
+    text-align: center;
+}
+
+.headingBox {
+    margin: 30px;
+}
+
+.instructionBox {
+    margin: 30px;
+}
+.inputBox {
+    margin: 10px;
+}
+
+.inputTextFiels {
+    width: 300px;
+}
+
+.submitChatButtonsStack {
+    margin: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+.submitChatButtons {
+    width: 150px;
+    height: 50px;
+}
+
+.submitRetryButtonStack  {
+    justify-content: center;
+    align-items: center;
+}
+
+.submitRetryButton {
+    width: 300px;
+    height: 50px;
+}

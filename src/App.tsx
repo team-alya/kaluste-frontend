@@ -1,35 +1,73 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { ThemeProvider, createTheme, Theme } from "@mui/material/styles";
+import { CssBaseline, FormControlLabel, Box, Switch } from "@mui/material";
+import { Link, Route, Routes } from "react-router-dom";
+import WelcomePage from "./components/WelcomePage/WelcomePage";
+import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
+import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
+import ChatbotPage from "./components/ChatbotPage/ChatbotPage";
+import { themeOptions, newThemeOptions } from "./theme";
+
+import "./App.css"; // Custom styles for navigation bar
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [darkMode, setDarkMode] = useState(true); // State to manage theme mode
+
+  const theme: Theme = createTheme(darkMode ? newThemeOptions : themeOptions);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode); // Toggle between light and dark mode
+  };
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Applies global styles for current theme */}
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {/* Navigation Bar */}
+        <nav className="navbar">
+          <div className="nav-item">
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+          </div>
+          <div className="nav-item">
+            <Link to="/upload" className="nav-link">
+              Upload Image
+            </Link>
+          </div>
+          <div className="nav-item">
+            <Link to="/confirmation" className="nav-link">
+              Confirmation
+            </Link>
+          </div>
+          <div className="nav-item">
+            <Link to="/chatbotpage" className="nav-link">
+              Chatbot
+            </Link>
+          </div>
+          <div className="toggle">
+            {/* Switch to toggle theme */}
+            <Box textAlign="center" margin={2}>
+              <FormControlLabel
+                control={<Switch checked={darkMode} onChange={toggleTheme} />}
+                label={darkMode ? "Theme 2" : "Theme 1"}
+              />
+            </Box>
+          </div>
+        </nav>
+
+        {/* Routes */}
+        <div>
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/upload" element={<ImageUploadPage />} />
+            <Route path="/confirmation" element={<FurniConfirmPage />} />
+            <Route path="/chatbotpage" element={<ChatbotPage />} />
+          </Routes>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
