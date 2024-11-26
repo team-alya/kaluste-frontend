@@ -30,7 +30,7 @@ function FurniConfirmPage() {
       leveys: furnitureResult?.mitat?.leveys || "",
     },
     materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
-    kunto: furnitureResult?.kunto || ""
+    kunto: furnitureResult?.kunto || "",
   });
 
   const navigate = useNavigate();
@@ -55,47 +55,54 @@ function FurniConfirmPage() {
   };
 
   // Handle form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    // Create furnitureDetails payload in the expected format
-    const furnitureDetailsPayload = {
-      requestId: furnitureDetails.requestId,
-      merkki: furnitureDetails.merkki,
-      malli: furnitureDetails.malli,
-      väri: furnitureDetails.väri,
-      mitat: {
-        pituus: Number(furnitureDetails.mitat.pituus),
-        leveys: Number(furnitureDetails.mitat.leveys),
-        korkeus: Number(furnitureDetails.mitat.korkeus),
-      },
-      materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
-      kunto: furnitureDetails.kunto,
-    };
+    try {
+      // Create furnitureDetails payload in the expected format
+      const furnitureDetailsPayload = {
+        requestId: furnitureDetails.requestId,
+        merkki: furnitureDetails.merkki,
+        malli: furnitureDetails.malli,
+        väri: furnitureDetails.väri,
+        mitat: {
+          pituus: Number(furnitureDetails.mitat.pituus),
+          leveys: Number(furnitureDetails.mitat.leveys),
+          korkeus: Number(furnitureDetails.mitat.korkeus),
+        },
+        materiaalit: furnitureDetails.materiaalit
+          .split(",")
+          .map((material) => material.trim()),
+        kunto: furnitureDetails.kunto,
+      };
 
-    // Make POST request with JSON body
-    const priceResponse = await fetch("http://localhost:3000/api/price", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
-    });
+      // Make POST request with JSON body
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-    if (priceResponse.ok) {
-      const priceData = await priceResponse.json();
-      console.log("Price analysis:", priceData);
-      navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData } });
-    } else {
-      console.error("Failed to fetch price analysis. Status:", priceResponse.status);
+      const priceResponse = await fetch(`${apiUrl}/api/price`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
+      });
+
+      if (priceResponse.ok) {
+        const priceData = await priceResponse.json();
+        console.log("Price analysis:", priceData);
+        navigate("/chatbotpage", {
+          state: { furnitureResult, priceAnalysis: priceData },
+        });
+      } else {
+        console.error(
+          "Failed to fetch price analysis. Status:",
+          priceResponse.status
+        );
+      }
+    } catch (error) {
+      console.error("Error during form submission:", error);
     }
-  } catch (error) {
-    console.error("Error during form submission:", error);
-  }
-};
-
-
+  };
 
   return (
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
