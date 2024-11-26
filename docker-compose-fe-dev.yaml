@@ -1,0 +1,11 @@
+services:
+  kaluste-fe-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kaluste_fe_dev_container
+    env_file: .env
+    ports:
+      - "${PORT}:${PORT}"
+    stdin_open: true
+    tty: true

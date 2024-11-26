@@ -1,50 +1,45 @@
-# React + TypeScript + Vite
+# Front-End for Älyä-hanke project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Front-End of the Älyä-hanke KalusteArvio-project. The goal of this app is to use Artifical Intelligence to give the user recommendations on what to do with their used furniture. These recommendations include recycling, selling, repairing and donating.
 
-Currently, two official plugins are available:
+## Installation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+To run the program follow the instructions below:
 
-## Expanding the ESLint configuration
+1. Clone the Github repository:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+  ` git clone https://github.com/team-alya/kaluste-frontend.git`
 
-- Configure the top-level `parserOptions` property like this:
+2. Change to the correct directory:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+  ` cd kaluste-frontend`
+	
+3. Install dependencies:
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+  ` npm install`
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+4. Start the app:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+  `npm run dev`
+
+### Notice!
+
+For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
+
+## Images of the user interface
+
+#### Welcome page:
+
+![image](https://github.com/user-attachments/assets/a0fb099a-a229-4515-8203-b3682c99cf03)
+
+#### Image upload page:
+
+![image](https://github.com/user-attachments/assets/5141177c-e5f3-49eb-8e04-ef476624e90b)
+
+#### Information confirmation page:
+
+![image](https://github.com/user-attachments/assets/7f6d7b32-837c-45bf-a1d5-311f48bb2098)
+
+
+
+
