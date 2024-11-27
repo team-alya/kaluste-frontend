@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
-  const { furnitureResult, imageBlob } = location.state || {
+  const { furnitureResult } = location.state || {
     furnitureResult: null,
     imageBlob: null,
   };
@@ -235,22 +235,6 @@ function FurniConfirmPage() {
             name="color"
             value={furnitureDetails.väri}
             onChange={(e) => handleInputChange("väri", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
-
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Kuvaile vikoja
-          </Typography>
-          <TextField
-            name="description"
-            value={furnitureDetails.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
