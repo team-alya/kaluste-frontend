@@ -58,7 +58,7 @@ const ChatbotPage = () => {
     Kunnostus: [
       
     ],
-  };
+  ]);
 
   const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
@@ -83,7 +83,9 @@ const ChatbotPage = () => {
       });
 
       try {
-        const response = await fetch("http://localhost:3000/api/chat", {
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+        const response = await fetch(`${apiUrl}/api/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -141,7 +143,9 @@ const ChatbotPage = () => {
     });
 
     try {
-      const response = await fetch("http://localhost:3000/api/chat", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+      const response = await fetch(`${apiUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -213,7 +217,7 @@ const ChatbotPage = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 500,
+        maxWidth: 800,
         margin: "auto",
         display: "flex",
         flexDirection: "column",
@@ -240,7 +244,7 @@ const ChatbotPage = () => {
           flexDirection: "column",
           gap: "10px",
           width: "100%",
-          maxHeight: "300px",
+          maxHeight: "325px",
           overflowY: "auto",
           mt: 2,
         }}

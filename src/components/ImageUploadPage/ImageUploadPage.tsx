@@ -64,7 +64,9 @@ const ImageUploadPage = () => {
       console.log(imageBlob);
       formData.append("image", imageBlob);
 
-      const response = await fetch("http://localhost:3000/api/image", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+      const response = await fetch(`${apiUrl}/api/image`, {
         method: "POST",
         body: formData,
       });
