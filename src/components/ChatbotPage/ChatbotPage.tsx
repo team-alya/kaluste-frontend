@@ -173,8 +173,9 @@ const ChatbotPage = () => {
   };
 
   const renderMessages = () => {
+    const currentTabKey = Object.keys(messages)[selectedTab] as keyof typeof messages;
     const currentTabMessages = [
-      ...messages[Object.keys(messages)[selectedTab]].map((text: any) => ({
+      ...messages[currentTabKey].map((text: unknown) => ({
         sender: "bot",
         text,
       })),
@@ -200,7 +201,7 @@ const ChatbotPage = () => {
           }}
         >
           <Typography variant="body1" sx={{ color: "black" }}>
-            {message.text}
+            {message.text as React.ReactNode}
           </Typography>
         </Paper>
       </Box>

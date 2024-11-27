@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Camera } from "react-camera-pro";
 import "./ImageUploadPage.css";
 import stockchair from "./stockchair.jpg";
@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
 const ImageUploadPage = () => {
-  const camera = useRef(null);
-  const fileInputRef = useRef(null);
-  const [image, setImage] = useState(null); // For displaying the image
-  const [imageBlob, setImageBlob] = useState(null); // Store the Blob or File for upload
+  const camera = useRef<typeof Camera | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [imageBlob, setImageBlob] = useState<File | null>(null); // Store the Blob or File for upload
   const [takeImage, setTakeImage] = useState(false); // For opening the camera
   const [furnitureResult, setFurnitureResult] = useState({
     requestId: "",
@@ -28,54 +28,68 @@ const ImageUploadPage = () => {
   const navigate = useNavigate();
 
   // Convert Base64 to Blob for camera images
-  const base64ToBlob = (base64) => {
+  const base64ToFile = (base64: string, filename: string): File => {
     const byteString = atob(base64.split(",")[1]);
     const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
     const byteArray = new Uint8Array(byteString.length);
-
+  
     for (let i = 0; i < byteString.length; i++) {
       byteArray[i] = byteString.charCodeAt(i);
     }
-    console.log("Blob for upload:", imageBlob);
-    return new Blob([byteArray], { type: mimeString });
+  
+    const blob = new Blob([byteArray], { type: mimeString });
+  
+    // Create a File from the Blob
+    return new File([blob], filename, {
+      type: mimeString,
+      lastModified: Date.now(), // You can adjust the lastModified if needed
+    });
   };
+  
 
   const handleFileInputClick = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   // Handle file input change
-  const handleChange = (e) => {
-    const file = e.target.files[0];
-    setImage(URL.createObjectURL(file)); // For displaying the image
-    setImageBlob(file); // Store the File object for upload
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0]; // Get the first file
+      setImage(URL.createObjectURL(file)); // For displaying the image
+      setImageBlob(file); // Store the File object for upload
+    }
   };
 
   // Handle upload for images
   const handleImageUpload = async () => {
     console.log("Camera image upload triggered");
+  
     if (!imageBlob) {
       console.log("No image Blob found for upload");
       return;
     }
-
+  
     try {
       const formData = new FormData();
       console.log(imageBlob);
-      formData.append("image", imageBlob);
+  
+      // If imageBlob is a Blob, convert it to a File before uploading
+      const fileToUpload = imageBlob instanceof Blob ? imageBlob : imageBlob;  // Just use imageBlob directly
 
+      formData.append("image", fileToUpload);
+  
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
+  
       const response = await fetch(`${apiUrl}/api/image`, {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) {
-        console.error(
-          "Failed to upload camera image. Status:",
-          response.status
-        );
+        console.error("Failed to upload camera image. Status:", response.status);
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
@@ -89,6 +103,7 @@ const ImageUploadPage = () => {
       navigate("/confirmation", { state: { furnitureResult } });
     }
   };
+  
 
   return (
     <div className="container">
@@ -144,13 +159,15 @@ const ImageUploadPage = () => {
                 variant="contained"
                 color="primary"
                 onClick={() => {
-                  const capturedImage = camera.current.takePhoto();
+                  const capturedImage = camera.current?.takePhoto();
                   console.log("Captured Image (Base64):", capturedImage); // Log Base64
 
-                  const blob = base64ToBlob(capturedImage); // Convert Base64 to Blob
-                  setImageBlob(blob); // Store Blob for upload
-                  setImage(capturedImage); // Set Base64 image for display
-                  setTakeImage(false);
+                  if (capturedImage) {
+                    const blob = base64ToFile(capturedImage, "captured-image.jpg");  // Pass both base64 string and filename
+                    setImageBlob(blob);  // Store the File for upload
+                    setImage(capturedImage);  // Set Base64 image for display
+                    setTakeImage(false);
+                  }
                 }}
               >
                 Ota kuva
