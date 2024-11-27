@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
 import {
-  Tabs,
-  Tab,
-  Typography,
   Box,
   Button,
-  Stack,
   Paper,
+  Stack,
+  Tab,
+  Tabs,
   TextField,
+  Typography,
 } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 interface ChatMessage {
@@ -58,7 +58,7 @@ const ChatbotPage = () => {
     Kunnostus: [
       
     ],
-  ]);
+  }
 
   const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
