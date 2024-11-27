@@ -5,8 +5,12 @@ import stockchair from "./stockchair.jpg";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
+interface CameraType {
+  takePhoto: () => string;
+}
+
 const ImageUploadPage = () => {
-  const camera = useRef<typeof Camera | null>(null);
+  const camera = useRef<CameraType | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [imageBlob, setImageBlob] = useState<File | null>(null); // Store the Blob or File for upload
