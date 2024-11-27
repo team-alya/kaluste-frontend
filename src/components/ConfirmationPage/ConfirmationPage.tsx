@@ -36,7 +36,7 @@ function FurniConfirmPage() {
   const navigate = useNavigate();
 
   // Generic change handler for input fields
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: string) => {
     setFurnitureDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
@@ -44,7 +44,7 @@ function FurniConfirmPage() {
   };
 
   // Change handler for nested mitat fields
-  const handleMitatChange = (dimension, value) => {
+  const handleMitatChange = (dimension: string, value: string) => {
     setFurnitureDetails((prevDetails) => ({
       ...prevDetails,
       mitat: {
@@ -55,7 +55,7 @@ function FurniConfirmPage() {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     try {
@@ -72,7 +72,7 @@ function FurniConfirmPage() {
         },
         materiaalit: furnitureDetails.materiaalit
           .split(",")
-          .map((material) => material.trim()),
+          .map((material: string) => material.trim()),
         kunto: furnitureDetails.kunto,
       };
 
