@@ -32,20 +32,19 @@ const ImageUploadPage = () => {
     const byteString = atob(base64.split(",")[1]);
     const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
     const byteArray = new Uint8Array(byteString.length);
-  
+
     for (let i = 0; i < byteString.length; i++) {
       byteArray[i] = byteString.charCodeAt(i);
     }
-  
+
     const blob = new Blob([byteArray], { type: mimeString });
-  
+
     // Create a File from the Blob
     return new File([blob], filename, {
       type: mimeString,
       lastModified: Date.now(), // You can adjust the lastModified if needed
     });
   };
-  
 
   const handleFileInputClick = () => {
     if (fileInputRef.current) {
@@ -66,30 +65,33 @@ const ImageUploadPage = () => {
   // Handle upload for images
   const handleImageUpload = async () => {
     console.log("Camera image upload triggered");
-  
+
     if (!imageBlob) {
       console.log("No image Blob found for upload");
       return;
     }
-  
+
     try {
       const formData = new FormData();
       console.log(imageBlob);
-  
+
       // If imageBlob is a Blob, convert it to a File before uploading
-      const fileToUpload = imageBlob instanceof Blob ? imageBlob : imageBlob;  // Just use imageBlob directly
+      const fileToUpload = imageBlob instanceof Blob ? imageBlob : imageBlob; // Just use imageBlob directly
 
       formData.append("image", fileToUpload);
-  
+
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  
+
       const response = await fetch(`${apiUrl}/api/image`, {
         method: "POST",
         body: formData,
       });
-  
+
       if (!response.ok) {
-        console.error("Failed to upload camera image. Status:", response.status);
+        console.error(
+          "Failed to upload camera image. Status:",
+          response.status
+        );
       } else {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
@@ -103,7 +105,6 @@ const ImageUploadPage = () => {
       navigate("/confirmation", { state: { furnitureResult } });
     }
   };
-  
 
   return (
     <div className="container">
@@ -163,9 +164,12 @@ const ImageUploadPage = () => {
                   console.log("Captured Image (Base64):", capturedImage); // Log Base64
 
                   if (capturedImage) {
-                    const blob = base64ToFile(capturedImage, "captured-image.jpg");  // Pass both base64 string and filename
-                    setImageBlob(blob);  // Store the File for upload
-                    setImage(capturedImage);  // Set Base64 image for display
+                    const blob = base64ToFile(
+                      capturedImage,
+                      "captured-image.jpg"
+                    ); // Pass both base64 string and filename
+                    setImageBlob(blob); // Store the File for upload
+                    setImage(capturedImage); // Set Base64 image for display
                     setTakeImage(false);
                   }
                 }}
