@@ -11,6 +11,8 @@ import {
 import "./ConfirmationPage.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { DNA } from 'react-loader-spinner'
+
 function FurniConfirmPage() {
   const location = useLocation();
   const { furnitureResult } = location.state || {
@@ -32,6 +34,8 @@ function FurniConfirmPage() {
     materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
     kunto: furnitureResult?.kunto || "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -57,6 +61,8 @@ function FurniConfirmPage() {
   // Handle form submission
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     try {
       // Create furnitureDetails payload in the expected format
@@ -105,7 +111,20 @@ function FurniConfirmPage() {
   };
 
   return (
+    
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
+      {isLoading && (
+        <div className="loader-overlay">
+          <DNA
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="dna-loading"
+            wrapperStyle={{ margin: "auto", display: "block" }}
+            wrapperClass="dna-wrapper"
+            />
+        </div>
+      )}
       <Box className="headingBox">
         <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>

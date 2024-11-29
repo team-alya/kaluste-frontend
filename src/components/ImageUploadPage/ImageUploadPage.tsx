@@ -5,6 +5,8 @@ import stockchair from "./stockchair.jpg";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 
+import { DNA } from 'react-loader-spinner'
+
 interface CameraType {
   takePhoto: () => string;
 }
@@ -29,6 +31,8 @@ const ImageUploadPage = () => {
     materiaalit: [],
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
   // Convert Base64 to Blob for camera images
@@ -46,7 +50,7 @@ const ImageUploadPage = () => {
     // Create a File from the Blob
     return new File([blob], filename, {
       type: mimeString,
-      lastModified: Date.now(), // You can adjust the lastModified if needed
+      lastModified: Date.now(),
     });
   };
 
@@ -68,6 +72,9 @@ const ImageUploadPage = () => {
 
   // Handle upload for images
   const handleImageUpload = async () => {
+
+    setIsLoading(true);
+
     console.log("Camera image upload triggered");
 
     if (!imageBlob) {
@@ -107,11 +114,25 @@ const ImageUploadPage = () => {
     } catch (error) {
       console.error("Error uploading camera image:", error);
       navigate("/confirmation", { state: { furnitureResult } });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="container">
+      {isLoading && (
+        <div className="loader-overlay">
+          <DNA
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="dna-loading"
+            wrapperStyle={{ margin: "auto", display: "block" }}
+            wrapperClass="dna-wrapper"
+            />
+        </div>
+      )}
       {!image ? (
         <>
           <h1 className="h1">Lataa kuva</h1>
@@ -219,7 +240,7 @@ const ImageUploadPage = () => {
               className="button"
               variant="contained"
               color="primary"
-              onClick={handleImageUpload}
+                onClick={handleImageUpload}
             >
               KYLLÄ
             </Button>
