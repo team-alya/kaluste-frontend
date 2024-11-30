@@ -65,6 +65,7 @@ const ChatbotPage = () => {
   };
 
   const handleSendMessage = async () => {
+
     if (userMessage.trim()) {
       setChatMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
@@ -82,35 +83,79 @@ const ChatbotPage = () => {
         return updatedStates;
       });
 
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
 
-        const response = await fetch(`${apiUrl}/api/chat`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requestId: furnitureResult.requestId,
-            question: userMessage,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setChatMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages];
-            updatedMessages[selectedTab] = [
-              ...updatedMessages[selectedTab],
-              { sender: "bot", text: data.answer },
-            ];
-            return updatedMessages;
-          });
-        } else {
-          console.error("Failed to fetch AI response. Status:", response.status);
+        console.log("Message to api/location")
+  
+        let source = "";
+        if (selectedTab === 1) {
+          source = "donation"
+        } else if (selectedTab === 2) {
+          source = "recycle"
+        } else if (selectedTab === 3) {
+          source = "repair"
         }
-      } catch (error) {
-        console.error("Error during message send:", error);
+  
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  
+          const response = await fetch(`${apiUrl}/api/location`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              location: userMessage,
+              source: source
+            }),
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.result },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
+      } else {
+
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+          const response = await fetch(`${apiUrl}/api/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              question: userMessage,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.answer },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
       }
-      
     }
   };
 
