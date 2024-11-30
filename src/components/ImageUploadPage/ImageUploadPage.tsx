@@ -179,7 +179,22 @@ const ImageUploadPage = () => {
               />
             </div>
           ) : (
-            <>
+              <>
+                
+                <div className="camera-container">
+                <Camera
+                  ref={camera}
+                  facingMode="environment"
+                  aspectRatio={4 / 3}
+                  errorMessages={{
+                    noCameraAccessible: undefined,
+                    permissionDenied: undefined,
+                    switchCamera: undefined,
+                    canvas: undefined,
+                  }}
+                />
+                </div>
+              <div className="button-container">
               <Button
                 className="button"
                 variant="contained"
@@ -210,20 +225,8 @@ const ImageUploadPage = () => {
               >
                 Sulje kamera
               </Button>
-
-              <div className="camera-container">
-                <Camera
-                  ref={camera}
-                  facingMode="environment"
-                  aspectRatio={4 / 3}
-                  errorMessages={{
-                    noCameraAccessible: undefined,
-                    permissionDenied: undefined,
-                    switchCamera: undefined,
-                    canvas: undefined,
-                  }}
-                />
               </div>
+              
             </>
           )}
         </>
