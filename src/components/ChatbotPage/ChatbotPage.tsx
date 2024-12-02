@@ -34,6 +34,7 @@ const ChatbotPage = () => {
     priceAnalysis: null,
   };
 
+  // The first AI-"messages" shown on each tab
   const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
     [{sender: "bot", text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
       Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
@@ -60,6 +61,7 @@ const ChatbotPage = () => {
     ],
   }
 
+  // Change tabs
   const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
   };
@@ -83,10 +85,13 @@ const ChatbotPage = () => {
         return updatedStates;
       });
 
+      // If the message is the first message in "lahjoitus", "kierrätys" or "kunnostus"
+      // Expect the message to be the users location and send it to a different API-endpoint
       if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
 
         console.log("Message to api/location")
   
+        // api/location needs the information of from which tab the users location is sent from
         let source = "";
         if (selectedTab === 1) {
           source = "donation"
@@ -170,21 +175,12 @@ const ChatbotPage = () => {
       return;
     }
     const message =
-      "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
+      "Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita.Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.";
 
     setTabStates((prevStates) => {
       const updatedStates = [...prevStates];
       updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
       return updatedStates;
-    });
-
-    setChatMessages((prevMessages) => {
-      const updatedMessages = [...prevMessages];
-      updatedMessages[selectedTab] = [
-        ...updatedMessages[selectedTab],
-        { sender: "user", text: message },
-      ];
-      return updatedMessages;
     });
 
     try {

@@ -35,7 +35,7 @@ const ImageUploadPage = () => {
 
   const navigate = useNavigate();
 
-  // Convert Base64 to Blob for camera images
+  // Convert Base64 to Blob since backend is expecting an image
   const base64ToFile = (base64: string, filename: string): File => {
     const byteString = atob(base64.split(",")[1]);
     const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
@@ -107,12 +107,14 @@ const ImageUploadPage = () => {
         const result = await response.json();
         console.log("Camera image uploaded successfully!", result);
         setFurnitureResult(result.result);
+        // Navigate to confirmation page and forward the AI result
         navigate("/confirmation", {
           state: { furnitureResult: result.result, imageBlob },
         });
       }
     } catch (error) {
       console.error("Error uploading camera image:", error);
+      // Navigate to confirmation page without the AI result
       navigate("/confirmation", { state: { furnitureResult } });
     } finally {
       setIsLoading(false);

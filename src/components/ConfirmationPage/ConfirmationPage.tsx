@@ -96,6 +96,7 @@ function FurniConfirmPage() {
       if (priceResponse.ok) {
         const priceData = await priceResponse.json();
         console.log("Price analysis:", priceData);
+        // Navigate to chatbotpage and forward the furniture information
         navigate("/chatbotpage", {
           state: { furnitureResult, priceAnalysis: priceData },
         });
@@ -125,6 +126,7 @@ function FurniConfirmPage() {
             />
         </div>
       )}
+      
       <Box className="headingBox">
         <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>
