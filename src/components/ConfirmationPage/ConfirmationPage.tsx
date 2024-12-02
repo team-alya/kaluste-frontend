@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
   MenuItem,
   Select,
@@ -10,8 +12,6 @@ import {
 } from "@mui/material";
 import "./ConfirmationPage.css";
 import { useLocation, useNavigate } from "react-router-dom";
-
-import { DNA } from 'react-loader-spinner'
 
 function FurniConfirmPage() {
   const location = useLocation();
@@ -112,21 +112,16 @@ function FurniConfirmPage() {
   };
 
   return (
-    
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
       {isLoading && (
-        <div className="loader-overlay">
-          <DNA
-            visible={true}
-            height="80"
-            width="80"
-            ariaLabel="dna-loading"
-            wrapperStyle={{ margin: "auto", display: "block" }}
-            wrapperClass="dna-wrapper"
-            />
-        </div>
+        <Backdrop
+          open={true}
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        >
+          <CircularProgress />
+        </Backdrop>
       )}
-      
+
       <Box className="headingBox">
         <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>
