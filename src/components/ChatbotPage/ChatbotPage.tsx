@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
 import {
-  Tabs,
-  Tab,
-  Typography,
   Box,
   Button,
-  Stack,
   Paper,
+  Stack,
+  Tab,
+  Tabs,
   TextField,
+  Typography,
 } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 interface ChatMessage {
@@ -34,6 +34,7 @@ const ChatbotPage = () => {
     priceAnalysis: null,
   };
 
+  // The first AI-"messages" shown on each tab
   const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
     [{sender: "bot", text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
       Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
@@ -58,13 +59,15 @@ const ChatbotPage = () => {
     Kunnostus: [
       
     ],
-  };
+  }
 
+  // Change tabs
   const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
   };
 
   const handleSendMessage = async () => {
+
     if (userMessage.trim()) {
       setChatMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
@@ -82,33 +85,82 @@ const ChatbotPage = () => {
         return updatedStates;
       });
 
-      try {
-        const response = await fetch("http://localhost:3000/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requestId: furnitureResult.requestId,
-            question: userMessage,
-          }),
-        });
+      // If the message is the first message in "lahjoitus", "kierrätys" or "kunnostus"
+      // Expect the message to be the users location and send it to a different API-endpoint
+      if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
 
-        if (response.ok) {
-          const data = await response.json();
-          setChatMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages];
-            updatedMessages[selectedTab] = [
-              ...updatedMessages[selectedTab],
-              { sender: "bot", text: data.answer },
-            ];
-            return updatedMessages;
-          });
-        } else {
-          console.error("Failed to fetch AI response. Status:", response.status);
+        console.log("Message to api/location")
+  
+        // api/location needs the information of from which tab the users location is sent from
+        let source = "";
+        if (selectedTab === 1) {
+          source = "donation"
+        } else if (selectedTab === 2) {
+          source = "recycle"
+        } else if (selectedTab === 3) {
+          source = "repair"
         }
-      } catch (error) {
-        console.error("Error during message send:", error);
+  
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  
+          const response = await fetch(`${apiUrl}/api/location`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              location: userMessage,
+              source: source
+            }),
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.result },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
+      } else {
+
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+          const response = await fetch(`${apiUrl}/api/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              question: userMessage,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.answer },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
       }
-      
     }
   };
 
@@ -123,7 +175,7 @@ const ChatbotPage = () => {
       return;
     }
     const message =
-      "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
+      "Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita.Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.";
 
     setTabStates((prevStates) => {
       const updatedStates = [...prevStates];
@@ -131,17 +183,10 @@ const ChatbotPage = () => {
       return updatedStates;
     });
 
-    setChatMessages((prevMessages) => {
-      const updatedMessages = [...prevMessages];
-      updatedMessages[selectedTab] = [
-        ...updatedMessages[selectedTab],
-        { sender: "user", text: message },
-      ];
-      return updatedMessages;
-    });
-
     try {
-      const response = await fetch("http://localhost:3000/api/chat", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+      const response = await fetch(`${apiUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -169,8 +214,9 @@ const ChatbotPage = () => {
   };
 
   const renderMessages = () => {
+    const currentTabKey = Object.keys(messages)[selectedTab] as keyof typeof messages;
     const currentTabMessages = [
-      ...messages[Object.keys(messages)[selectedTab]].map((text: any) => ({
+      ...messages[currentTabKey].map((text: unknown) => ({
         sender: "bot",
         text,
       })),
@@ -196,7 +242,7 @@ const ChatbotPage = () => {
           }}
         >
           <Typography variant="body1" sx={{ color: "black" }}>
-            {message.text}
+            {message.text as React.ReactNode}
           </Typography>
         </Paper>
       </Box>
@@ -213,7 +259,7 @@ const ChatbotPage = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 500,
+        maxWidth: 800,
         margin: "auto",
         display: "flex",
         flexDirection: "column",
@@ -240,7 +286,7 @@ const ChatbotPage = () => {
           flexDirection: "column",
           gap: "10px",
           width: "100%",
-          maxHeight: "300px",
+          maxHeight: "325px",
           overflowY: "auto",
           mt: 2,
         }}
