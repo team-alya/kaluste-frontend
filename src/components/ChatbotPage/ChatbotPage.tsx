@@ -78,8 +78,8 @@ const ChatbotPage = () => {
         body: JSON.stringify({
           requestId: furnitureResult.requestId,
           review: {
-            rating: sliderValue,
-            comment: feedback
+            comment: feedback,
+            rating: sliderValue         
           }
         }),
       });
@@ -91,6 +91,8 @@ const ChatbotPage = () => {
         setFeedback("");
       } else {
         console.error("Failed to send feedback:", response.status);
+        console.log(feedback)
+        console.log(sliderValue)
       }
     } catch (error) {
       console.error("Error while sending feedback:", error);
