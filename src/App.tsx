@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ThemeProvider, createTheme, Theme } from "@mui/material/styles";
-import { CssBaseline, FormControlLabel, Box, Switch } from "@mui/material";
-import { Link, Route, Routes } from "react-router-dom";
+import { CssBaseline, Box, FormControlLabel, Switch } from "@mui/material";
+import { Route, Routes } from "react-router-dom";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import ImageUploadPage from "./components/ImageUploadPage/ImageUploadPage";
 import FurniConfirmPage from "./components/ConfirmationPage/ConfirmationPage";
@@ -23,39 +23,16 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Applies global styles for current theme */}
       <div>
-        {/* Navigation Bar */}
-        <nav className="navbar">
-          <div className="nav-item">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-          </div>
-          <div className="nav-item">
-            <Link to="/upload" className="nav-link">
-              Upload Image
-            </Link>
-          </div>
-          <div className="nav-item">
-            <Link to="/confirmation" className="nav-link">
-              Confirmation
-            </Link>
-          </div>
-          <div className="nav-item">
-            <Link to="/chatbotpage" className="nav-link">
-              Chatbot
-            </Link>
-          </div>
-          <div className="toggle">
+      <div className="toggle">
             {/* Switch to toggle theme */}
             <Box textAlign="center" margin={2}>
               <FormControlLabel
                 control={<Switch checked={darkMode} onChange={toggleTheme} />}
                 label={darkMode ? "Theme 2" : "Theme 1"}
-              />
-            </Box>
-          </div>
-        </nav>
-
+            />
+                    </Box>
+        </div>
+        </div>
         {/* Routes */}
         <div>
           <Routes>
@@ -63,9 +40,8 @@ function App() {
             <Route path="/upload" element={<ImageUploadPage />} />
             <Route path="/confirmation" element={<FurniConfirmPage />} />
             <Route path="/chatbotpage" element={<ChatbotPage />} />
-          </Routes>
+        </Routes>
         </div>
-      </div>
     </ThemeProvider>
   );
 }

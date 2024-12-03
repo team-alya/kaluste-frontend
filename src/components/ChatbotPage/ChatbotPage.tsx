@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
 import {
-  Tabs,
-  Tab,
-  Typography,
   Box,
   Button,
-  Stack,
   Paper,
+  Stack,
+  Tab,
+  Tabs,
   TextField,
+  Typography,
 } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-// Define the type for a chat message
 interface ChatMessage {
   sender: string;
   text: string;
@@ -19,54 +18,57 @@ interface ChatMessage {
 
 const ChatbotPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [userMessage, setUserMessage] = useState(""); // State for input field
-  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
-    [], // Myynti chat history
-    [], // Lahjoitus chat history
-    [], // Kierrätys chat history
-    [], // Kunnostus chat history
-  ]); // Array to hold chat messages for each tab
+  const [userMessage, setUserMessage] = useState("");
+  
+  // Separate state for each tab's buttons and input field visibility
+  const [tabStates, setTabStates] = useState([
+    { showInputField: false, isButtonsUsed: false }, // Myynti
+    { showInputField: true, isButtonsUsed: true },   // Lahjoitus
+    { showInputField: true, isButtonsUsed: true },   // Kierrätys
+    { showInputField: true, isButtonsUsed: true },   // Kunnostus
+  ]);
 
-  const [showInputField, setShowInputField] = useState(false); // State to show input field
   const location = useLocation();
   const { furnitureResult, priceAnalysis } = location.state || {
     furnitureResult: null,
     priceAnalysis: null,
   };
 
-  const chatContainerRef = useRef<HTMLDivElement>(null); // Reference for the chat container
+  // The first AI-"messages" shown on each tab
+  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
+    [{sender: "bot", text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
+      Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
+      Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa."}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja."}], 
+    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita."}]
+  ]);
 
-  // The predefined messages for each tab
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   const messages = {
     Myynti: [
-      `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.`,
-      `Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}`,
-      "Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?",
+      
     ],
     Lahjoitus: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.",
+      
     ],
     Kierrätys: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.",
+      
     ],
     Kunnostus: [
-      "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.",
+      
     ],
-  };
+  }
 
-  // Handle tab change
-  const handleChange = (
-    _event: any,
-    newValue: React.SetStateAction<number>
-  ) => {
+  // Change tabs
+  const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
     setSelectedTab(newValue);
-    setShowInputField(false); // Hide the input field when switching tabs
   };
 
-  // Handle sending message
   const handleSendMessage = async () => {
+
     if (userMessage.trim()) {
-      // Optimistically update the state
       setChatMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
         updatedMessages[selectedTab] = [
@@ -76,67 +78,117 @@ const ChatbotPage = () => {
         return updatedMessages;
       });
 
-      setUserMessage(""); // Clear the input field
+      setUserMessage("");
+      setTabStates((prevStates) => {
+        const updatedStates = [...prevStates];
+        updatedStates[selectedTab].showInputField = true; // Show input field when a message is sent
+        return updatedStates;
+      });
 
-      try {
-        const response = await fetch("http://localhost:3000/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            requestId: furnitureResult.requestId,
-            question: userMessage,
-          }),
-        });
+      // If the message is the first message in "lahjoitus", "kierrätys" or "kunnostus"
+      // Expect the message to be the users location and send it to a different API-endpoint
+      if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
 
-        if (response.ok) {
-          const data = await response.json();
-
-          // Add the response from the bot to the chat
-          setChatMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages];
-            updatedMessages[selectedTab] = [
-              ...updatedMessages[selectedTab],
-              { sender: "bot", text: data.answer },
-            ];
-            return updatedMessages;
-          });
-        } else {
-          console.error(
-            "Failed to fetch AI response. Status:",
-            response.status
-          );
+        console.log("Message to api/location")
+  
+        // api/location needs the information of from which tab the users location is sent from
+        let source = "";
+        if (selectedTab === 1) {
+          source = "donation"
+        } else if (selectedTab === 2) {
+          source = "recycle"
+        } else if (selectedTab === 3) {
+          source = "repair"
         }
-      } catch (error) {
-        console.error("Error during message send:", error);
+  
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  
+          const response = await fetch(`${apiUrl}/api/location`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              location: userMessage,
+              source: source
+            }),
+          });
+  
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.result },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
+      } else {
+
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+          const response = await fetch(`${apiUrl}/api/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              requestId: furnitureResult.requestId,
+              question: userMessage,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setChatMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              updatedMessages[selectedTab] = [
+                ...updatedMessages[selectedTab],
+                { sender: "bot", text: data.answer },
+              ];
+              return updatedMessages;
+            });
+          } else {
+            console.error("Failed to fetch AI response. Status:", response.status);
+          }
+        } catch (error) {
+          console.error("Error during message send:", error);
+        }
       }
     }
   };
 
-  // Handle predefined response buttons (KYLLÄ, EI KIITOS)
-  const handleButtonClick = async (_response: string) => {
+  const handleButtonClick = async (response: string) => {
+    if (response === "EI KIITOS") {
+      // Just hide the buttons without sending any message
+      setTabStates((prevStates) => {
+        const updatedStates = [...prevStates];
+        updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
+        return updatedStates;
+      });
+      return;
+    }
     const message =
-      "Luo huomiota kiinnittävä, hyvin jaoteltu ja myyvä myynti-ilmoitus kyseiselle huonekalulle. Mainitse ilmoituksessa huonekalun ominaisuudet, mitat ja hinta.";
+      "Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita.Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.";
 
-    setShowInputField(true); // Show the input field for further typing
-
-    // Optimistically add the predefined message to the chat
-    setChatMessages((prevMessages) => {
-      const updatedMessages = [...prevMessages];
-      updatedMessages[selectedTab] = [
-        ...updatedMessages[selectedTab],
-        { sender: "user", text: message },
-      ];
-      return updatedMessages;
+    setTabStates((prevStates) => {
+      const updatedStates = [...prevStates];
+      updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
+      return updatedStates;
     });
 
     try {
-      const response = await fetch("http://localhost:3000/api/chat", {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+      const response = await fetch(`${apiUrl}/api/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           requestId: furnitureResult.requestId,
           question: message,
@@ -145,8 +197,6 @@ const ChatbotPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-
-        // Add the response from the bot to the chat
         setChatMessages((prevMessages) => {
           const updatedMessages = [...prevMessages];
           updatedMessages[selectedTab] = [
@@ -163,10 +213,10 @@ const ChatbotPage = () => {
     }
   };
 
-  // Render the chat messages for the current tab
   const renderMessages = () => {
+    const currentTabKey = Object.keys(messages)[selectedTab] as keyof typeof messages;
     const currentTabMessages = [
-      ...messages[Object.keys(messages)[selectedTab]].map((text: any) => ({
+      ...messages[currentTabKey].map((text: unknown) => ({
         sender: "bot",
         text,
       })),
@@ -192,18 +242,16 @@ const ChatbotPage = () => {
           }}
         >
           <Typography variant="body1" sx={{ color: "black" }}>
-            {message.text}
+            {message.text as React.ReactNode}
           </Typography>
         </Paper>
       </Box>
     ));
   };
 
-  // Scroll to the bottom whenever messages change
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
@@ -211,7 +259,7 @@ const ChatbotPage = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: 500,
+        maxWidth: 800,
         margin: "auto",
         display: "flex",
         flexDirection: "column",
@@ -222,7 +270,6 @@ const ChatbotPage = () => {
         KalusteArvioBotti
       </Typography>
 
-      {/* Tabs for navigation */}
       <Tabs value={selectedTab} onChange={handleChange} centered>
         <Tab label="Myynti" />
         <Tab label="Lahjoitus" />
@@ -230,7 +277,6 @@ const ChatbotPage = () => {
         <Tab label="Kunnostus" />
       </Tabs>
 
-      {/* Chatbot Messages */}
       <Box
         ref={chatContainerRef}
         sx={{
@@ -240,7 +286,7 @@ const ChatbotPage = () => {
           flexDirection: "column",
           gap: "10px",
           width: "100%",
-          maxHeight: "300px",
+          maxHeight: "325px",
           overflowY: "auto",
           mt: 2,
         }}
@@ -248,35 +294,19 @@ const ChatbotPage = () => {
         {renderMessages()}
       </Box>
 
-      {/* Predefined buttons */}
-      {!showInputField && (
+      {!tabStates[selectedTab].showInputField && selectedTab === 0 && chatMessages[selectedTab].length === 1 && !tabStates[selectedTab].isButtonsUsed && (
         <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleButtonClick("KYLLÄ")}
-          >
+          <Button variant="contained" color="primary" onClick={() => handleButtonClick("KYLLÄ")}>
             KYLLÄ
           </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => handleButtonClick("EI KIITOS")}
-          >
+          <Button variant="outlined" color="primary" onClick={() => handleButtonClick("EI KIITOS")}>
             EI KIITOS
           </Button>
         </Stack>
       )}
 
-      {/* User Input Field */}
-      {showInputField && (
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="center"
-          mt={2}
-          sx={{ width: "100%" }}
-        >
+      {tabStates[selectedTab].showInputField && (
+        <Stack direction="row" spacing={2} justifyContent="center" mt={2} sx={{ width: "100%" }}>
           <TextField
             label="Write your message"
             variant="outlined"
@@ -284,11 +314,7 @@ const ChatbotPage = () => {
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSendMessage}
-          >
+          <Button variant="contained" color="primary" onClick={handleSendMessage}>
             Send
           </Button>
         </Stack>

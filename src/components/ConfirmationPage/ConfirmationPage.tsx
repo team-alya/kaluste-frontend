@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
   MenuItem,
   Select,
@@ -13,7 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 function FurniConfirmPage() {
   const location = useLocation();
-  const { furnitureResult, imageBlob } = location.state || {
+  const { furnitureResult } = location.state || {
     furnitureResult: null,
     imageBlob: null,
   };
@@ -30,13 +32,15 @@ function FurniConfirmPage() {
       leveys: furnitureResult?.mitat?.leveys || "",
     },
     materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
-    kunto: furnitureResult?.kunto || ""
+    kunto: furnitureResult?.kunto || "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   // Generic change handler for input fields
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: string) => {
     setFurnitureDetails((prevDetails) => ({
       ...prevDetails,
       [field]: value,
@@ -44,7 +48,7 @@ function FurniConfirmPage() {
   };
 
   // Change handler for nested mitat fields
-  const handleMitatChange = (dimension, value) => {
+  const handleMitatChange = (dimension: string, value: string) => {
     setFurnitureDetails((prevDetails) => ({
       ...prevDetails,
       mitat: {
@@ -55,50 +59,69 @@ function FurniConfirmPage() {
   };
 
   // Handle form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
 
-  try {
-    // Create furnitureDetails payload in the expected format
-    const furnitureDetailsPayload = {
-      requestId: furnitureDetails.requestId,
-      merkki: furnitureDetails.merkki,
-      malli: furnitureDetails.malli,
-      väri: furnitureDetails.väri,
-      mitat: {
-        pituus: Number(furnitureDetails.mitat.pituus),
-        leveys: Number(furnitureDetails.mitat.leveys),
-        korkeus: Number(furnitureDetails.mitat.korkeus),
-      },
-      materiaalit: furnitureDetails.materiaalit.split(",").map((material) => material.trim()),
-      kunto: furnitureDetails.kunto,
-    };
+    setIsLoading(true);
 
-    // Make POST request with JSON body
-    const priceResponse = await fetch("http://localhost:3000/api/price", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
-    });
+    try {
+      // Create furnitureDetails payload in the expected format
+      const furnitureDetailsPayload = {
+        requestId: furnitureDetails.requestId,
+        merkki: furnitureDetails.merkki,
+        malli: furnitureDetails.malli,
+        väri: furnitureDetails.väri,
+        mitat: {
+          pituus: Number(furnitureDetails.mitat.pituus),
+          leveys: Number(furnitureDetails.mitat.leveys),
+          korkeus: Number(furnitureDetails.mitat.korkeus),
+        },
+        materiaalit: furnitureDetails.materiaalit
+          .split(",")
+          .map((material: string) => material.trim()),
+        kunto: furnitureDetails.kunto,
+      };
 
-    if (priceResponse.ok) {
-      const priceData = await priceResponse.json();
-      console.log("Price analysis:", priceData);
-      navigate("/chatbotpage", { state: { furnitureResult, priceAnalysis: priceData } });
-    } else {
-      console.error("Failed to fetch price analysis. Status:", priceResponse.status);
+      // Make POST request with JSON body
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+      const priceResponse = await fetch(`${apiUrl}/api/price`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
+      });
+
+      if (priceResponse.ok) {
+        const priceData = await priceResponse.json();
+        console.log("Price analysis:", priceData);
+        // Navigate to chatbotpage and forward the furniture information
+        navigate("/chatbotpage", {
+          state: { furnitureResult, priceAnalysis: priceData },
+        });
+      } else {
+        console.error(
+          "Failed to fetch price analysis. Status:",
+          priceResponse.status
+        );
+      }
+    } catch (error) {
+      console.error("Error during form submission:", error);
     }
-  } catch (error) {
-    console.error("Error during form submission:", error);
-  }
-};
-
-
+  };
 
   return (
     <Box className="mainBox" component="form" onSubmit={handleSubmit}>
+      {isLoading && (
+        <Backdrop
+          open={true}
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        >
+          <CircularProgress />
+        </Backdrop>
+      )}
+
       <Box className="headingBox">
         <Typography variant="h5">Tietojen tarkistus</Typography>
       </Box>
@@ -228,22 +251,6 @@ const handleSubmit = async (e) => {
             name="color"
             value={furnitureDetails.väri}
             onChange={(e) => handleInputChange("väri", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
-
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Kuvaile vikoja
-          </Typography>
-          <TextField
-            name="description"
-            value={furnitureDetails.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
             margin="normal"
             size="small"
             className="inputTextFiels"
