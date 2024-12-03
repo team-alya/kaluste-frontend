@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Slider from '@mui/material/Slider';
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -17,6 +18,8 @@ interface ChatMessage {
 }
 
 const ChatbotPage = () => {
+  const [sliderValue, setSliderValue] = useState<number>(1);
+  const [feedback, setFeedback] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [userMessage, setUserMessage] = useState("");
   
@@ -60,6 +63,39 @@ const ChatbotPage = () => {
       
     ],
   }
+
+  const handleSliderChange = (_event: Event, newValue: number | number[]) => {
+    setSliderValue(newValue as number);
+  };
+
+  const handleFeedbackSubmit = async () => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+    try {
+      const response = await fetch(`${apiUrl}/api/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: furnitureResult.requestId,
+          review: {
+            rating: sliderValue,
+            comment: feedback
+          }
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Feedback sent successfully!");
+        // Optionally, you could clear the inputs or display a success message
+        setSliderValue(1);
+        setFeedback("");
+      } else {
+        console.error("Failed to send feedback:", response.status);
+      }
+    } catch (error) {
+      console.error("Error while sending feedback:", error);
+    }
+  };
 
   // Change tabs
   const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
@@ -319,6 +355,42 @@ const ChatbotPage = () => {
           </Button>
         </Stack>
       )}
+      <hr
+        style={{
+            color: "DodgerBlue",
+            backgroundColor: "DodgerBlue",
+            height: 5,
+            width: "80%",
+            margin: "50px"
+        }}
+    />
+      <p>Annathan palautetta sovelluksesta antamalla arvion 1-5 ja vapaavalintaisen kommentin</p>
+      <Box sx={{ width: 300, margin: "auto" }}>
+        <Slider
+          aria-label="Rating"
+          value={sliderValue}
+          onChange={handleSliderChange}
+          step={1}
+          marks
+          min={1}
+          max={5}
+          valueLabelDisplay="auto"
+        />
+      </Box>
+      <TextField
+        id="outlined-basic"
+        label="Palautteesi"
+        variant="outlined"
+        multiline
+        rows={5}
+        margin="normal"
+        fullWidth
+        value={feedback}
+        onChange={(e) => setFeedback(e.target.value)}
+      />
+      <Button variant="contained" color="primary" onClick={handleFeedbackSubmit}>
+        Lähetä
+      </Button>
     </Box>
   );
 };
