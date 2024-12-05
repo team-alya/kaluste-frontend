@@ -2,6 +2,10 @@
 
 Front-End of the Älyä-hanke KalusteArvio-project. The goal of this app is to use Artifical Intelligence to give the user recommendations on what to do with their used furniture. These recommendations include recycling, selling, repairing and donating.
 
+# Technologies Used
+
+**React + Vite + TypeScript**
+
 ## Installation
 
 To run the program follow the instructions below:
