@@ -4,7 +4,7 @@ Front-End of the Älyä-hanke KalusteArvio-project. The goal of this app is to u
 
 # Technologies Used
 
-**React + Vite + TypeScript**
+React + Vite + TypeScript
 
 ## Installation
 
