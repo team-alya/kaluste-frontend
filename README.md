@@ -32,6 +32,14 @@ To run the program follow the instructions below:
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
 
+### Notice!
+
+When you start the application for the first time you will get a popup conserning mkcert.
+<br>
+Accept the popup.
+<br>
+This enables the use of https-protocol when running locally, since using mobile devices cameras requires an https-connection.
+
 ## Images of the user interface
 
 #### Welcome page:
