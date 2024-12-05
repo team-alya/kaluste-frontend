@@ -3,10 +3,21 @@
 Front-End of the Älyä-hanke KalusteArvio-project. The goal of this app is to use Artifical Intelligence to give the user recommendations on what to do with their used furniture. These recommendations include recycling, selling, repairing and donating.
 
 ## Technologies Used
+**React:**
+- A JavaScript library for building user interfaces.
+- [React Documentation](https://react.dev/)
 
-- React with Vite
-- TypeScript
-- Material-UI
+**Vite:**
+- A fast development build tool optimized for modern web projects.
+- [Vite Documentation](https://vite.dev/)
+
+**TypeScript:**
+- A typed superset of JavaScript that compiles to plain JavaScript.
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+
+**Material-UI:**
+- A popular React UI framework for building responsive and accessible user interfaces.
+- [Material-UI Documentation](https://mui.com/material-ui/)
 
 ## Installation
 
@@ -32,14 +43,6 @@ To run the program follow the instructions below:
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
 
-### Notice!
-
-When you start the application for the first time you will get a popup conserning mkcert.
-<br>
-Accept the popup.
-<br>
-This enables the use of https-protocol when running locally, since using mobile devices cameras requires an https-connection.
-
 ## Images of the user interface
 
 #### Welcome page:
@@ -53,7 +56,3 @@ This enables the use of https-protocol when running locally, since using mobile 
 #### Information confirmation page:
 
 ![image](https://github.com/user-attachments/assets/7f6d7b32-837c-45bf-a1d5-311f48bb2098)
-
-
-
-
