@@ -10,19 +10,19 @@ React + Vite + TypeScript
 
 To run the program follow the instructions below:
 
-1. Clone the Github repository:
+**1. Clone the Github repository:**
 
   ` git clone https://github.com/team-alya/kaluste-frontend.git`
 
-2. Change to the correct directory:
+**2. Change to the correct directory:**
 
   ` cd kaluste-frontend`
 	
-3. Install dependencies:
+**3. Install dependencies:**
 
   ` npm install`
 
-4. Start the app:
+**4. Start the app:**
 
   `npm run dev`
 
