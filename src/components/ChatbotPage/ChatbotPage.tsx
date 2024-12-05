@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Modal from '@mui/material/Modal';
 import Slider from '@mui/material/Slider';
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -64,6 +65,21 @@ const ChatbotPage = () => {
     ],
   }
 
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
+
   const handleSliderChange = (_event: Event, newValue: number | number[]) => {
     setSliderValue(newValue as number);
   };
@@ -87,6 +103,7 @@ const ChatbotPage = () => {
       if (response.ok) {
         console.log("Feedback sent successfully!");
         // Optionally, you could clear the inputs or display a success message
+        handleOpen();
         setSliderValue(1);
         setFeedback("");
       } else {
@@ -357,7 +374,11 @@ const ChatbotPage = () => {
           </Button>
         </Stack>
       )}
-      <hr
+      
+      
+      {chatMessages[selectedTab].length > 1 && 
+        <>
+        <hr
         style={{
             color: "DodgerBlue",
             backgroundColor: "DodgerBlue",
@@ -365,8 +386,8 @@ const ChatbotPage = () => {
             width: "80%",
             margin: "50px"
         }}
-    />
-      <p>Annathan palautetta sovelluksesta antamalla arvion 1-5 ja vapaavalintaisen kommentin</p>
+      />
+      <p>Annathan palautetta ylläolevista neuvoista antamalla arvion 1-5 ja vapaavalintaisen kommentin</p>
       <Box sx={{ width: 300, margin: "auto" }}>
         <Slider
           aria-label="Rating"
@@ -392,7 +413,21 @@ const ChatbotPage = () => {
       />
       <Button variant="contained" color="primary" onClick={handleFeedbackSubmit}>
         Lähetä
-      </Button>
+        </Button>
+        <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Kiitos palautteestasi
+          </Typography>
+        </Box>
+      </Modal>
+        </>
+      }
     </Box>
   );
 };
