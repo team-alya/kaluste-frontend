@@ -43,6 +43,14 @@ To run the program follow the instructions below:
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
 
+### Notice!
+
+When you first start the application using "npm run dev" locally you will get a popup conserning mkcert.
+<br>
+Accept the popup.
+<br>
+Mkcert is used to create a https-connection when running the application locally, because using a mobile devices camera requires an https-connection.
+
 ## Images of the user interface
 
 #### Welcome page:
