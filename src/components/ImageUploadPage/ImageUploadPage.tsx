@@ -103,7 +103,7 @@ const ImageUploadPage = () => {
       if (!response.ok) {
         console.error(
           "Failed to upload camera image. Status:",
-          response.status
+          response.status,
         );
       } else {
         const result = await response.json();
@@ -224,7 +224,7 @@ const ImageUploadPage = () => {
                     if (capturedImage) {
                       const blob = base64ToFile(
                         capturedImage,
-                        "captured-image.jpg"
+                        "captured-image.jpg",
                       );
                       setImageBlob(blob);
                       setImage(capturedImage);

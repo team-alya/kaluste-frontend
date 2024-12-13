@@ -23,25 +23,25 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Applies global styles for current theme */}
       <div>
-      <div className="toggle">
-            {/* Switch to toggle theme */}
-            <Box textAlign="center" margin={2}>
-              <FormControlLabel
-                control={<Switch checked={darkMode} onChange={toggleTheme} />}
-                label={darkMode ? "Theme 2" : "Theme 1"}
+        <div className="toggle">
+          {/* Switch to toggle theme */}
+          <Box textAlign="center" margin={2}>
+            <FormControlLabel
+              control={<Switch checked={darkMode} onChange={toggleTheme} />}
+              label={darkMode ? "Theme 2" : "Theme 1"}
             />
-                    </Box>
+          </Box>
         </div>
-        </div>
-        {/* Routes */}
-        <div>
-          <Routes>
-            <Route path="/" element={<WelcomePage />} />
-            <Route path="/upload" element={<ImageUploadPage />} />
-            <Route path="/confirmation" element={<FurniConfirmPage />} />
-            <Route path="/chatbotpage" element={<ChatbotPage />} />
+      </div>
+      {/* Routes */}
+      <div>
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/upload" element={<ImageUploadPage />} />
+          <Route path="/confirmation" element={<FurniConfirmPage />} />
+          <Route path="/chatbotpage" element={<ChatbotPage />} />
         </Routes>
-        </div>
+      </div>
     </ThemeProvider>
   );
 }

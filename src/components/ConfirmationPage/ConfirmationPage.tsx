@@ -103,7 +103,7 @@ function FurniConfirmPage() {
       } else {
         console.error(
           "Failed to fetch price analysis. Status:",
-          priceResponse.status
+          priceResponse.status,
         );
       }
     } catch (error) {

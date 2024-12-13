@@ -8,8 +8,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import Modal from '@mui/material/Modal';
-import Slider from '@mui/material/Slider';
+import Modal from "@mui/material/Modal";
+import Slider from "@mui/material/Slider";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -23,13 +23,13 @@ const ChatbotPage = () => {
   const [feedback, setFeedback] = useState<string>("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [userMessage, setUserMessage] = useState("");
-  
+
   // Separate state for each tab's buttons and input field visibility
   const [tabStates, setTabStates] = useState([
     { showInputField: false, isButtonsUsed: false }, // Myynti
-    { showInputField: true, isButtonsUsed: true },   // Lahjoitus
-    { showInputField: true, isButtonsUsed: true },   // Kierrätys
-    { showInputField: true, isButtonsUsed: true },   // Kunnostus
+    { showInputField: true, isButtonsUsed: true }, // Lahjoitus
+    { showInputField: true, isButtonsUsed: true }, // Kierrätys
+    { showInputField: true, isButtonsUsed: true }, // Kunnostus
   ]);
 
   const location = useLocation();
@@ -40,30 +40,42 @@ const ChatbotPage = () => {
 
   // The first AI-"messages" shown on each tab
   const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
-    [{sender: "bot", text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
+    [
+      {
+        sender: "bot",
+        text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
       Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
-      Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`}], 
-    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa."}], 
-    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja."}], 
-    [{sender: "bot", text: "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita."}]
+      Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`,
+      },
+    ],
+    [
+      {
+        sender: "bot",
+        text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.",
+      },
+    ],
+    [
+      {
+        sender: "bot",
+        text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.",
+      },
+    ],
+    [
+      {
+        sender: "bot",
+        text: "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.",
+      },
+    ],
   ]);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const messages = {
-    Myynti: [
-      
-    ],
-    Lahjoitus: [
-      
-    ],
-    Kierrätys: [
-      
-    ],
-    Kunnostus: [
-      
-    ],
-  }
+    Myynti: [],
+    Lahjoitus: [],
+    Kierrätys: [],
+    Kunnostus: [],
+  };
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -95,8 +107,8 @@ const ChatbotPage = () => {
           requestId: furnitureResult.requestId,
           review: {
             comment: feedback,
-            rating: sliderValue         
-          }
+            rating: sliderValue,
+          },
         }),
       });
 
@@ -108,8 +120,8 @@ const ChatbotPage = () => {
         setFeedback("");
       } else {
         console.error("Failed to send feedback:", response.status);
-        console.log(feedback)
-        console.log(sliderValue)
+        console.log(feedback);
+        console.log(sliderValue);
       }
     } catch (error) {
       console.error("Error while sending feedback:", error);
@@ -117,12 +129,14 @@ const ChatbotPage = () => {
   };
 
   // Change tabs
-  const handleChange = (_event: unknown, newValue: React.SetStateAction<number>) => {
+  const handleChange = (
+    _event: unknown,
+    newValue: React.SetStateAction<number>,
+  ) => {
     setSelectedTab(newValue);
   };
 
   const handleSendMessage = async () => {
-
     if (userMessage.trim()) {
       setChatMessages((prevMessages) => {
         const updatedMessages = [...prevMessages];
@@ -143,32 +157,32 @@ const ChatbotPage = () => {
       // If the message is the first message in "lahjoitus", "kierrätys" or "kunnostus"
       // Expect the message to be the users location and send it to a different API-endpoint
       if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
+        console.log("Message to api/location");
 
-        console.log("Message to api/location")
-  
         // api/location needs the information of from which tab the users location is sent from
         let source = "";
         if (selectedTab === 1) {
-          source = "donation"
+          source = "donation";
         } else if (selectedTab === 2) {
-          source = "recycle"
+          source = "recycle";
         } else if (selectedTab === 3) {
-          source = "repair"
+          source = "repair";
         }
-  
+
         try {
-          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-  
+          const apiUrl =
+            import.meta.env.VITE_API_URL || "http://localhost:3000";
+
           const response = await fetch(`${apiUrl}/api/location`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               requestId: furnitureResult.requestId,
               location: userMessage,
-              source: source
+              source: source,
             }),
           });
-  
+
           if (response.ok) {
             const data = await response.json();
             setChatMessages((prevMessages) => {
@@ -180,15 +194,18 @@ const ChatbotPage = () => {
               return updatedMessages;
             });
           } else {
-            console.error("Failed to fetch AI response. Status:", response.status);
+            console.error(
+              "Failed to fetch AI response. Status:",
+              response.status,
+            );
           }
         } catch (error) {
           console.error("Error during message send:", error);
         }
       } else {
-
         try {
-          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+          const apiUrl =
+            import.meta.env.VITE_API_URL || "http://localhost:3000";
 
           const response = await fetch(`${apiUrl}/api/chat`, {
             method: "POST",
@@ -210,7 +227,10 @@ const ChatbotPage = () => {
               return updatedMessages;
             });
           } else {
-            console.error("Failed to fetch AI response. Status:", response.status);
+            console.error(
+              "Failed to fetch AI response. Status:",
+              response.status,
+            );
           }
         } catch (error) {
           console.error("Error during message send:", error);
@@ -224,7 +244,10 @@ const ChatbotPage = () => {
       // Just hide the buttons without sending any message
       setTabStates((prevStates) => {
         const updatedStates = [...prevStates];
-        updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
+        updatedStates[selectedTab] = {
+          showInputField: true,
+          isButtonsUsed: true,
+        };
         return updatedStates;
       });
       return;
@@ -234,7 +257,10 @@ const ChatbotPage = () => {
 
     setTabStates((prevStates) => {
       const updatedStates = [...prevStates];
-      updatedStates[selectedTab] = { showInputField: true, isButtonsUsed: true };
+      updatedStates[selectedTab] = {
+        showInputField: true,
+        isButtonsUsed: true,
+      };
       return updatedStates;
     });
 
@@ -269,7 +295,9 @@ const ChatbotPage = () => {
   };
 
   const renderMessages = () => {
-    const currentTabKey = Object.keys(messages)[selectedTab] as keyof typeof messages;
+    const currentTabKey = Object.keys(messages)[
+      selectedTab
+    ] as keyof typeof messages;
     const currentTabMessages = [
       ...messages[currentTabKey].map((text: unknown) => ({
         sender: "bot",
@@ -306,7 +334,8 @@ const ChatbotPage = () => {
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
 
@@ -349,19 +378,36 @@ const ChatbotPage = () => {
         {renderMessages()}
       </Box>
 
-      {!tabStates[selectedTab].showInputField && selectedTab === 0 && chatMessages[selectedTab].length === 1 && !tabStates[selectedTab].isButtonsUsed && (
-        <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
-          <Button variant="contained" color="primary" onClick={() => handleButtonClick("KYLLÄ")}>
-            KYLLÄ
-          </Button>
-          <Button variant="outlined" color="primary" onClick={() => handleButtonClick("EI KIITOS")}>
-            EI KIITOS
-          </Button>
-        </Stack>
-      )}
+      {!tabStates[selectedTab].showInputField &&
+        selectedTab === 0 &&
+        chatMessages[selectedTab].length === 1 &&
+        !tabStates[selectedTab].isButtonsUsed && (
+          <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleButtonClick("KYLLÄ")}
+            >
+              KYLLÄ
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => handleButtonClick("EI KIITOS")}
+            >
+              EI KIITOS
+            </Button>
+          </Stack>
+        )}
 
       {tabStates[selectedTab].showInputField && (
-        <Stack direction="row" spacing={2} justifyContent="center" mt={2} sx={{ width: "100%" }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="center"
+          mt={2}
+          sx={{ width: "100%" }}
+        >
           <TextField
             label="Write your message"
             variant="outlined"
@@ -369,65 +415,75 @@ const ChatbotPage = () => {
             value={userMessage}
             onChange={(e) => setUserMessage(e.target.value)}
           />
-          <Button variant="contained" color="primary" onClick={handleSendMessage}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSendMessage}
+          >
             Send
           </Button>
         </Stack>
       )}
-      
-      
-      {chatMessages[selectedTab].length > 1 && 
+
+      {chatMessages[selectedTab].length > 1 && (
         <>
-        <hr
-        style={{
-            color: "DodgerBlue",
-            backgroundColor: "DodgerBlue",
-            height: 5,
-            width: "80%",
-            margin: "50px"
-        }}
-      />
-      <p>Annathan palautetta ylläolevista neuvoista antamalla arvion 1-5 ja vapaavalintaisen kommentin</p>
-      <Box sx={{ width: 300, margin: "auto" }}>
-        <Slider
-          aria-label="Rating"
-          value={sliderValue}
-          onChange={handleSliderChange}
-          step={1}
-          marks
-          min={1}
-          max={5}
-          valueLabelDisplay="auto"
-        />
-      </Box>
-      <TextField
-        id="outlined-basic"
-        label="Palautteesi"
-        variant="outlined"
-        multiline
-        rows={5}
-        margin="normal"
-        fullWidth
-        value={feedback}
-        onChange={(e) => setFeedback(e.target.value)}
-      />
-      <Button variant="contained" color="primary" onClick={handleFeedbackSubmit}>
-        Lähetä
-        </Button>
-        <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Kiitos palautteestasi
-          </Typography>
-        </Box>
-      </Modal>
+          <hr
+            style={{
+              color: "DodgerBlue",
+              backgroundColor: "DodgerBlue",
+              height: 5,
+              width: "80%",
+              margin: "50px",
+            }}
+          />
+          <p>
+            Annathan palautetta ylläolevista neuvoista antamalla arvion 1-5 ja
+            vapaavalintaisen kommentin
+          </p>
+          <Box sx={{ width: 300, margin: "auto" }}>
+            <Slider
+              aria-label="Rating"
+              value={sliderValue}
+              onChange={handleSliderChange}
+              step={1}
+              marks
+              min={1}
+              max={5}
+              valueLabelDisplay="auto"
+            />
+          </Box>
+          <TextField
+            id="outlined-basic"
+            label="Palautteesi"
+            variant="outlined"
+            multiline
+            rows={5}
+            margin="normal"
+            fullWidth
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleFeedbackSubmit}
+          >
+            Lähetä
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-modal-title" variant="h6" component="h2">
+                Kiitos palautteestasi
+              </Typography>
+            </Box>
+          </Modal>
         </>
-      }
+      )}
     </Box>
   );
 };

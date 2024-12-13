@@ -1,4 +1,3 @@
-
 .navbar {
   display: flex;
   justify-content: space-between; /* Ensure items are spread between left and right */
@@ -14,7 +13,7 @@
   text-decoration: underline;
   font-size: 1.2rem;
   font-weight: bold;
-  color:rgb(0, 204, 255);
+  color: rgb(0, 204, 255);
 }
 
 .nav-link:hover {

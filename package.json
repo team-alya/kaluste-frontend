@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -15,6 +16,7 @@
     "@mui/material": "^6.1.0",
     "kaluste-frontend": "file:",
     "openai": "^4.71.0",
+    "prettier": "^3.4.2",
     "react": "^18.3.1",
     "react-camera-pro": "^1.4.0",
     "react-dom": "^18.3.1",
