@@ -1,336 +1,95 @@
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Modal from "@mui/material/Modal";
-import Slider from "@mui/material/Slider";
+import { HomeIcon, Loader2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { FurnitureFormData } from "../../types/furniture";
+import { Message } from "../Message";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import FeedbackForm from "./FeedbackForm";
 
+// Types and Interfaces
 interface ChatMessage {
   sender: string;
   text: string;
 }
 
-const ChatbotPage = () => {
-  const [sliderValue, setSliderValue] = useState<number>(1);
-  const [feedback, setFeedback] = useState<string>("");
-  const [selectedTab, setSelectedTab] = useState(0);
+interface LocationState {
+  furnitureResult: FurnitureFormData;
+  priceAnalysis: any;
+}
+
+type TabType = "myynti" | "lahjoitus" | "kierrätys" | "kunnostus";
+
+interface TabState {
+  showInputField: boolean;
+  isButtonsUsed: boolean;
+}
+
+interface TabStates {
+  myynti: TabState;
+  lahjoitus: TabState;
+  kierrätys: TabState;
+  kunnostus: TabState;
+}
+
+// Main Component
+const ChatbotPage: React.FC = () => {
+  const [selectedTab, setSelectedTab] = useState<TabType>("myynti");
   const [userMessage, setUserMessage] = useState("");
-
-  // Separate state for each tab's buttons and input field visibility
-  const [tabStates, setTabStates] = useState([
-    { showInputField: false, isButtonsUsed: false }, // Myynti
-    { showInputField: true, isButtonsUsed: true }, // Lahjoitus
-    { showInputField: true, isButtonsUsed: true }, // Kierrätys
-    { showInputField: true, isButtonsUsed: true }, // Kunnostus
-  ]);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const { furnitureResult, priceAnalysis } = location.state || {
-    furnitureResult: null,
-    priceAnalysis: null,
-  };
+  const navigate = useNavigate();
 
-  // The first AI-"messages" shown on each tab
-  const [chatMessages, setChatMessages] = useState<ChatMessage[][]>([
-    [
+  const { furnitureResult, priceAnalysis } =
+    (location.state as LocationState) || {
+      furnitureResult: null,
+      priceAnalysis: null,
+    };
+
+  const [tabStates, setTabStates] = useState<TabStates>({
+    myynti: { showInputField: false, isButtonsUsed: false },
+    lahjoitus: { showInputField: true, isButtonsUsed: true },
+    kierrätys: { showInputField: true, isButtonsUsed: true },
+    kunnostus: { showInputField: true, isButtonsUsed: true },
+  });
+
+  const [chatMessages, setChatMessages] = useState<
+    Record<string, ChatMessage[]>
+  >({
+    myynti: [
       {
         sender: "bot",
         text: `Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${priceAnalysis?.result.alin_hinta} - ${priceAnalysis?.result.korkein_hinta} euroa.
-      Suosittelen seuraavia myyntikanavia: ${priceAnalysis.result.myyntikanavat}
-      Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`,
+
+Suosittelen seuraavia myyntikanavia: ${priceAnalysis?.result.myyntikanavat}
+
+Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?`,
       },
     ],
-    [
+    lahjoitus: [
       {
         sender: "bot",
         text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.",
       },
     ],
-    [
+    kierrätys: [
       {
         sender: "bot",
         text: "Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.",
       },
     ],
-    [
+    kunnostus: [
       {
         sender: "bot",
         text: "Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.",
       },
     ],
-  ]);
-
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  const messages = {
-    Myynti: [],
-    Lahjoitus: [],
-    Kierrätys: [],
-    Kunnostus: [],
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
-
-  const handleSliderChange = (_event: Event, newValue: number | number[]) => {
-    setSliderValue(newValue as number);
-  };
-
-  const handleFeedbackSubmit = async () => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-    try {
-      const response = await fetch(`${apiUrl}/api/review`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requestId: furnitureResult.requestId,
-          review: {
-            comment: feedback,
-            rating: sliderValue,
-          },
-        }),
-      });
-
-      if (response.ok) {
-        console.log("Feedback sent successfully!");
-        // Optionally, you could clear the inputs or display a success message
-        handleOpen();
-        setSliderValue(1);
-        setFeedback("");
-      } else {
-        console.error("Failed to send feedback:", response.status);
-        console.log(feedback);
-        console.log(sliderValue);
-      }
-    } catch (error) {
-      console.error("Error while sending feedback:", error);
-    }
-  };
-
-  // Change tabs
-  const handleChange = (
-    _event: unknown,
-    newValue: React.SetStateAction<number>,
-  ) => {
-    setSelectedTab(newValue);
-  };
-
-  const handleSendMessage = async () => {
-    if (userMessage.trim()) {
-      setChatMessages((prevMessages) => {
-        const updatedMessages = [...prevMessages];
-        updatedMessages[selectedTab] = [
-          ...updatedMessages[selectedTab],
-          { sender: "user", text: userMessage },
-        ];
-        return updatedMessages;
-      });
-
-      setUserMessage("");
-      setTabStates((prevStates) => {
-        const updatedStates = [...prevStates];
-        updatedStates[selectedTab].showInputField = true; // Show input field when a message is sent
-        return updatedStates;
-      });
-
-      // If the message is the first message in "lahjoitus", "kierrätys" or "kunnostus"
-      // Expect the message to be the users location and send it to a different API-endpoint
-      if (selectedTab != 0 && chatMessages[selectedTab].length === 1) {
-        console.log("Message to api/location");
-
-        // api/location needs the information of from which tab the users location is sent from
-        let source = "";
-        if (selectedTab === 1) {
-          source = "donation";
-        } else if (selectedTab === 2) {
-          source = "recycle";
-        } else if (selectedTab === 3) {
-          source = "repair";
-        }
-
-        try {
-          const apiUrl =
-            import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-          const response = await fetch(`${apiUrl}/api/location`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              requestId: furnitureResult.requestId,
-              location: userMessage,
-              source: source,
-            }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setChatMessages((prevMessages) => {
-              const updatedMessages = [...prevMessages];
-              updatedMessages[selectedTab] = [
-                ...updatedMessages[selectedTab],
-                { sender: "bot", text: data.result },
-              ];
-              return updatedMessages;
-            });
-          } else {
-            console.error(
-              "Failed to fetch AI response. Status:",
-              response.status,
-            );
-          }
-        } catch (error) {
-          console.error("Error during message send:", error);
-        }
-      } else {
-        try {
-          const apiUrl =
-            import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-          const response = await fetch(`${apiUrl}/api/chat`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              requestId: furnitureResult.requestId,
-              question: userMessage,
-            }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setChatMessages((prevMessages) => {
-              const updatedMessages = [...prevMessages];
-              updatedMessages[selectedTab] = [
-                ...updatedMessages[selectedTab],
-                { sender: "bot", text: data.answer },
-              ];
-              return updatedMessages;
-            });
-          } else {
-            console.error(
-              "Failed to fetch AI response. Status:",
-              response.status,
-            );
-          }
-        } catch (error) {
-          console.error("Error during message send:", error);
-        }
-      }
-    }
-  };
-
-  const handleButtonClick = async (response: string) => {
-    if (response === "EI KIITOS") {
-      // Just hide the buttons without sending any message
-      setTabStates((prevStates) => {
-        const updatedStates = [...prevStates];
-        updatedStates[selectedTab] = {
-          showInputField: true,
-          isButtonsUsed: true,
-        };
-        return updatedStates;
-      });
-      return;
-    }
-    const message =
-      "Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita.Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.";
-
-    setTabStates((prevStates) => {
-      const updatedStates = [...prevStates];
-      updatedStates[selectedTab] = {
-        showInputField: true,
-        isButtonsUsed: true,
-      };
-      return updatedStates;
-    });
-
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-      const response = await fetch(`${apiUrl}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requestId: furnitureResult.requestId,
-          question: message,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setChatMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages];
-          updatedMessages[selectedTab] = [
-            ...updatedMessages[selectedTab],
-            { sender: "bot", text: data.answer },
-          ];
-          return updatedMessages;
-        });
-      } else {
-        console.error("Failed to fetch AI response. Status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error during message send:", error);
-    }
-  };
-
-  const renderMessages = () => {
-    const currentTabKey = Object.keys(messages)[
-      selectedTab
-    ] as keyof typeof messages;
-    const currentTabMessages = [
-      ...messages[currentTabKey].map((text: unknown) => ({
-        sender: "bot",
-        text,
-      })),
-      ...chatMessages[selectedTab],
-    ];
-
-    return currentTabMessages.map((message, index) => (
-      <Box
-        key={index}
-        sx={{
-          display: "flex",
-          justifyContent: message.sender === "user" ? "flex-end" : "flex-start",
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: "10px 15px",
-            marginBottom: "10px",
-            maxWidth: "75%",
-            borderRadius: "15px",
-            backgroundColor: message.sender === "user" ? "#d1c4e9" : "#e0f7fa",
-          }}
-        >
-          <Typography variant="body1" sx={{ color: "black" }}>
-            {message.text as React.ReactNode}
-          </Typography>
-        </Paper>
-      </Box>
-    ));
-  };
+  });
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -339,152 +98,306 @@ const ChatbotPage = () => {
     }
   }, [chatMessages]);
 
+  // API Handlers
+  const handleFeedbackSubmit = async (rating: number, comment: string) => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+    try {
+      const response = await fetch(`${apiUrl}/api/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: furnitureResult?.requestId,
+          review: {
+            comment,
+            rating,
+          },
+        }),
+      });
+
+      if (response.ok) {
+        setIsFeedbackModalOpen(false);
+        setIsDialogOpen(true);
+      } else {
+        console.error("Failed to send feedback:", response.status);
+      }
+    } catch (error) {
+      console.error("Error while sending feedback:", error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!userMessage.trim() || isLoading) return;
+
+    const currentMessage = userMessage;
+    setUserMessage("");
+
+    // Immediately update UI with user message
+    setChatMessages((prev) => ({
+      ...prev,
+      [selectedTab]: [
+        ...prev[selectedTab],
+        { sender: "user", text: currentMessage },
+      ],
+    }));
+
+    setTabStates((prev) => ({
+      ...prev,
+      [selectedTab]: { ...prev[selectedTab], showInputField: true },
+    }));
+
+    setIsLoading(true);
+    const isFirstMessage = chatMessages[selectedTab].length === 1;
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+    try {
+      let response;
+      if (isFirstMessage && selectedTab !== "myynti") {
+        const source = {
+          lahjoitus: "donation",
+          kierrätys: "recycle",
+          kunnostus: "repair",
+        }[selectedTab];
+
+        response = await fetch(`${apiUrl}/api/location`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            requestId: furnitureResult?.requestId,
+            location: currentMessage,
+            source,
+          }),
+        });
+      } else {
+        response = await fetch(`${apiUrl}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            requestId: furnitureResult?.requestId,
+            question: currentMessage,
+          }),
+        });
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        setChatMessages((prev) => ({
+          ...prev,
+          [selectedTab]: [
+            ...prev[selectedTab],
+            {
+              sender: "bot",
+              text:
+                isFirstMessage && selectedTab !== "myynti"
+                  ? data.result
+                  : data.answer,
+            },
+          ],
+        }));
+      }
+    } catch (error) {
+      console.error("Error during message send:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCreateSalesPost = async () => {
+    const message =
+      "Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita. Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.";
+    await handleChatMessage(message);
+  };
+
+  const handleChatMessage = async (message: string) => {
+    setIsLoading(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const response = await fetch(`${apiUrl}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: furnitureResult?.requestId,
+          question: message,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setChatMessages((prev) => ({
+          ...prev,
+          [selectedTab]: [
+            ...prev[selectedTab],
+            { sender: "bot", text: data.answer },
+          ],
+        }));
+      }
+    } catch (error) {
+      console.error("Error during message send:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: 800,
-        margin: "auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Typography variant="h6" gutterBottom>
-        KalusteArvioBotti
-      </Typography>
-
-      <Tabs value={selectedTab} onChange={handleChange} centered>
-        <Tab label="Myynti" />
-        <Tab label="Lahjoitus" />
-        <Tab label="Kierrätys" />
-        <Tab label="Kunnostus" />
-      </Tabs>
-
-      <Box
-        ref={chatContainerRef}
-        sx={{
-          padding: "20px",
-          textAlign: "left",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          width: "100%",
-          maxHeight: "325px",
-          overflowY: "auto",
-          mt: 2,
-        }}
-      >
-        {renderMessages()}
-      </Box>
-
-      {!tabStates[selectedTab].showInputField &&
-        selectedTab === 0 &&
-        chatMessages[selectedTab].length === 1 &&
-        !tabStates[selectedTab].isButtonsUsed && (
-          <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleButtonClick("KYLLÄ")}
-            >
-              KYLLÄ
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => handleButtonClick("EI KIITOS")}
-            >
-              EI KIITOS
-            </Button>
-          </Stack>
-        )}
-
-      {tabStates[selectedTab].showInputField && (
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="center"
-          mt={2}
-          sx={{ width: "100%" }}
-        >
-          <TextField
-            label="Write your message"
-            variant="outlined"
-            fullWidth
-            value={userMessage}
-            onChange={(e) => setUserMessage(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSendMessage}
-          >
-            Send
-          </Button>
-        </Stack>
-      )}
-
-      {chatMessages[selectedTab].length > 1 && (
-        <>
-          <hr
-            style={{
-              color: "DodgerBlue",
-              backgroundColor: "DodgerBlue",
-              height: 5,
-              width: "80%",
-              margin: "50px",
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <Card className="shadow-lg">
+        <CardHeader>
+          <div className="grid grid-cols-3 items-center">
+            {/* Placeholder div joka vie 1/3 tilasta  */}
+            <div></div>
+            <CardTitle className="text-2xl font-bold text-center">
+              KalusteArvioBotti
+            </CardTitle>
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={() => navigate("/")}>
+                <HomeIcon className="h-4 w-4 mr-2" />
+                Alkuun
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs
+            value={selectedTab}
+            onValueChange={(value: string) => {
+              if (
+                value === "myynti" ||
+                value === "lahjoitus" ||
+                value === "kierrätys" ||
+                value === "kunnostus"
+              ) {
+                setSelectedTab(value);
+              }
             }}
-          />
-          <p>
-            Annathan palautetta ylläolevista neuvoista antamalla arvion 1-5 ja
-            vapaavalintaisen kommentin
-          </p>
-          <Box sx={{ width: 300, margin: "auto" }}>
-            <Slider
-              aria-label="Rating"
-              value={sliderValue}
-              onChange={handleSliderChange}
-              step={1}
-              marks
-              min={1}
-              max={5}
-              valueLabelDisplay="auto"
-            />
-          </Box>
-          <TextField
-            id="outlined-basic"
-            label="Palautteesi"
-            variant="outlined"
-            multiline
-            rows={5}
-            margin="normal"
-            fullWidth
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFeedbackSubmit}
+            className="space-y-4"
           >
-            Lähetä
-          </Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={style}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Kiitos palautteestasi
-              </Typography>
-            </Box>
-          </Modal>
-        </>
-      )}
-    </Box>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="myynti">Myynti</TabsTrigger>
+              <TabsTrigger value="lahjoitus">Lahjoitus</TabsTrigger>
+              <TabsTrigger value="kierrätys">Kierrätys</TabsTrigger>
+              <TabsTrigger value="kunnostus">Kunnostus</TabsTrigger>
+            </TabsList>
+
+            {Object.keys(tabStates).map((tab) => (
+              <TabsContent key={tab} value={tab} className="space-y-4">
+                <div
+                  ref={chatContainerRef}
+                  className="h-[400px] overflow-y-auto rounded-lg border bg-white p-4"
+                >
+                  <div className="flex flex-col space-y-2">
+                    {chatMessages[tab].map((message, index) => (
+                      <Message
+                        key={index}
+                        role={message.sender === "user" ? "user" : "assistant"}
+                        content={message.text}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {!tabStates[tab as keyof typeof tabStates].showInputField &&
+                  tab === "myynti" &&
+                  chatMessages[tab].length === 1 &&
+                  !tabStates[tab as keyof typeof tabStates].isButtonsUsed && (
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        onClick={() => {
+                          setTabStates((prev) => ({
+                            ...prev,
+                            myynti: {
+                              showInputField: true,
+                              isButtonsUsed: true,
+                            },
+                          }));
+                          handleCreateSalesPost();
+                        }}
+                        className="w-32"
+                        disabled={isLoading}
+                      >
+                        Kyllä
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setTabStates((prev) => ({
+                            ...prev,
+                            myynti: {
+                              showInputField: true,
+                              isButtonsUsed: true,
+                            },
+                          }));
+                        }}
+                        className="w-32"
+                        disabled={isLoading}
+                      >
+                        Ei kiitos
+                      </Button>
+                    </div>
+                  )}
+
+                {tabStates[tab as keyof typeof tabStates].showInputField && (
+                  <div className="flex gap-2 bg-white p-2 rounded-lg border">
+                    <Input
+                      value={userMessage}
+                      onChange={(e) => setUserMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Kirjoita viestisi..."
+                      className="flex-grow"
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      className="shrink-0"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Lähetä"
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+
+          {chatMessages[selectedTab].length > 1 && (
+            <div className="mt-4">
+              <Button
+                onClick={() => setIsFeedbackModalOpen(true)}
+                variant="outline"
+                className="w-full"
+              >
+                Anna palautetta
+              </Button>
+            </div>
+          )}
+
+          <FeedbackForm
+            isOpen={isFeedbackModalOpen}
+            onClose={() => setIsFeedbackModalOpen(false)}
+            onSubmit={handleFeedbackSubmit}
+          />
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Kiitos palautteestasi</DialogTitle>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

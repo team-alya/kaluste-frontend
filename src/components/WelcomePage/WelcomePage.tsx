@@ -1,10 +1,9 @@
-import React from "react";
-import { Container, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import "./WelcomePage.css";
-import skyImage from "./sky.png";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import skyimage from "./sky.png";
 
-const WelcomePage: React.FC = () => {
+const WelcomePage = () => {
   const navigate = useNavigate();
 
   const handleStartClick = () => {
@@ -12,43 +11,32 @@ const WelcomePage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" className="welcome-page">
-      <Box className="content-box">
-        <Typography variant="h3" className="title">
-          KalusteArvio
-        </Typography>
-
-        <Box component="img" src={skyImage} alt="Logo" className="logo" />
-
-        <Typography variant="h6" className="description">
-          Hei! Olen KalusteArvioBotti. Autan sinua arvioimaan mitä sinun
-          kannattaa tehdä tarpeettomalle tai huonokuntoiselle kalusteelle.
-          <br />
-          <br />
-        </Typography>
-
-        <Typography variant="h6" className="steps">
-          1. Lataa kuva kalusteesta.
-          <br />
-          <br />
-          2. Tarkista tekoälyn tunnistamat kalusteen tiedot.
-          <br />
-          <br />
-          3. Tekoäly auttaa sinua arvioimaan mitä kalusteelle kannattaa tehdä.
-          <br />
-          <br />
-        </Typography>
-
-        <Button
-          variant="contained"
-          color="primary"
-          className="start-button"
-          onClick={handleStartClick}
-        >
-          ALOITA
-        </Button>
-      </Box>
-    </Container>
+    <div className="container mx-auto px-4 py-8">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-center">
+            KalusteArvio
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <img src={skyimage} alt="Logo" className="w-32 h-32 mx-auto" />
+          <p className="text-center">
+            Hei! Olen KalusteArvioBotti. Autan sinua arvioimaan mitä sinun
+            kannattaa tehdä tarpeettomalle tai huonokuntoiselle kalusteelle.
+          </p>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>Lataa kuva kalusteesta.</li>
+            <li>Tarkista tekoälyn tunnistamat kalusteen tiedot.</li>
+            <li>
+              Tekoäly auttaa sinua arvioimaan mitä kalusteelle kannattaa tehdä.
+            </li>
+          </ol>
+          <Button onClick={handleStartClick} className="w-full">
+            ALOITA
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -1,268 +1,394 @@
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Backdrop,
+  ArrowLeft,
+  BadgeCheck,
   Box,
-  Button,
-  CircularProgress,
-  FormControl,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import "./ConfirmationPage.css";
+  Check,
+  Columns,
+  Loader2,
+  PackageCheck,
+  PaintBucket,
+  Ruler,
+  Tag,
+} from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
-function FurniConfirmPage() {
+import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+
+import {
+  furnitureSchema,
+  kuntoOptions,
+  type FurnitureFormData,
+} from "../../types/furniture";
+
+const FurniConfirmPage = () => {
   const location = useLocation();
-  const { furnitureResult } = location.state || {
-    furnitureResult: null,
-    imageBlob: null,
-  };
-
-  // Initialize furnitureDetails state object
-  const [furnitureDetails, setFurnitureDetails] = useState({
-    requestId: furnitureResult?.requestId || "",
-    merkki: furnitureResult?.merkki || "",
-    malli: furnitureResult?.malli || "",
-    väri: furnitureResult?.väri || "",
-    mitat: {
-      pituus: furnitureResult?.mitat?.pituus || "",
-      korkeus: furnitureResult?.mitat?.korkeus || "",
-      leveys: furnitureResult?.mitat?.leveys || "",
-    },
-    materiaalit: furnitureResult?.materiaalit?.join(", ") || "",
-    kunto: furnitureResult?.kunto || "",
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
 
-  // Generic change handler for input fields
-  const handleInputChange = (field: string, value: string) => {
-    setFurnitureDetails((prevDetails) => ({
-      ...prevDetails,
-      [field]: value,
-    }));
-  };
-
-  // Change handler for nested mitat fields
-  const handleMitatChange = (dimension: string, value: string) => {
-    setFurnitureDetails((prevDetails) => ({
-      ...prevDetails,
+  const form = useForm<FurnitureFormData>({
+    resolver: zodResolver(furnitureSchema),
+    defaultValues: {
+      requestId: "",
+      merkki: "",
+      malli: "",
+      väri: "",
       mitat: {
-        ...prevDetails.mitat,
-        [dimension]: value,
+        pituus: 0,
+        korkeus: 0,
+        leveys: 0,
       },
-    }));
-  };
+      materiaalit: [],
+      kunto: "Tuntematon",
+    },
+  });
 
-  // Handle form submission
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
+  useEffect(() => {
+    const state = location.state?.furnitureResult;
+    if (!state) {
+      navigate(-1);
+      return;
+    }
 
-    setIsLoading(true);
+    // Convert string measurements to numbers if they're strings
+    const formattedData = {
+      ...state,
+      mitat: {
+        pituus: Number(state.mitat.pituus),
+        korkeus: Number(state.mitat.korkeus),
+        leveys: Number(state.mitat.leveys),
+      },
+    };
 
+    form.reset(formattedData);
+  }, [location.state, form, navigate]);
+
+  const onSubmit = async (data: FurnitureFormData) => {
     try {
-      // Create furnitureDetails payload in the expected format
-      const furnitureDetailsPayload = {
-        requestId: furnitureDetails.requestId,
-        merkki: furnitureDetails.merkki,
-        malli: furnitureDetails.malli,
-        väri: furnitureDetails.väri,
-        mitat: {
-          pituus: Number(furnitureDetails.mitat.pituus),
-          leveys: Number(furnitureDetails.mitat.leveys),
-          korkeus: Number(furnitureDetails.mitat.korkeus),
-        },
-        materiaalit: furnitureDetails.materiaalit
-          .split(",")
-          .map((material: string) => material.trim()),
-        kunto: furnitureDetails.kunto,
-      };
-
-      // Make POST request with JSON body
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-      const priceResponse = await fetch(`${apiUrl}/api/price`, {
+      const response = await fetch(`${apiUrl}/api/price`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ furnitureDetails: furnitureDetailsPayload }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ furnitureDetails: data }),
       });
 
-      if (priceResponse.ok) {
-        const priceData = await priceResponse.json();
-        console.log("Price analysis:", priceData);
-        // Navigate to chatbotpage and forward the furniture information
-        navigate("/chatbotpage", {
-          state: { furnitureResult, priceAnalysis: priceData },
-        });
-      } else {
-        console.error(
-          "Failed to fetch price analysis. Status:",
-          priceResponse.status,
-        );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const priceData = await response.json();
+      navigate("/chatbotpage", {
+        state: {
+          furnitureResult: data,
+          priceAnalysis: priceData,
+        },
+      });
     } catch (error) {
       console.error("Error during form submission:", error);
+      form.setError("root", {
+        message: "Virhe lähetettäessä tietoja. Yritä uudelleen.",
+      });
     }
   };
 
+  if (form.formState.errors.root) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertDescription>
+            {form.formState.errors.root.message}
+          </AlertDescription>
+        </Alert>
+        <Button className="mt-4" onClick={() => navigate(-1)}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Palaa takaisin
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <Box className="mainBox" component="form" onSubmit={handleSubmit}>
-      {isLoading && (
-        <Backdrop
-          open={true}
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        >
-          <CircularProgress />
-        </Backdrop>
-      )}
+    <div className="container mx-auto px-4 py-8 ">
+      <Card className="max-w-2xl mx-auto shadow-lg">
+        <CardHeader className="bg-primary/5">
+          <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <PackageCheck className="h-8 w-8 text-primary" />
+            Tietojen tarkistus
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <fieldset
+              disabled={form.formState.isSubmitting}
+              style={{ border: "none" }}
+              className={`${form.formState.isSubmitting ? "opacity-70 transition-opacity" : ""}`}
+            >
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <div className="flex justify-center mt-2">
+                  <div className="bg-green-50 px-4 py-3 rounded-lg border border-green-100 mb-6 w-fit">
+                    <div className="flex items-center gap-3">
+                      <BadgeCheck className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-green-700">
+                          Kalusteen tunnistaminen onnistui
+                        </p>
+                        <p className="text-xs text-green-600">
+                          Tarkista, korjaa ja hyväksy tiedot
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <Box className="headingBox">
-        <Typography variant="h5">Tietojen tarkistus</Typography>
-      </Box>
+                <div className="grid gap-6">
+                  <FormField
+                    control={form.control}
+                    name="merkki"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Merkki
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      <Box className="instructionBox">
-        <Typography variant="body1">
-          Kalusteen tunnistaminen onnistui.
-          <br />
-          Tarkista, korjaa ja hyväksy tiedot.
-        </Typography>
-      </Box>
+                  <FormField
+                    control={form.control}
+                    name="malli"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Box className="h-4 w-4" />
+                          Malli
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      {/* Form Fields */}
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Kalusteen merkki
-          </Typography>
-          <TextField
-            name="furnitureModel"
-            value={furnitureDetails.merkki}
-            onChange={(e) => handleInputChange("merkki", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
+                  <FormField
+                    control={form.control}
+                    name="kunto"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Check className="h-4 w-4" />
+                          Kunto
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Valitse kunto" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {kuntoOptions.map((kunto) => (
+                              <SelectItem key={kunto} value={kunto}>
+                                {kunto}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Kalusteen malli
-          </Typography>
-          <TextField
-            name="furnitureModel"
-            value={furnitureDetails.malli}
-            onChange={(e) => handleInputChange("malli", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
+                  <div className="space-y-4">
+                    <FormLabel className="flex items-center gap-2">
+                      <Ruler className="h-4 w-4" />
+                      Mitat
+                    </FormLabel>
+                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="mitat.pituus"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm">
+                              Pituus (cm)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                                className="bg-white"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="mitat.korkeus"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm">
+                              Korkeus (cm)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                                className="bg-white"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="mitat.leveys"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm">
+                              Leveys (cm)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                                className="bg-white"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Valitse kunto
-          </Typography>
-          <Select
-            labelId="condition-label"
-            value={furnitureDetails.kunto}
-            onChange={(e) => handleInputChange("kunto", e.target.value)}
-            size="small"
-            className="inputTextFiels"
-          >
-            <MenuItem value="" disabled>
-              Valitse kunto
-            </MenuItem>
-            <MenuItem value="Erinomainen">Erinomainen</MenuItem>
-            <MenuItem value="Hyvä">Hyvä</MenuItem>
-            <MenuItem value="Kohtalainen">Kohtalainen</MenuItem>
-            <MenuItem value="Huono">Huono</MenuItem>
-            <MenuItem value="Tuntematon">Tuntematon</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+                  <FormField
+                    control={form.control}
+                    name="materiaalit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Columns className="h-4 w-4" />
+                          Materiaalit
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value.join(", ")}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  .split(",")
+                                  .map((s) => s.trim())
+                                  .filter(Boolean),
+                              )
+                            }
+                            placeholder="Erota materiaalit pilkulla"
+                            className="bg-white"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Mitat (LxKxS)
-          </Typography>
-          <TextField
-            name="pituus"
-            placeholder="Pituus"
-            value={furnitureDetails.mitat.pituus}
-            onChange={(e) => handleMitatChange("pituus", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-          <TextField
-            name="korkeus"
-            placeholder="Korkeus"
-            value={furnitureDetails.mitat.korkeus}
-            onChange={(e) => handleMitatChange("korkeus", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-          <TextField
-            name="leveys"
-            placeholder="Leveys"
-            value={furnitureDetails.mitat.leveys}
-            onChange={(e) => handleMitatChange("leveys", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
+                  <FormField
+                    control={form.control}
+                    name="väri"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <PaintBucket className="h-4 w-4" />
+                          Väri
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Materiaalit
-          </Typography>
-          <TextField
-            name="materials"
-            value={furnitureDetails.materiaalit}
-            onChange={(e) => handleInputChange("materiaalit", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
-
-      <Box className="inputBox">
-        <FormControl>
-          <Typography align="left" variant="body1">
-            Väri
-          </Typography>
-          <TextField
-            name="color"
-            value={furnitureDetails.väri}
-            onChange={(e) => handleInputChange("väri", e.target.value)}
-            margin="normal"
-            size="small"
-            className="inputTextFiels"
-          />
-        </FormControl>
-      </Box>
-
-      <Button type="submit" variant="contained" className="submitRetryButton">
-        Hyväksy
-      </Button>
-    </Box>
+                <div className="flex justify-between gap-4 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate(-1)}
+                    className="bg-white"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Takaisin
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Lähetetään...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Hyväksy
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </fieldset>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
-}
+};
 
 export default FurniConfirmPage;

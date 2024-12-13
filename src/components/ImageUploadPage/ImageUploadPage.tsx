@@ -1,296 +1,299 @@
-import { useState, useRef } from "react";
-import { Camera } from "react-camera-pro";
-import stockchair from "./stockchair.jpg";
-import { useNavigate } from "react-router-dom";
 import {
-  Backdrop,
-  Box,
-  Button,
-  CircularProgress,
-  Typography,
-} from "@mui/material";
+  AlertCircle,
+  CameraIcon,
+  ImageIcon,
+  ImagePlus,
+  Info,
+  Loader2,
+  Upload,
+  X,
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Camera } from "react-camera-pro";
+import { useNavigate } from "react-router-dom";
+import { FurnitureFormData } from "../../types/furniture";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import examplePicture from "./stockchair.jpg";
 
 interface CameraType {
   takePhoto: () => string;
 }
 
-const ImageUploadPage = () => {
+const ImageUploadPage: React.FC = () => {
   const camera = useRef<CameraType | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [image, setImage] = useState<string | null>(null);
-  const [imageBlob, setImageBlob] = useState<File | null>(null); // Store the Blob or File for upload
-  const [takeImage, setTakeImage] = useState(false); // For opening the camera
-  const [furnitureResult, setFurnitureResult] = useState({
-    requestId: "",
-    merkki: "",
-    väri: "",
-    kunto: "",
-    mitat: {
-      pituus: 0,
-      korkeus: 0,
-      leveys: 0,
-    },
-    malli: "",
-    materiaalit: [],
-  });
-
+  const [imageState, setImageState] = useState<{
+    preview: string | null;
+    file: File | null;
+  }>({ preview: null, file: null });
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [furnitureResult, setFurnitureResult] =
+    useState<FurnitureFormData | null>(null);
 
   const navigate = useNavigate();
 
-  // Convert Base64 to Blob since backend is expecting an image
-  const base64ToFile = (base64: string, filename: string): File => {
-    const byteString = atob(base64.split(",")[1]);
-    const mimeString = base64.split(",")[0].split(":")[1].split(";")[0];
-    const byteArray = new Uint8Array(byteString.length);
-
-    for (let i = 0; i < byteString.length; i++) {
-      byteArray[i] = byteString.charCodeAt(i);
+  useEffect(() => {
+    if (isCameraOpen) {
+      navigator.mediaDevices.getUserMedia({ video: true }).catch((error) => {
+        console.error("Camera access error:", error);
+        if (error.name === "NotFoundError") {
+          setCameraError("Kameraa ei löytynyt laitteestasi");
+        } else if (error.name === "NotAllowedError") {
+          setCameraError("Kameran käyttöoikeus evätty");
+        } else {
+          setCameraError("Kameraan ei saada yhteyttä");
+        }
+      });
     }
+  }, [isCameraOpen]);
 
-    const blob = new Blob([byteArray], { type: mimeString });
+  const handleFileInputClick = () => fileInputRef.current?.click();
 
-    // Create a File from the Blob
-    return new File([blob], filename, {
-      type: mimeString,
-      lastModified: Date.now(),
-    });
-  };
-
-  const handleFileInputClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  // Handle file input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0]; // Get the first file
-      setImage(URL.createObjectURL(file)); // For displaying the image
-      setImageBlob(file); // Store the File object for upload
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageState({
+        preview: URL.createObjectURL(file),
+        file,
+      });
     }
   };
 
-  // Handle upload for images
+  const handleCameraCapture = () => {
+    try {
+      const capturedImage = camera.current?.takePhoto();
+      if (capturedImage) {
+        fetch(capturedImage)
+          .then((res) => res.blob())
+          .then((blob) => {
+            const file = new File([blob], "captured-image.jpg", {
+              type: "image/jpeg",
+            });
+            setImageState({
+              preview: URL.createObjectURL(file),
+              file,
+            });
+            setIsCameraOpen(false);
+            setCameraError(null);
+          })
+          .catch(() => {
+            setCameraError("Kuvan ottaminen epäonnistui. Yritä uudelleen.");
+          });
+      }
+    } catch (error) {
+      console.error("Camera capture error:", error);
+      setCameraError("Kuvan ottaminen epäonnistui");
+    }
+  };
+
   const handleImageUpload = async () => {
+    if (!imageState.file) return;
+
     setIsLoading(true);
-
-    console.log("Camera image upload triggered");
-
-    if (!imageBlob) {
-      console.log("No image Blob found for upload");
-      return;
-    }
+    const formData = new FormData();
+    formData.append("image", imageState.file);
 
     try {
-      const formData = new FormData();
-      console.log(imageBlob);
-
-      // If imageBlob is a Blob, convert it to a File before uploading
-      const fileToUpload = imageBlob instanceof Blob ? imageBlob : imageBlob; // Just use imageBlob directly
-
-      formData.append("image", fileToUpload);
-
       const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
       const response = await fetch(`${apiUrl}/api/image`, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        console.error(
-          "Failed to upload camera image. Status:",
-          response.status,
-        );
-      } else {
-        const result = await response.json();
-        console.log("Camera image uploaded successfully!", result);
-        setFurnitureResult(result.result);
-        // Navigate to confirmation page and forward the AI result
-        navigate("/confirmation", {
-          state: { furnitureResult: result.result, imageBlob },
-        });
-      }
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const result = await response.json();
+      setFurnitureResult(result.result);
+      navigate("/confirmation", {
+        state: { furnitureResult: result.result },
+      });
     } catch (error) {
-      console.error("Error uploading camera image:", error);
-      // Navigate to confirmation page without the AI result
+      console.error("Error uploading image:", error);
       navigate("/confirmation", { state: { furnitureResult } });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const closeCamera = () => {
+    setIsCameraOpen(false);
+    setCameraError(null);
+  };
+
   return (
-    <Box
-      sx={{ padding: 3, textAlign: "center", maxWidth: 1200, margin: "0 auto" }}
-    >
-      {isLoading && (
-        <Backdrop
-          open={true}
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        >
-          <CircularProgress />
-        </Backdrop>
-      )}
-      {!image ? (
-        <>
-          <Typography variant="h4">Lataa kuva</Typography>
-          <br />
-          <br />
-          <Typography variant="h6">
-            Varmista, että kaluste on hyvin valaistu ja koko huonekalu näkyy
-            kuvassa.
-          </Typography>
-
-          {!takeImage && (
-            <Box
-              component="img"
-              src={stockchair}
-              alt="stock-photo-chair"
-              sx={{
-                width: "100%",
-                maxWidth: 400,
-                borderRadius: 2,
-                margin: "1rem auto",
-                display: "block",
-              }}
-            />
+    <div className="container mx-auto px-4 py-8 min-h-screen">
+      <Card className="max-w-2xl mx-auto shadow-lg">
+        <CardHeader className="bg-primary/5 border-b">
+          <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <ImagePlus className="h-6 w-6 text-primary" />
+            {!imageState.preview ? "Lataa kuva" : "Kalusteen tunnistus"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          {isLoading && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+              <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-gray-600">Analysoidaan kuvaa...</p>
+              </div>
+            </div>
           )}
 
-          {!takeImage ? (
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                justifyContent: "center",
-                marginTop: 3,
-              }}
-            >
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setTakeImage(true)}
-              >
-                OTA KUVA
-              </Button>
+          {!imageState.preview ? (
+            <div className="space-y-6">
+              <div className="bg-blue-50  border border-blue-100 rounded-lg p-4 flex justify-center mx-auto w-fit gap-3">
+                <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-700">
+                  Varmista, että kaluste on hyvin valaistu ja koko huonekalu
+                  näkyy kuvassa.
+                </p>
+              </div>
 
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleFileInputClick}
-              >
-                GALLERIA
-              </Button>
+              {!isCameraOpen && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center gap-2 text-secondary-foreground">
+                    <ImageIcon className="h-5 w-5" />
+                    <span className="font-medium">Esimerkki kuva</span>
+                  </div>
+                  <div className="relative group">
+                    <img
+                      src={examplePicture}
+                      alt="stock-photo-chair"
+                      className="w-full max-w-md mx-auto rounded-lg shadow-md"
+                    />
+                  </div>
+                </div>
+              )}
 
-              <input
-                type="file"
-                id="file-input"
-                ref={fileInputRef}
-                onChange={handleChange}
-                style={{ display: "none" }}
-              />
-            </Box>
+              {!isCameraOpen ? (
+                <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 sm:px-0">
+                  <Button
+                    variant={"outline"}
+                    onClick={() => setIsCameraOpen(true)}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2"
+                  >
+                    <CameraIcon className="h-4 w-4" />
+                    Ota kuva
+                  </Button>
+                  <Button
+                    variant={"outline"}
+                    onClick={handleFileInputClick}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Galleria
+                  </Button>
+                  <input
+                    type="file"
+                    id="file-input"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {cameraError ? (
+                    <div className="space-y-4">
+                      <div className="bg-red-50 border border-red-100 rounded-lg p-4 flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-700">{cameraError}</p>
+                      </div>
+                      <div className="flex justify-center px-4 sm:px-0">
+                        <Button
+                          variant="outline"
+                          onClick={closeCamera}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2"
+                        >
+                          <X className="h-4 w-4" />
+                          Sulje kamera
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="max-w-md mx-auto rounded-lg overflow-hidden shadow-lg">
+                        <Camera
+                          ref={camera}
+                          facingMode="environment"
+                          aspectRatio={4 / 3}
+                          errorMessages={{
+                            noCameraAccessible: "Kameraan ei saada yhteyttä",
+                            permissionDenied: "Kameran käyttöoikeus evätty",
+                            switchCamera: "Kameran vaihtaminen epäonnistui",
+                            canvas: "Canvas-elementtiä ei tueta",
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 sm:px-0">
+                        <Button
+                          onClick={handleCameraCapture}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2"
+                        >
+                          <CameraIcon className="h-4 w-4" />
+                          Ota kuva
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={closeCamera}
+                          className="w-full sm:w-auto flex items-center justify-center gap-2"
+                        >
+                          <X className="h-4 w-4" />
+                          Sulje kamera
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
-            <>
-              <Box sx={{ margin: "1rem auto", maxWidth: 500 }}>
-                <Camera
-                  ref={camera}
-                  facingMode="environment"
-                  aspectRatio={4 / 3}
-                  errorMessages={{
-                    noCameraAccessible: undefined,
-                    permissionDenied: undefined,
-                    switchCamera: undefined,
-                    canvas: undefined,
-                  }}
+            <div className="space-y-6 ">
+              <div className="bg-blue-50 px-4 py-3 rounded-lg border mx-auto border-blue-100 mb-6 flex items-center gap-2 w-fit">
+                <Info className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                <p className="text-sm text-blue-700">
+                  Tarkista, että kaluste näkyy kuvassa selkeästi ennen
+                  lähettämistä
+                </p>
+              </div>
+
+              <div className="relative group">
+                <img
+                  src={imageState.preview}
+                  alt="Otettu kuva"
+                  className="outline outline-2 outline-zinc-200 w-full max-w-md mx-auto rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.01]"
                 />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  justifyContent: "center",
-                  marginTop: 2,
-                }}
-              >
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 sm:px-0">
                 <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    const capturedImage = camera.current?.takePhoto();
-                    if (capturedImage) {
-                      const blob = base64ToFile(
-                        capturedImage,
-                        "captured-image.jpg",
-                      );
-                      setImageBlob(blob);
-                      setImage(capturedImage);
-                      setTakeImage(false);
-                    }
-                  }}
+                  variant={"outline"}
+                  onClick={handleImageUpload}
+                  className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 "
+                  size="lg"
                 >
-                  Ota kuva
+                  <Upload className="h-4 w-4" />
+                  Lähetä kuva analysoitavaksi
                 </Button>
                 <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setTakeImage(false)}
+                  variant="outline"
+                  onClick={() => setImageState({ preview: null, file: null })}
+                  className="w-full h-10 sm:w-auto flex items-center justify-center gap-2"
                 >
-                  Sulje kamera
+                  <X className="h-4 w-4" />
+                  Ota uusi kuva
                 </Button>
-              </Box>
-            </>
+              </div>
+            </div>
           )}
-        </>
-      ) : (
-        <Box>
-          <Typography variant="h4">Kalusteen tunnistus</Typography>
-          <br />
-          <br />
-          <Typography variant="h6">Onko kuvassa kalusteesi?</Typography>
-
-          <Box
-            component="img"
-            src={image}
-            alt="Taken Image"
-            sx={{
-              width: "100%",
-              maxWidth: 500,
-              borderRadius: 2,
-              margin: "1rem auto",
-              display: "block",
-            }}
-          />
-
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              justifyContent: "center",
-              marginTop: 2,
-            }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleImageUpload}
-            >
-              KYLLÄ
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => setImage(null)}
-            >
-              EI
-            </Button>
-          </Box>
-        </Box>
-      )}
-    </Box>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
