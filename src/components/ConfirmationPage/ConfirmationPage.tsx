@@ -11,9 +11,9 @@ import {
   Ruler,
   Tag,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -36,14 +36,23 @@ import {
 } from "../ui/select";
 
 import {
+  analyzeFurniturePrice,
+  PriceAnalysisApiResponse,
+} from "../../services/api";
+import { useFurnitureStore } from "../../stores/furnitureStore";
+import {
   furnitureSchema,
   kuntoOptions,
   type FurnitureFormData,
 } from "../../types/furniture";
+import LoaderAnimation from "../loader";
 
 const FurniConfirmPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { furnitureResult, setPriceAnalysis } = useFurnitureStore();
 
   const form = useForm<FurnitureFormData>({
     resolver: zodResolver(furnitureSchema),
@@ -63,60 +72,47 @@ const FurniConfirmPage = () => {
   });
 
   useEffect(() => {
-    const state = location.state?.furnitureResult;
-    if (!state) {
+    if (!furnitureResult) {
       navigate(-1);
       return;
     }
 
-    // Convert string measurements to numbers if they're strings
     const formattedData = {
-      ...state,
+      ...furnitureResult,
       mitat: {
-        pituus: Number(state.mitat.pituus),
-        korkeus: Number(state.mitat.korkeus),
-        leveys: Number(state.mitat.leveys),
+        pituus: Number(furnitureResult.mitat.pituus),
+        korkeus: Number(furnitureResult.mitat.korkeus),
+        leveys: Number(furnitureResult.mitat.leveys),
       },
     };
 
     form.reset(formattedData);
-  }, [location.state, form, navigate]);
+  }, [furnitureResult, form, navigate]);
 
   const onSubmit = async (data: FurnitureFormData) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-      const response = await fetch(`${apiUrl}/api/price`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ furnitureDetails: data }),
-      });
+      const priceData: PriceAnalysisApiResponse =
+        await analyzeFurniturePrice(data);
+      console.log("priceData:", priceData);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const priceData = await response.json();
-      navigate("/chatbotpage", {
-        state: {
-          furnitureResult: data,
-          priceAnalysis: priceData,
-        },
-      });
+      setPriceAnalysis(priceData.result);
+      navigate("/chatbotpage");
     } catch (error) {
       console.error("Error during form submission:", error);
-      form.setError("root", {
-        message: "Virhe lähetettäessä tietoja. Yritä uudelleen.",
-      });
+      setError("Virhe lähetettäessä tietoja. Yritä uudelleen.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (form.formState.errors.root) {
+  if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Alert variant="destructive">
-          <AlertDescription>
-            {form.formState.errors.root.message}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
         <Button className="mt-4" onClick={() => navigate(-1)}>
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -136,6 +132,10 @@ const FurniConfirmPage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <LoaderAnimation
+            isLoading={isLoading}
+            text="Analysoidaan tietoja..."
+          />
           <Form {...form}>
             <fieldset
               disabled={form.formState.isSubmitting}

@@ -46,11 +46,6 @@ export interface PriceAnalysisResponse {
   tori_hinnat: ToriPrices;
 }
 
-export interface PriceAnalysisResult {
-  message: string;
-  result: PriceAnalysisResponse;
-}
-
 // Zod schema for validation
 export const priceAnalysisSchema = z.object({
   korkein_hinta: z.number(),

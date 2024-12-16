@@ -4,14 +4,15 @@ import {
   ImageIcon,
   ImagePlus,
   Info,
-  Loader2,
   Upload,
   X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Camera } from "react-camera-pro";
 import { useNavigate } from "react-router-dom";
-import { FurnitureFormData } from "../../types/furniture";
+import { uploadImage } from "../../services/api";
+import { useFurnitureStore } from "../../stores/furnitureStore";
+import LoaderAnimation from "../loader";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import examplePicture from "./stockchair.jpg";
@@ -30,10 +31,11 @@ const ImageUploadPage: React.FC = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [furnitureResult, setFurnitureResult] =
-    useState<FurnitureFormData | null>(null);
 
   const navigate = useNavigate();
+  const setFurnitureResult = useFurnitureStore(
+    (state) => state.setFurnitureResult,
+  );
 
   useEffect(() => {
     if (isCameraOpen) {
@@ -93,27 +95,15 @@ const ImageUploadPage: React.FC = () => {
     if (!imageState.file) return;
 
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append("image", imageState.file);
-
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
-      const response = await fetch(`${apiUrl}/api/image`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
-
-      const result = await response.json();
-      setFurnitureResult(result.result);
+      const result = await uploadImage(imageState.file);
+      setFurnitureResult(result);
       navigate("/confirmation", {
-        state: { furnitureResult: result.result },
+        state: { furnitureResult: result },
       });
     } catch (error) {
       console.error("Error uploading image:", error);
-      navigate("/confirmation", { state: { furnitureResult } });
+      navigate("/confirmation");
     } finally {
       setIsLoading(false);
     }
@@ -134,14 +124,7 @@ const ImageUploadPage: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          {isLoading && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-              <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-gray-600">Analysoidaan kuvaa...</p>
-              </div>
-            </div>
-          )}
+          <LoaderAnimation isLoading={isLoading} text="Analysoi kuvaa..." />
 
           {!imageState.preview ? (
             <div className="space-y-6">
