@@ -1,9 +1,11 @@
-import { Message as baseMessage } from "ai";
 import { useChat } from "ai/react";
 import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getInitialMessage } from "../../lib/utils";
+import {
+  getTabInitialMessage,
+  SALES_POST_PROMPT,
+} from "../../prompts/chatPrompt";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import { TABS, TabType } from "../../types/chat";
 import { Message } from "../Message";
@@ -28,6 +30,7 @@ const ChatbotPage: React.FC = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { furnitureResult, priceAnalysis } = useFurnitureStore();
+
   const id = `${furnitureResult?.requestId}-${currentTab}`;
   const {
     messages,
@@ -43,7 +46,15 @@ const ChatbotPage: React.FC = () => {
     id: id,
     body: {
       requestId: furnitureResult?.requestId,
+      furnitureContext: furnitureResult || {},
     },
+    initialMessages: [
+      {
+        id,
+        role: "assistant",
+        content: getTabInitialMessage(currentTab, priceAnalysis || undefined),
+      },
+    ],
   });
 
   useEffect(() => {
@@ -53,8 +64,8 @@ const ChatbotPage: React.FC = () => {
   }, [furnitureResult, navigate]);
 
   useEffect(() => {
-    console.log("isLoading", isLoading);
-  }, [currentTab, isLoading, stop]);
+    console.log("messages", messages);
+  }, [messages]);
 
   useEffect(() => {
     if (!searchParams.get("tab")) {
@@ -69,46 +80,25 @@ const ChatbotPage: React.FC = () => {
     }
   }, [messages]);
 
-  useEffect(() => {
-    // Only set initial messages if we don't have any for the current tab
-    if (messages.length === 0) {
-      const initialMessage = getInitialMessage({
-        id: id,
-        currentTab,
-        priceAnalysis: priceAnalysis ?? undefined,
-      });
-      if (initialMessage) {
-        setMessages([initialMessage as unknown as baseMessage]);
-      }
-    }
-  }, [
-    currentTab,
-    furnitureResult?.requestId,
-    id,
-    messages.length,
-    priceAnalysis,
-    setMessages,
-  ]);
-
   const handleCreateSalesPost = async () => {
     setSalesTabState("chatting");
     await append({
       role: "user",
-      content: `Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. 
-      Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. 
-      Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, 
-      mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita. 
-      Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.`,
+      content: SALES_POST_PROMPT,
     });
   };
 
-  const handleDeclineSalesPost = async () => {
+  const handleDeclineSalesPost = () => {
     setSalesTabState("chatting");
-    await append({
-      role: "assistant",
-      content:
-        "Selvä, voit kysyä minulta lisätietoja myynnistä chat-kentän kautta.",
-    });
+    setMessages((messages) => [
+      ...messages,
+      {
+        id,
+        role: "assistant",
+        content:
+          "Selvä, voit kysyä minulta lisätietoja myynnistä chat-kentän kautta.",
+      },
+    ]);
   };
 
   const handleFeedbackSubmit = async (rating: number, comment: string) => {
