@@ -8,7 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const sendMessage = async (
   requestId: string,
-  message: string
+  message: string,
 ): Promise<ChatApiResponse> => {
   const response = await fetch(`${API_URL}/api/chat`, {
     method: "POST",
@@ -29,7 +29,7 @@ export const sendMessage = async (
 export const sendLocationRequest = async (
   requestId: string,
   location: string,
-  source: LocationSource
+  source: LocationSource,
 ): Promise<LocationApiResponse> => {
   const response = await fetch(`${API_URL}/api/location`, {
     method: "POST",
@@ -49,7 +49,7 @@ export const sendLocationRequest = async (
 };
 
 export const createSalesPost = async (
-  requestId: string
+  requestId: string,
 ): Promise<ChatApiResponse> => {
   const message = `Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. 
     Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. 
@@ -63,7 +63,7 @@ export const createSalesPost = async (
 export const sendFeedBack = async (
   requestId: string,
   rating: number,
-  comment: string
+  comment: string,
 ): Promise<{ message: string }> => {
   const response = await fetch(`${API_URL}/api/review`, {
     method: "POST",

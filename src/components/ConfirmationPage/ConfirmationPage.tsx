@@ -35,10 +35,7 @@ import {
   SelectValue,
 } from "../ui/select";
 
-import {
-  analyzeFurniturePrice,
-  PriceAnalysisApiResponse,
-} from "../../services/api";
+import { analyzeFurniturePrice } from "../../services/api";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import {
   furnitureSchema,
@@ -56,7 +53,7 @@ const FurniConfirmPage = () => {
 
   const form = useForm<FurnitureFormData>({
     resolver: zodResolver(furnitureSchema),
-    defaultValues: {
+    defaultValues: furnitureResult || {
       requestId: "",
       merkki: "",
       malli: "",
@@ -76,29 +73,17 @@ const FurniConfirmPage = () => {
       navigate(-1);
       return;
     }
-
-    const formattedData = {
-      ...furnitureResult,
-      mitat: {
-        pituus: Number(furnitureResult.mitat.pituus),
-        korkeus: Number(furnitureResult.mitat.korkeus),
-        leveys: Number(furnitureResult.mitat.leveys),
-      },
-    };
-
-    form.reset(formattedData);
-  }, [furnitureResult, form, navigate]);
+  }, [furnitureResult, navigate]);
 
   const onSubmit = async (data: FurnitureFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const priceData: PriceAnalysisApiResponse =
-        await analyzeFurniturePrice(data);
-      console.log("priceData:", priceData);
+      const priceAnalysis = await analyzeFurniturePrice(data);
+      console.log("priceAnalysis:", priceAnalysis);
 
-      setPriceAnalysis(priceData.result);
+      setPriceAnalysis(priceAnalysis);
       navigate("/chatbotpage");
     } catch (error) {
       console.error("Error during form submission:", error);
@@ -200,32 +185,34 @@ const FurniConfirmPage = () => {
                   <FormField
                     control={form.control}
                     name="kunto"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Check className="h-4 w-4" />
-                          Kunto
-                        </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="bg-white">
-                              <SelectValue placeholder="Valitse kunto" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {kuntoOptions.map((kunto) => (
-                              <SelectItem key={kunto} value={kunto}>
-                                {kunto}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Check className="h-4 w-4" />
+                            Kunto
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Valitse kunto" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {kuntoOptions.map((kunto) => (
+                                <SelectItem key={kunto} value={kunto}>
+                                  {kunto}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
 
                   <div className="space-y-4">

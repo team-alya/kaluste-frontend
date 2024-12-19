@@ -2,11 +2,6 @@ import { FurnitureFormData, PriceAnalysisResponse } from "../types/furniture";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-export interface PriceAnalysisApiResponse {
-  message: string;
-  result: PriceAnalysisResponse;
-}
-
 export const uploadImage = async (
   imageFile: File,
 ): Promise<FurnitureFormData> => {
@@ -23,12 +18,14 @@ export const uploadImage = async (
   }
 
   const data = await response.json();
-  return data.result;
+  return data;
 };
 
 export const analyzeFurniturePrice = async (
   furnitureData: FurnitureFormData,
-): Promise<PriceAnalysisApiResponse> => {
+): Promise<PriceAnalysisResponse> => {
+  console.log("furnitureData", furnitureData);
+
   const response = await fetch(`${API_URL}/api/price`, {
     method: "POST",
     headers: {

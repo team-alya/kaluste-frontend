@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const kuntoOptions = [
+  "Uusi",
   "Erinomainen",
   "Hyvä",
   "Kohtalainen",
@@ -11,7 +12,7 @@ export const kuntoOptions = [
 export type KuntoType = (typeof kuntoOptions)[number];
 
 export const furnitureSchema = z.object({
-  requestId: z.string(),
+  requestId: z.string().uuid(),
   merkki: z.string().min(1, "Merkki on pakollinen"),
   malli: z.string().min(1, "Malli on pakollinen"),
   väri: z.string().min(1, "Väri on pakollinen"),
@@ -23,12 +24,12 @@ export const furnitureSchema = z.object({
   materiaalit: z
     .array(z.string())
     .min(1, "Vähintään yksi materiaali vaaditaan"),
-  kunto: z.enum(kuntoOptions, {
-    errorMap: () => ({ message: "Valitse kunto listasta" }),
-  }),
+  kunto: z
+    .enum(kuntoOptions, {
+      errorMap: () => ({ message: "Valitse kunto listasta" }),
+    })
+    .default("Tuntematon"),
 });
-
-export type FurnitureFormData = z.infer<typeof furnitureSchema>;
 
 export interface ToriPrices {
   Uusi?: [number, number];
@@ -38,18 +39,12 @@ export interface ToriPrices {
   [key: string]: [number, number] | undefined;
 }
 
-export interface PriceAnalysisResponse {
-  requestId: string;
-  korkein_hinta: number;
-  alin_hinta: number;
-  myyntikanavat: string[];
-  tori_hinnat: ToriPrices;
-}
-
 // Zod schema for validation
 export const priceAnalysisSchema = z.object({
   korkein_hinta: z.number(),
   alin_hinta: z.number(),
   myyntikanavat: z.array(z.string()),
-  tori_hinnat: z.record(z.tuple([z.number(), z.number()]).optional()),
 });
+
+export type FurnitureFormData = z.infer<typeof furnitureSchema>;
+export type PriceAnalysisResponse = z.infer<typeof priceAnalysisSchema>;
