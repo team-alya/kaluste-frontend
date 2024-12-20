@@ -1,28 +1,21 @@
-# Front-End for Älyä-hanke project
+# KalusteArvio Frontend
 
-Front-End of the Älyä-hanke KalusteArvio-project. The goal of this app is to use Artifical Intelligence to give the user recommendations on what to do with their used furniture. These recommendations include recycling, selling, repairing and donating.
+Frontend application for the Älyä-hanke KalusteArvio-project. The app uses AI to analyze furniture images and provide recommendations for selling, donating, recycling, or repairing used furniture.
 
-## Technologies Used
+## Core Features
 
-### React
+1. Upload furniture image for AI analysis
+2. Validate and edit detected furniture information
+3. Get AI-powered price estimates and recommendations
+4. Chat with AI assistant in different modes (sell, donate, recycle, repair)
 
-- A JavaScript library for building user interfaces.
-- [React Documentation](https://react.dev/)
+## Tech Stack
 
-### Vite
-
-- A fast development build tool optimized for modern web projects.
-- [Vite Documentation](https://vite.dev/)
-
-### TypeScript
-
-- A typed superset of JavaScript that compiles to plain JavaScript.
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-
-### Material-UI
-
-- A popular React UI framework for building responsive and accessible user interfaces.
-- [Material-UI Documentation](https://mui.com/material-ui/)
+- **React + TypeScript + Vite**
+- **State Management**: Zustand for global state (furniture details and price analysis)
+- **Chat Interface**: Vercel AI SDK (useChat hook) for streaming AI responses
+- **Form Handling**: React Hook Form + Zod validation
+- **UI**: Tailwind CSS + Shadcn/UI components
 
 ## Installation
 
@@ -46,14 +39,6 @@ To run the program follow the instructions below:
 ### Notice!
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
-
-### Notice!
-
-When you first start the application using "npm run dev" locally you will get a popup conserning mkcert.
-<br>
-Accept the popup.
-<br>
-Mkcert is used to create a https-connection when running the application locally, because using a mobile devices camera requires an https-connection.
 
 ## Images of the user interface
 

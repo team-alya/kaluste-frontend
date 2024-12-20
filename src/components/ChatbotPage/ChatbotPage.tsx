@@ -6,6 +6,7 @@ import {
   getTabInitialMessage,
   SALES_POST_PROMPT,
 } from "../../prompts/chatPrompt";
+import { sendFeedBack } from "../../services/chatService";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import { TABS, TabType } from "../../types/chat";
 import { Message } from "../Message";
@@ -64,10 +65,6 @@ const ChatbotPage: React.FC = () => {
   }, [furnitureResult, navigate]);
 
   useEffect(() => {
-    console.log("messages", messages);
-  }, [messages]);
-
-  useEffect(() => {
     if (!searchParams.get("tab")) {
       setSearchParams({ tab: "myynti" });
     }
@@ -106,21 +103,11 @@ const ChatbotPage: React.FC = () => {
       console.error("No requestId available");
       return;
     }
-
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/review`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requestId: furnitureResult.requestId,
-            review: { rating, comment },
-          }),
-        },
-      );
-
-      if (response.ok) {
+      const { message } = await sendFeedBack(id, rating, comment);
+      console.log("message", message);
+      if (message) {
+        console.log("message", message);
         setIsFeedbackModalOpen(false);
         setIsDialogOpen(true);
       }

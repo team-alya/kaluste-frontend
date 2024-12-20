@@ -10,7 +10,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { Camera } from "react-camera-pro";
 import { useNavigate } from "react-router-dom";
-import { uploadImage } from "../../services/api";
+import { uploadImage } from "../../services/furniture-api";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import LoaderAnimation from "../loader";
 import { Button } from "../ui/button";

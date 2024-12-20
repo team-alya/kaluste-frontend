@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "../ui/select";
 
-import { analyzeFurniturePrice } from "../../services/api";
+import { analyzeFurniturePrice } from "../../services/furniture-api";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import {
   furnitureSchema,
