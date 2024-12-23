@@ -6,7 +6,7 @@ export const kuntoOptions = [
   "Hyvä",
   "Kohtalainen",
   "Huono",
-  "Tuntematon",
+  "Ei tiedossa",
 ] as const;
 
 export type KuntoType = (typeof kuntoOptions)[number];
@@ -15,7 +15,7 @@ export const furnitureSchema = z.object({
   requestId: z.string().uuid(),
   merkki: z.string().min(1, "Merkki on pakollinen"),
   malli: z.string().min(1, "Malli on pakollinen"),
-  väri: z.string().min(1, "Väri on pakollinen"),
+  vari: z.string().min(1, "Väri on pakollinen"),
   mitat: z.object({
     pituus: z.number().min(0, "Pituus ei voi olla negatiivinen"),
     korkeus: z.number().min(0, "Korkeus ei voi olla negatiivinen"),
@@ -28,7 +28,7 @@ export const furnitureSchema = z.object({
     .enum(kuntoOptions, {
       errorMap: () => ({ message: "Valitse kunto listasta" }),
     })
-    .default("Tuntematon"),
+    .default("Ei tiedossa"),
 });
 
 export interface ToriPrices {

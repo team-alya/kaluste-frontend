@@ -57,14 +57,14 @@ const FurniConfirmPage = () => {
       requestId: "",
       merkki: "",
       malli: "",
-      väri: "",
+      vari: "",
       mitat: {
         pituus: 0,
         korkeus: 0,
         leveys: 0,
       },
       materiaalit: [],
-      kunto: "Tuntematon",
+      kunto: "Ei tiedossa",
     },
   });
 
@@ -74,6 +74,9 @@ const FurniConfirmPage = () => {
       return;
     }
   }, [furnitureResult, navigate]);
+  useEffect(() => {
+    console.log("furnitureResult:", furnitureResult);
+  }, [furnitureResult]);
 
   const onSubmit = async (data: FurnitureFormData) => {
     setIsLoading(true);
@@ -325,7 +328,7 @@ const FurniConfirmPage = () => {
 
                   <FormField
                     control={form.control}
-                    name="väri"
+                    name="vari"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
