@@ -1,9 +1,19 @@
 # Build vaihe
 FROM node:20-alpine AS builder
 WORKDIR /app
+
+# Kopioi npm config ensin
+COPY .npmrc ./
+
 COPY package*.json ./
-RUN npm ci
+
+
+RUN npm install --legacy-peer-deps
+
+# Kopioi loput tiedostot
 COPY . .
+
+# Buildaa sovellus
 RUN npm run build
 
 # Tuotantovaihe
