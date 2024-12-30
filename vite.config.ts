@@ -11,16 +11,14 @@ export default defineConfig({
     },
   },
   server: {
-    https: {
-      key: undefined,
-      cert: undefined,
-    },
-    proxy: {
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    proxy:
+      process.env.NODE_ENV === "development"
+        ? {
+            "/api": {
+              target: "http://localhost:3000",
+              changeOrigin: true,
+            },
+          }
+        : undefined,
   },
 });

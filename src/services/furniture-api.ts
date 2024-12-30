@@ -8,6 +8,9 @@ export const uploadImage = async (
   const formData = new FormData();
   formData.append("image", imageFile);
 
+  console.log("Sending request to:", `${API_URL}/api/image`);
+  console.log("File being sent:", imageFile);
+
   const response = await fetch(`${API_URL}/api/image`, {
     method: "POST",
     body: formData,
@@ -17,10 +20,15 @@ export const uploadImage = async (
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const errorText = await response.text();
+    console.error("Server error response:", errorText);
+    throw new Error(
+      `HTTP error! status: ${response.status}, message: ${errorText}`,
+    );
   }
 
   const data = await response.json();
+  console.log("Received response:", data);
   return data;
 };
 
