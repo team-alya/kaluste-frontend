@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import skyimage from "./sky.png";
 
 const WelcomePage = () => {
   const navigate = useNavigate();
@@ -19,7 +18,11 @@ const WelcomePage = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <img src={skyimage} alt="Logo" className="w-32 h-32 mx-auto" />
+          <img
+            src={"/alya-logo.png"}
+            alt="Logo"
+            className="w-32 h-32 mx-auto"
+          />
           <p className="text-center">
             Hei! Olen KalusteArvioBotti. Autan sinua arvioimaan mitä sinun
             kannattaa tehdä tarpeettomalle tai huonokuntoiselle kalusteelle.

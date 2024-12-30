@@ -15,7 +15,6 @@ import { useFurnitureStore } from "../../stores/furnitureStore";
 import LoaderAnimation from "../loader";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import examplePicture from "./stockchair.jpg";
 
 interface CameraType {
   takePhoto: () => string;
@@ -144,7 +143,7 @@ const ImageUploadPage: React.FC = () => {
                   </div>
                   <div className="relative group">
                     <img
-                      src={examplePicture}
+                      src={"/stockchair.jpg"}
                       alt="stock-photo-chair"
                       className="w-full max-w-md mx-auto rounded-lg shadow-md"
                     />

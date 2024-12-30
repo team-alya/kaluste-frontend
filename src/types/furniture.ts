@@ -28,7 +28,7 @@ export const furnitureSchema = z.object({
     .enum(kuntoOptions, {
       errorMap: () => ({ message: "Valitse kunto listasta" }),
     })
-    .default("ei tiedossa"),
+    .default("Ei tiedossa"),
 });
 
 export interface ToriPrices {
