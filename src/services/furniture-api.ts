@@ -11,6 +11,9 @@ export const uploadImage = async (
   const response = await fetch(`${API_URL}/api/image`, {
     method: "POST",
     body: formData,
+    headers: {
+      Accept: "application/json",
+    },
   });
 
   if (!response.ok) {
