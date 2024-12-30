@@ -75,10 +75,6 @@ const FurniConfirmPage = () => {
     }
   }, [furnitureResult, navigate]);
 
-  useEffect(() => {
-    console.log("furnitureResult:", furnitureResult);
-  }, [furnitureResult]);
-
   const onSubmit = async (data: FurnitureFormData) => {
     setIsLoading(true);
     setError(null);
