@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const kuntoOptions = [
-  "uusi",
-  "erinomainen",
-  "hyvä",
-  "kohtalainen",
-  "huono",
-  "ei tiedossa",
+  "Uusi",
+  "Erinomainen",
+  "Hyvä",
+  "Kohtalainen",
+  "Huono",
+  "Ei tiedossa",
 ] as const;
 
 export type KuntoType = (typeof kuntoOptions)[number];

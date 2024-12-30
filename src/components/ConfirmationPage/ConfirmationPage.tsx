@@ -64,7 +64,7 @@ const FurniConfirmPage = () => {
         leveys: 0,
       },
       materiaalit: [],
-      kunto: "ei tiedossa",
+      kunto: "Ei tiedossa",
     },
   });
 
