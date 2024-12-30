@@ -64,7 +64,7 @@ const FurniConfirmPage = () => {
         leveys: 0,
       },
       materiaalit: [],
-      kunto: "Ei tiedossa",
+      kunto: "ei tiedossa",
     },
   });
 
@@ -74,6 +74,7 @@ const FurniConfirmPage = () => {
       return;
     }
   }, [furnitureResult, navigate]);
+
   useEffect(() => {
     console.log("furnitureResult:", furnitureResult);
   }, [furnitureResult]);

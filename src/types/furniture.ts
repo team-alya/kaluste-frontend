@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const kuntoOptions = [
-  "Uusi",
-  "Erinomainen",
-  "Hyvä",
-  "Kohtalainen",
-  "Huono",
-  "Ei tiedossa",
+  "uusi",
+  "erinomainen",
+  "hyvä",
+  "kohtalainen",
+  "huono",
+  "ei tiedossa",
 ] as const;
 
 export type KuntoType = (typeof kuntoOptions)[number];
@@ -28,7 +28,7 @@ export const furnitureSchema = z.object({
     .enum(kuntoOptions, {
       errorMap: () => ({ message: "Valitse kunto listasta" }),
     })
-    .default("Ei tiedossa"),
+    .default("ei tiedossa"),
 });
 
 export interface ToriPrices {

@@ -2,17 +2,23 @@ import { useChat } from "ai/react";
 import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useFeedback } from "../../lib/hooks/useFeedback";
 import {
   getTabInitialMessage,
   SALES_POST_PROMPT,
 } from "../../prompts/chatPrompt";
-import { sendFeedBack } from "../../services/chatService";
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import { TABS, TabType } from "../../types/chat";
 import { Message } from "../Message";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import FeedbackForm from "./FeedbackForm";
@@ -25,13 +31,10 @@ const ChatbotPage: React.FC = () => {
   const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
     "awaiting_confirmation",
   );
-  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
   const navigate = useNavigate();
   const { furnitureResult, priceAnalysis } = useFurnitureStore();
-
   const id = `${furnitureResult?.requestId}-${currentTab}`;
   const {
     messages,
@@ -58,6 +61,14 @@ const ChatbotPage: React.FC = () => {
     ],
   });
 
+  const {
+    isFeedbackModalOpen,
+    setIsFeedbackModalOpen,
+    isDialogOpen,
+    setIsDialogOpen,
+    handleFeedbackSubmit,
+  } = useFeedback(id, furnitureResult!);
+
   useEffect(() => {
     if (!furnitureResult) {
       navigate("/");
@@ -68,6 +79,7 @@ const ChatbotPage: React.FC = () => {
     if (!searchParams.get("tab")) {
       setSearchParams({ tab: "myynti" });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -96,24 +108,6 @@ const ChatbotPage: React.FC = () => {
           "Selvä, voit kysyä minulta lisätietoja myynnistä chat-kentän kautta.",
       },
     ]);
-  };
-
-  const handleFeedbackSubmit = async (rating: number, comment: string) => {
-    if (!furnitureResult?.requestId) {
-      console.error("No requestId available");
-      return;
-    }
-    try {
-      const { message } = await sendFeedBack(id, rating, comment);
-      console.log("message", message);
-      if (message) {
-        console.log("message", message);
-        setIsFeedbackModalOpen(false);
-        setIsDialogOpen(true);
-      }
-    } catch (error) {
-      console.error("Error while sending feedback:", error);
-    }
   };
 
   const renderTabContent = (tab: TabType) => {
@@ -275,6 +269,9 @@ const ChatbotPage: React.FC = () => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Kiitos palautteestasi</DialogTitle>
+                <DialogDescription>
+                  Palautteesi on vastaanotettu onnistuneesti.
+                </DialogDescription>
               </DialogHeader>
             </DialogContent>
           </Dialog>
