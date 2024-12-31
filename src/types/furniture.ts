@@ -31,19 +31,58 @@ export const furnitureSchema = z.object({
     .default("Ei tiedossa"),
 });
 
-export interface ToriPrices {
-  Uusi?: [number, number];
-  Hyvä?: [number, number];
-  Kohtalainen?: [number, number];
-  Huono?: [number, number];
-  [key: string]: [number, number] | undefined;
-}
-
-// Zod schema for validation
 export const priceAnalysisSchema = z.object({
-  korkein_hinta: z.number(),
-  alin_hinta: z.number(),
-  myyntikanavat: z.array(z.string()),
+  korkein_hinta: z.number().describe("Suurin realistinen myyntihinta euroina"),
+
+  alin_hinta: z.number().describe("Alin realistinen myyntihinta euroina"),
+
+  suositus_hinta: z
+    .number()
+    .min(0)
+    .max(1000000)
+    .describe("Suositeltu optimaalinen myyntihinta euroina"),
+
+  arvioitu_myyntiaika: z
+    .object({
+      nopea: z
+        .number()
+        .min(1)
+        .max(365)
+        .describe("Arvioitu myyntiaika päivissä alimmalla hinnalla"),
+      normaali: z
+        .number()
+        .min(1)
+        .max(365)
+        .describe("Arvioitu myyntiaika päivissä suositushinnalla"),
+      hidas: z
+        .number()
+        .min(1)
+        .max(365)
+        .describe("Arvioitu myyntiaika päivissä korkeimmalla hinnalla"),
+    })
+    .describe("Arviot myyntiajasta eri hintaluokissa"),
+
+  myyntikanavat: z
+    .array(z.string())
+    .describe("Lista suositelluista suomalaisista myyntipaikoista"),
+
+  perustelu: z
+    .array(z.string())
+    .describe(
+      "Lyhyt ja ytimekäs perustelu hinta-arviolle. Älä toista perustiedoissa mainittuja asioita. Älä mainitse Perplexityä-analyysin lähteenäsi.",
+    ),
+
+  markkinatilanne: z
+    .object({
+      kysyntä: z.string().describe("Arvio kysynnästä (korkea/normaali/matala)"),
+      kilpailu: z
+        .number()
+        .min(0)
+        .max(100)
+        .describe("Arvio kilpailevien ilmoitusten määrästä"),
+      sesonki: z.boolean().describe("Onko tuotteella nyt sesonki"),
+    })
+    .describe("Arvio markkinatilanteesta"),
 });
 
 export type FurnitureFormData = z.infer<typeof furnitureSchema>;

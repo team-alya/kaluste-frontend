@@ -6,44 +6,63 @@ export const getTabInitialMessage = (
   currentTab: TabType,
   priceAnalysis?: PriceAnalysisResponse | null,
 ) => {
-  let hinnat: string;
-  let myyntikanavat: string;
-
   switch (currentTab) {
-    case "myynti":
+    case "myynti": {
       if (!priceAnalysis) {
-        return "Haluatko että laadin sinulle myynti-ilmoitukseen pohjan?";
+        return `Haluatko että laadin sinulle myynti-ilmoitukseen pohjan?`;
       }
 
-      hinnat =
+      const hinnatText =
         priceAnalysis.alin_hinta && priceAnalysis.korkein_hinta
-          ? `${priceAnalysis.alin_hinta} - ${priceAnalysis.korkein_hinta} euroa`
+          ? `${priceAnalysis.alin_hinta} - ${priceAnalysis.korkein_hinta}`
           : "ei saatavilla";
 
-      myyntikanavat = priceAnalysis.myyntikanavat?.length
-        ? `\n\nSuosittelen seuraavia myyntikanavia: ${priceAnalysis.myyntikanavat.join(", ")}`
+      const suositusHintaText = priceAnalysis.suositus_hinta
+        ? `\nSuosittelemme asettamaan myyntihinnaksi ${priceAnalysis.suositus_hinta} euroa.`
+        : "";
+
+      const myyntiaikaText = priceAnalysis.arvioitu_myyntiaika
+        ? `\n\nArvioitu myyntiaika:
+• Edullisella hinnalla (${priceAnalysis.alin_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.nopea} päivää
+• Suositushinnalla (${priceAnalysis.suositus_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.normaali} päivää
+• Korkealla hinnalla (${priceAnalysis.korkein_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.hidas} päivää`
+        : "";
+
+      const markkinatilanneText = priceAnalysis.markkinatilanne
+        ? `\n\nMarkkinatilanne:
+• Kysyntä: ${priceAnalysis.markkinatilanne.kysyntä}
+• ${priceAnalysis.markkinatilanne.sesonki ? "Nyt on hyvä sesonki myymiselle!" : "Ei ole sesonkiaika."}`
+        : "";
+
+      const myyntikanavat = priceAnalysis.myyntikanavat?.length
+        ? `\n\nSuosittelemme seuraavia myyntikanavia:\n${priceAnalysis.myyntikanavat.map((kanava) => `• ${kanava}`).join("\n")}`
+        : "";
+
+      const perustelut = priceAnalysis.perustelu?.length
+        ? `\n\nHinta-arvion perustelut:\n${priceAnalysis.perustelu.map((perustelu) => `• ${perustelu}`).join("\n")}`
         : "";
 
       return dedent`
-          Mikäli haluat myydä kalusteen, kalusteen myyntihinta on todennäköisesti ${hinnat}.${myyntikanavat}
-   
-          Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?
-        `;
+        Hinta-arvio tuotteellesi on ${hinnatText} euroa.${suositusHintaText}${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
+
+        Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?
+      `;
+    }
 
     case "lahjoitus":
       return dedent`
-          Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.
-        `;
+        Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.
+      `;
 
     case "kierrätys":
       return dedent`
-          Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.
-        `;
+        Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.
+      `;
 
     default:
       return dedent`
-          Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.
-        `;
+        Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.
+      `;
   }
 };
 

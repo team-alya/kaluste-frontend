@@ -6,7 +6,7 @@ import WelcomePage from "./components/WelcomePage/WelcomePage";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#c1e1c1] via-[#72b77b] to-[#75a46e] text-foreground">
+    <div className="min-h-screen bg-gradient-to-br from-[#c1e1c1] via-[#77b980] to-[#5a8055] text-foreground">
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/upload" element={<ImageUploadPage />} />

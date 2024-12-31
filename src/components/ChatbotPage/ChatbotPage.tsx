@@ -61,6 +61,11 @@ const ChatbotPage: React.FC = () => {
     ],
   });
 
+  useEffect(() => {
+    console.log("furnitureResult", furnitureResult);
+    console.log("priceAnalysis", priceAnalysis);
+  }, []);
+
   const {
     isFeedbackModalOpen,
     setIsFeedbackModalOpen,
@@ -115,11 +120,16 @@ const ChatbotPage: React.FC = () => {
     const showSalesButtons =
       tab === "myynti" && salesTabState === "awaiting_confirmation";
 
+    const chatContainerHeight =
+      tab === "myynti" && salesTabState === "awaiting_confirmation"
+        ? "h-[32vh] md:h-[35vh]"
+        : "h-[55vh] md:h-[65vh]";
+
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col space-y-4">
         <div
           ref={chatContainerRef}
-          className="h-[400px] overflow-y-auto rounded-lg border bg-white p-4"
+          className={`overflow-y-auto rounded-lg border bg-white p-4 transition-all duration-1000 ${chatContainerHeight}`}
         >
           <div className="flex flex-col space-y-2">
             {messages.map((message, index) => (
@@ -131,7 +141,6 @@ const ChatbotPage: React.FC = () => {
             ))}
           </div>
         </div>
-
         {showSalesButtons && (
           <div className="flex justify-center gap-4">
             <Button
@@ -196,7 +205,7 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-[45rem]">
       <Card className="shadow-lg">
         <CardHeader>
           <div className="grid grid-cols-3 items-center">
