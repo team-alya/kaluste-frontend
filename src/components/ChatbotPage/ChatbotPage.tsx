@@ -10,6 +10,7 @@ import {
 import { useFurnitureStore } from "../../stores/furnitureStore";
 import { TABS, TabType } from "../../types/chat";
 import { Message } from "../Message";
+import PageWrapper from "../PageWrapper";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -29,7 +30,7 @@ const ChatbotPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get("tab") as TabType) || "myynti";
   const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
-    "awaiting_confirmation",
+    "awaiting_confirmation"
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -200,88 +201,90 @@ const ChatbotPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-[45rem]">
-      <Card className="bg-white/90 shadow-xl">
-        <CardHeader>
-          <div className="grid md:grid-cols-3 md:items-center">
-            <div></div>
-            <CardTitle className="text-2xl font-bold text-center">
-              KalusteArvioBotti
-            </CardTitle>
-            <div className="flex md:justify-end justify-center mt-1 md:mt-0">
-              <Button variant="outline" onClick={() => navigate("/")}>
-                <HomeIcon className="h-4 w-4 mr-2" />
-                Alkuun
-              </Button>
+    <PageWrapper>
+      <div className="container mx-auto px-4 py-8 max-w-[45rem]">
+        <Card className="bg-white/90 shadow-xl">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle className="text-2xl font-bold text-center md:text-left order-1 md:order-2">
+                KalusteArvioBotti
+              </CardTitle>
+              <div className="flex justify-center md:justify-start order-2 md:order-1">
+                <Button variant="outline" onClick={() => navigate("/")}>
+                  <HomeIcon className="h-4 w-4 mr-2" />
+                  Alkuun
+                </Button>
+              </div>
+              <div className="hidden md:block w-[88px] order-3"></div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs
-            value={currentTab}
-            onValueChange={(value) => {
-              if (TABS.includes(value as TabType)) {
-                if (isLoading) {
-                  stop();
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              value={currentTab}
+              onValueChange={(value) => {
+                if (TABS.includes(value as TabType)) {
+                  if (isLoading) {
+                    stop();
+                  }
+                  setSearchParams({ tab: value });
                 }
-                setSearchParams({ tab: value });
-              }
-            }}
-            className="space-y-4"
-          >
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger disabled={isLoading} value="myynti">
-                Myynti
-              </TabsTrigger>
-              <TabsTrigger disabled={isLoading} value="lahjoitus">
-                Lahjoitus
-              </TabsTrigger>
-              <TabsTrigger disabled={isLoading} value="kierrätys">
-                Kierrätys
-              </TabsTrigger>
-              <TabsTrigger disabled={isLoading} value="kunnostus">
-                Kunnostus
-              </TabsTrigger>
-            </TabsList>
+              }}
+              className="space-y-4"
+            >
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger disabled={isLoading} value="myynti">
+                  Myynti
+                </TabsTrigger>
+                <TabsTrigger disabled={isLoading} value="lahjoitus">
+                  Lahjoitus
+                </TabsTrigger>
+                <TabsTrigger disabled={isLoading} value="kierrätys">
+                  Kierrätys
+                </TabsTrigger>
+                <TabsTrigger disabled={isLoading} value="kunnostus">
+                  Kunnostus
+                </TabsTrigger>
+              </TabsList>
 
-            {TABS.map((tab) => (
-              <TabsContent key={tab} value={tab}>
-                {renderTabContent(tab)}
-              </TabsContent>
-            ))}
-          </Tabs>
+              {TABS.map((tab) => (
+                <TabsContent key={tab} value={tab}>
+                  {renderTabContent(tab)}
+                </TabsContent>
+              ))}
+            </Tabs>
 
-          {messages.length > 1 && (
-            <div className="mt-4">
-              <Button
-                onClick={() => setIsFeedbackModalOpen(true)}
-                variant="outline"
-                className="w-full"
-              >
-                Anna palautetta
-              </Button>
-            </div>
-          )}
+            {messages.length > 1 && (
+              <div className="mt-4">
+                <Button
+                  onClick={() => setIsFeedbackModalOpen(true)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Anna palautetta
+                </Button>
+              </div>
+            )}
 
-          <FeedbackForm
-            isOpen={isFeedbackModalOpen}
-            onClose={() => setIsFeedbackModalOpen(false)}
-            onSubmit={handleFeedbackSubmit}
-          />
+            <FeedbackForm
+              isOpen={isFeedbackModalOpen}
+              onClose={() => setIsFeedbackModalOpen(false)}
+              onSubmit={handleFeedbackSubmit}
+            />
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Kiitos palautteestasi</DialogTitle>
-                <DialogDescription>
-                  Palautteesi on vastaanotettu onnistuneesti.
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
-        </CardContent>
-      </Card>
-    </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Kiitos palautteestasi</DialogTitle>
+                  <DialogDescription>
+                    Palautteesi on vastaanotettu onnistuneesti.
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+      </div>
+    </PageWrapper>
   );
 };
 
