@@ -61,11 +61,6 @@ const ChatbotPage: React.FC = () => {
     ],
   });
 
-  useEffect(() => {
-    console.log("furnitureResult", furnitureResult);
-    console.log("priceAnalysis", priceAnalysis);
-  }, []);
-
   const {
     isFeedbackModalOpen,
     setIsFeedbackModalOpen,
