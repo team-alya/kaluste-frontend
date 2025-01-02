@@ -4,6 +4,9 @@
 
 @layer base {
   :root {
+    --green-light: 142 76% 45%;
+    --green-default: 142 76% 36%;
+    --green-dark: 142 76% 30%;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -32,6 +35,9 @@
   }
 
   .dark {
+    --green-light: 142 70% 50%;
+    --green-default: 142 70% 45%;
+    --green-dark: 142 70% 40%;
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
     --card: 24 9.8% 10%;

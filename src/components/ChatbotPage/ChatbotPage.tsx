@@ -122,8 +122,8 @@ const ChatbotPage: React.FC = () => {
 
     const chatContainerHeight =
       tab === "myynti" && salesTabState === "awaiting_confirmation"
-        ? "h-[32vh] md:h-[35vh]"
-        : "h-[55vh] md:h-[65vh]";
+        ? "h-[50vh] md:h-[42vh]"
+        : "h-[52vh] md:h-[65vh]";
 
     return (
       <div className="flex flex-col space-y-4">
@@ -206,14 +206,14 @@ const ChatbotPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-[45rem]">
-      <Card className="shadow-lg">
+      <Card className="bg-white/90 shadow-xl">
         <CardHeader>
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid md:grid-cols-3 md:items-center">
             <div></div>
             <CardTitle className="text-2xl font-bold text-center">
               KalusteArvioBotti
             </CardTitle>
-            <div className="flex justify-end">
+            <div className="flex md:justify-end justify-center mt-1 md:mt-0">
               <Button variant="outline" onClick={() => navigate("/")}>
                 <HomeIcon className="h-4 w-4 mr-2" />
                 Alkuun
