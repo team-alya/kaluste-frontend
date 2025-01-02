@@ -117,7 +117,7 @@ const ImageUploadPage: React.FC = () => {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 py-8 min-h-screen">
+      <div className="px-4 min-h-screen">
         <Card className="max-w-2xl mx-auto shadow-lg">
           <CardHeader className="bg-primary/5 border-b">
             <div className="flex items-center justify-between relative">

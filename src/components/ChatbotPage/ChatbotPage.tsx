@@ -30,7 +30,7 @@ const ChatbotPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get("tab") as TabType) || "myynti";
   const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
-    "awaiting_confirmation"
+    "awaiting_confirmation",
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -202,7 +202,7 @@ const ChatbotPage: React.FC = () => {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 py-8 max-w-[45rem]">
+      <div className="container mx-auto  max-w-[45rem]">
         <Card className="bg-white/90 shadow-xl">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

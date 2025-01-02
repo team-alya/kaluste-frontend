@@ -3,7 +3,7 @@ import { FurnitureFormData, PriceAnalysisResponse } from "../types/furniture";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const uploadImage = async (
-  imageFile: File
+  imageFile: File,
 ): Promise<FurnitureFormData> => {
   const formData = new FormData();
   formData.append("image", imageFile);
@@ -20,7 +20,7 @@ export const uploadImage = async (
     const errorText = await response.text();
     console.error("Server error response:", errorText);
     throw new Error(
-      `HTTP error! status: ${response.status}, message: ${errorText}`
+      `HTTP error! status: ${response.status}, message: ${errorText}`,
     );
   }
 
@@ -29,7 +29,7 @@ export const uploadImage = async (
 };
 
 export const analyzeFurniturePrice = async (
-  furnitureData: FurnitureFormData
+  furnitureData: FurnitureFormData,
 ): Promise<PriceAnalysisResponse> => {
   const response = await fetch(`${API_URL}/api/price`, {
     method: "POST",
