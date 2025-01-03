@@ -100,7 +100,7 @@ const ImageUploadPage: React.FC = () => {
               {!imageState.preview ? (
                 <motion.div
                   key="upload-view"
-                  className="space-y-6"
+                  className="space-y-4"
                   {...fadeAnimation}
                 >
                   <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex justify-center mx-auto w-fit gap-3">
@@ -133,7 +133,7 @@ const ImageUploadPage: React.FC = () => {
                           <Button
                             variant={"outline"}
                             onClick={() => setIsCameraOpen(true)}
-                            className="w-full flex items-center justify-center gap-2 sm:w-48 h-10"
+                            className="w-full flex items-center justify-center gap-2 sm:w-48 h-9"
                           >
                             <CameraIcon className="h-4 w-4" />
                             Ota kuva
@@ -141,7 +141,7 @@ const ImageUploadPage: React.FC = () => {
                           <Button
                             variant={"outline"}
                             onClick={handleFileInputClick}
-                            className="w-full flex items-center justify-center gap-2 sm:w-48 h-10"
+                            className="w-full flex items-center justify-center gap-2 sm:w-48 h-9"
                           >
                             <Upload className="h-4 w-4" />
                             Galleria
@@ -247,7 +247,7 @@ const ImageUploadPage: React.FC = () => {
                     <img
                       src={imageState.preview}
                       alt="Otettu kuva"
-                      className="outline outline-2 outline-zinc-200 w-full max-w-md mx-auto rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.01]"
+                      className="outline outline-2 outline-zinc-200 w-full max-w-md xl:max-h-none max-h-96 xl:object-none object-contain mx-auto rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.01]"
                     />
                   </div>
 
@@ -255,7 +255,7 @@ const ImageUploadPage: React.FC = () => {
                     <Button
                       variant={"outline"}
                       onClick={handleImageUpload}
-                      className="w-full h-10 sm:w-auto flex items-center justify-center gap-2"
+                      className="w-full h-9 sm:w-auto flex items-center justify-center gap-2"
                       size="lg"
                     >
                       <Upload className="h-4 w-4" />
@@ -266,7 +266,7 @@ const ImageUploadPage: React.FC = () => {
                       onClick={() =>
                         setImageState({ preview: null, file: null })
                       }
-                      className="w-full h-10 sm:w-auto flex items-center justify-center gap-2"
+                      className="w-full h-9 sm:w-auto flex items-center justify-center gap-2"
                     >
                       <X className="h-4 w-4" />
                       Ota uusi kuva
