@@ -29,11 +29,69 @@ const HeroSection = () => {
           opacity: 0,
           transition: { duration: 0.3 },
         }}
-        className="min-h-[90vh] bg-background/80 flex items-center py-12 sm:py-16 lg:py-20"
+        className="min-h-[90vh] bg-background/80 flex items-center py-12 sm:py-16 lg:py-20 relative z-20 overflow-hidden"
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="grid gap-12">
+        {/* Koristeelliset elementit */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none hidden md:block"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          {/* Vasen yläkulma */}
+          <motion.img
+            src="/hero/circle.svg"
+            className="absolute top-12 left-12 w-24 h-12"
+            initial={{ scale: 0.9, opacity: 0.35 }}
+            animate={{ scale: 1, opacity: 0.5 }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+
+          {/* Oikea alakulma */}
+          <motion.img
+            src="/hero/half-circle.svg"
+            className="absolute  bottom-[-10px] -right-10 w-32 h-20 z-10"
+            initial={{ x: 15, opacity: 0.3 }}
+            animate={{ x: 0, opacity: 0.4 }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+
+          {/* Oikea yläkulma */}
+          <motion.img
+            src="/hero/circle.svg"
+            className="fixed top-[5%] left-[85%] w-12 h-12"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.8 }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+
+          {/* Pallo keskellä about */}
+          <motion.div
+            className="absolute bottom-1/4 left-1/4 w-16 h-16 bg-green-light/10 rounded-full -z-10"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1.1 }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+        </motion.div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 -mt-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center ">
+            <div className="grid gap-12 ">
               {/* Header and Introduction */}
               <motion.div
                 className="space-y-6"
@@ -140,7 +198,7 @@ const HeroSection = () => {
                 <Button
                   onClick={handleStartClick}
                   size="lg"
-                  className="mt-6 sm:mt-8 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold md:w-56 w-full 
+                  className="z-20 mt-6 sm:mt-8 px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold md:w-56 w-full 
                     hover:scale-[1.02] hover:shadow-md transition-all duration-200"
                 >
                   ALOITA
