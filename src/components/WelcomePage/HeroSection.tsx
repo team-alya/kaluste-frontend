@@ -3,6 +3,7 @@ import { motion, useAnimation } from "motion/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageWrapper from "../PageWrapper";
+import { TextLoop } from "../ui/text-loop";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -36,13 +37,16 @@ const HeroSection = () => {
               {/* Header and Introduction */}
               <motion.div
                 className="space-y-6"
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: -0.25, y: 40 }}
                 animate={controls}
                 variants={{
                   showContent: {
                     opacity: 1,
                     y: 0,
-                    transition: { duration: 0.7 },
+                    transition: {
+                      duration: 0.8,
+                      ease: "easeOut",
+                    },
                   },
                 }}
               >
@@ -54,13 +58,19 @@ const HeroSection = () => {
                   <p className="text-xs text-muted-foreground/50 font-medium uppercase tracking-wide">
                     Vastuullista huonekalujen kierrätystä
                   </p>
-                  <p className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-[600px] leading-normal font-light">
+                  <p className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-[630px] leading-normal font-light">
                     Olen{" "}
-                    <span className="text-green-light border-b border-green-light/50">
-                      KalusteArvioBotti.
-                    </span>{" "}
-                    Autan sinua arvioimaan mitä sinun kannattaa tehdä
-                    tarpeettomalle tai huonokuntoiselle kalusteelle.
+                    <span className="text-green-light">KalusteArvioBotti.</span>{" "}
+                    Autan sinua{" "}
+                    <TextLoop
+                      interval={3.7}
+                      className="text-green-light inline-block w-32 md:w-44  text-start mt-0.5"
+                    >
+                      <span className="block">arviomainaan</span>
+                      <span className="block">kierrättämään</span>
+                      <span className="block">uudistamaan</span>
+                    </TextLoop>
+                    käytetyn kalusteen.
                   </p>
                 </div>
               </motion.div>
@@ -97,13 +107,16 @@ const HeroSection = () => {
               {/* Instructions */}
               <motion.div
                 className="space-y-4 sm:space-y-6"
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: -0.25, y: 40 }}
                 animate={controls}
                 variants={{
                   showContent: {
                     opacity: 1,
                     y: 0,
-                    transition: { duration: 0.7 },
+                    transition: {
+                      duration: 0.8,
+                      ease: "easeOut",
+                    },
                   },
                 }}
               >

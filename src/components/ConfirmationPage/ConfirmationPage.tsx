@@ -112,8 +112,10 @@ const FurniConfirmPage = () => {
       <Card className="max-w-2xl mx-auto shadow-lg">
         <CardHeader className="bg-primary/5">
           <div className="flex items-center justify-between relative">
-            <BackButton />
-            <CardTitle className="absolute left-1/2 -translate-x-1/2 text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <div className="z-10">
+              <BackButton />
+            </div>
+            <CardTitle className="w-full sm:absolute sm:left-1/2 sm:-translate-x-1/2 text-2xl font-bold text-center flex items-center justify-center gap-2 whitespace-nowrap">
               <PackageCheck className="h-8 w-8 text-primary" />
               Tietojen tarkistus
             </CardTitle>
@@ -314,7 +316,7 @@ const FurniConfirmPage = () => {
                                 e.target.value
                                   .split(",")
                                   .map((s) => s.trim())
-                                  .filter(Boolean),
+                                  .filter(Boolean)
                               )
                             }
                             placeholder="Erota materiaalit pilkulla"

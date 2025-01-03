@@ -14,7 +14,7 @@ export const Message = ({
 }) => {
   return (
     <motion.div
-      className={`flex flex-row gap-4 px-4 w-full md:w-[500px] md:px-0 first-of-type:pt-5`}
+      className={`flex flex-row md:gap-4 gap-3 px-4 w-full md:w-[500px] md:px-0 first-of-type:pt-5`}
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
@@ -23,7 +23,7 @@ export const Message = ({
       </div>
 
       <div className="flex flex-col gap-6 w-full">
-        <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4">
+        <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4 tracking-tighter md:tracking-normal">
           <Markdown>{content as string}</Markdown>
         </div>
       </div>

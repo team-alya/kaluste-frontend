@@ -30,7 +30,7 @@ const ChatbotPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get("tab") as TabType) || "myynti";
   const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
-    "awaiting_confirmation",
+    "awaiting_confirmation"
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +125,7 @@ const ChatbotPage: React.FC = () => {
       <div className="flex flex-col space-y-4">
         <div
           ref={chatContainerRef}
-          className={`overflow-y-auto rounded-lg border bg-white p-4 transition-all duration-1000 ${chatContainerHeight}`}
+          className={`overflow-y-auto rounded-lg border bg-white md:p-4 transition-all duration-1000 ${chatContainerHeight}`}
         >
           <div className="flex flex-col space-y-2">
             {messages.map((message, index) => (
@@ -205,7 +205,7 @@ const ChatbotPage: React.FC = () => {
       <div className="container mx-auto  max-w-[45rem]">
         <Card className="bg-white/90 shadow-xl">
           <CardHeader>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-4 gap-3">
               <CardTitle className="text-2xl font-bold text-center md:text-left order-1 md:order-2">
                 KalusteArvioBotti
               </CardTitle>
@@ -231,7 +231,7 @@ const ChatbotPage: React.FC = () => {
               }}
               className="space-y-4"
             >
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-4 tracking-tighter md:tracking-normal text-sm md:text-base">
                 <TabsTrigger disabled={isLoading} value="myynti">
                   Myynti
                 </TabsTrigger>
