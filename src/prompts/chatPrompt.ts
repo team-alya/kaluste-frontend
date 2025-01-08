@@ -1,69 +1,48 @@
 import dedent from "dedent";
-import { TabType } from "../types/chat";
 import { PriceAnalysisResponse } from "../types/furniture";
 
 export const getTabInitialMessage = (
-  currentTab: TabType,
-  priceAnalysis?: PriceAnalysisResponse | null,
+  priceAnalysis?: PriceAnalysisResponse | null
 ) => {
-  switch (currentTab) {
-    case "myynti": {
-      if (!priceAnalysis) {
-        return `Haluatko että laadin sinulle myynti-ilmoitukseen pohjan?`;
-      }
+  if (!priceAnalysis) {
+    return `Miten voin auttaa? voit kysyä minulta lisätietoja.\n\nVoin myös auttaa sinua löytämään:\n• Lähimmät kierrätyspisteet\n• Kunnostuspalvelut\n• Lisätietoja markkinatilanteesta`;
+  }
 
-      const hinnatText =
-        priceAnalysis.alin_hinta && priceAnalysis.korkein_hinta
-          ? `${priceAnalysis.alin_hinta} - ${priceAnalysis.korkein_hinta}`
-          : "ei saatavilla";
+  const hinnatText =
+    priceAnalysis.alin_hinta && priceAnalysis.korkein_hinta
+      ? `${priceAnalysis.alin_hinta} - ${priceAnalysis.korkein_hinta}`
+      : "ei saatavilla";
 
-      const suositusHintaText = priceAnalysis.suositus_hinta
-        ? `\nSuosittelemme asettamaan myyntihinnaksi ${priceAnalysis.suositus_hinta} euroa.`
-        : "";
+  const suositusHintaText = priceAnalysis.suositus_hinta
+    ? `\nSuosittelemme asettamaan myyntihinnaksi ${priceAnalysis.suositus_hinta} euroa.`
+    : "";
 
-      const myyntiaikaText = priceAnalysis.arvioitu_myyntiaika
-        ? `\n\nArvioitu myyntiaika:
+  const myyntiaikaText = priceAnalysis.arvioitu_myyntiaika
+    ? `\n\nArvioitu myyntiaika:
 • Edullisella hinnalla (${priceAnalysis.alin_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.nopea} päivää
 • Suositushinnalla (${priceAnalysis.suositus_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.normaali} päivää
 • Korkealla hinnalla (${priceAnalysis.korkein_hinta}€): noin ${priceAnalysis.arvioitu_myyntiaika.hidas} päivää`
-        : "";
+    : "";
 
-      const markkinatilanneText = priceAnalysis.markkinatilanne
-        ? `\n\nMarkkinatilanne:
+  const markkinatilanneText = priceAnalysis.markkinatilanne
+    ? `\n\nMarkkinatilanne:
 • Kysyntä: ${priceAnalysis.markkinatilanne.kysyntä}
 • ${priceAnalysis.markkinatilanne.sesonki ? "Nyt on hyvä sesonki myymiselle!" : "Ei ole sesonkiaika."}`
-        : "";
+    : "";
 
-      const myyntikanavat = priceAnalysis.myyntikanavat?.length
-        ? `\n\nSuosittelemme seuraavia myyntikanavia:\n${priceAnalysis.myyntikanavat.map((kanava) => `• ${kanava}`).join("\n")}`
-        : "";
+  const myyntikanavat = priceAnalysis.myyntikanavat?.length
+    ? `\n\nSuosittelemme seuraavia myyntikanavia:\n${priceAnalysis.myyntikanavat.map((kanava) => `• ${kanava}`).join("\n")}`
+    : "";
 
-      const perustelut = priceAnalysis.perustelu?.length
-        ? `\n\nHinta-arvion perustelut:\n${priceAnalysis.perustelu.map((perustelu) => `• ${perustelu}`).join("\n")}`
-        : "";
+  const perustelut = priceAnalysis.perustelu?.length
+    ? `\n\nHinta-arvion perustelut:\n${priceAnalysis.perustelu.map((perustelu) => `• ${perustelu}`).join("\n")}`
+    : "";
 
-      return dedent`
-        Hinta-arvio tuotteellesi on ${hinnatText} euroa.${suositusHintaText}${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
+  return dedent`
+  Hinta-arvio tuotteellesi on ${hinnatText} euroa.${suositusHintaText}${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
 
-        Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?
-      `;
-    }
-
-    case "lahjoitus":
-      return dedent`
-        Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, joihin kalusteen voi lahjoittaa.
-      `;
-
-    case "kierrätys":
-      return dedent`
-        Kertoisitko osoitteesi, jotta voin ehdottaa sinua lähellä olevia paikkoja, jotka kierrättävät kalusteiden materiaaleja.
-      `;
-
-    default:
-      return dedent`
-        Kertoisitko osoitteesi, jotta voin ehdottaa lähellä olevia yrityksiä, joissa kunnostetaan kalusteita.
-      `;
-  }
+  Haluatko, että laadin sinulle myynti-ilmoitukseen pohjan?
+`;
 };
 
 export const SALES_POST_PROMPT = dedent`

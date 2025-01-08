@@ -11,39 +11,38 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFeedback } from "@/lib/hooks/useFeedback";
 import { getTabInitialMessage, SALES_POST_PROMPT } from "@/prompts/chatPrompt";
 import { useFurnitureStore } from "@/stores/furnitureStore";
-import { TABS, TabType } from "@/types/chat";
 import { useChat } from "ai/react";
 import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
 import React, { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-type SalesTabState = "awaiting_confirmation" | "chatting";
+type SalesState = "awaiting_confirmation" | "chatting";
+
+const FOLLOW_UP_MESSAGES = {
+  afterSalesConfirm: {
+    role: "assistant" as const,
+    content:
+      "Yläpuolella on ehdotukseni myynti-ilmoitukseksi. Voit halutessasi kysyä minulta tarkennuksia ilmoitukseen.\n\nVoin myös auttaa sinua huonekalun kierrätykseen tai kunnostukseen liittyvissä kysymyksissä.",
+  },
+  afterSalesDecline: {
+    role: "assistant" as const,
+    content:
+      "Selvä! Jos haluat apua myynnin kanssa myöhemmin, voit kysyä minulta lisätietoja.\n\nVoin myös auttaa sinua löytämään:\n• Lähimmät kierrätyspisteet\n• Kunnostuspalvelut\n• Lisätietoja markkinatilanteesta",
+  },
+};
 
 const ChatbotPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentTab = (searchParams.get("tab") as TabType) || "myynti";
-  const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
-    "awaiting_confirmation",
+  const [salesState, setSalesState] = React.useState<SalesState>(
+    "awaiting_confirmation"
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  // Käytetään muissa kuin myynti-tabissa /location endpointtia, koska se mahdollistaa Google Searchin käytön vastauksissa Geminin avulla.
-  const apiEndpoint = ["lahjoitus", "kierrätys", "kunnostus"].includes(
-    currentTab,
-  )
-    ? "/api/location"
-    : "/api/chat";
-  useEffect(() => {
-    console.log("apiEndpoint", apiEndpoint);
-  }, [apiEndpoint]);
-
   const navigate = useNavigate();
   const { furnitureResult, priceAnalysis } = useFurnitureStore();
-  const id = `${furnitureResult?.requestId}-${currentTab}`;
+  const id = `${furnitureResult?.requestId}`;
+
   const {
     messages,
     input,
@@ -64,7 +63,7 @@ const ChatbotPage: React.FC = () => {
       {
         id,
         role: "assistant",
-        content: getTabInitialMessage(currentTab, priceAnalysis || undefined),
+        content: getTabInitialMessage(priceAnalysis || undefined),
       },
     ],
   });
@@ -77,18 +76,11 @@ const ChatbotPage: React.FC = () => {
     handleFeedbackSubmit,
   } = useFeedback(id, furnitureResult!);
 
-  useEffect(() => {
-    if (!furnitureResult) {
-      navigate("/");
-    }
-  }, [furnitureResult, navigate]);
-
-  useEffect(() => {
-    if (!searchParams.get("tab")) {
-      setSearchParams({ tab: "myynti" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   if (!furnitureResult) {
+  //     navigate("/");
+  //   }
+  // }, [furnitureResult, navigate]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -98,122 +90,43 @@ const ChatbotPage: React.FC = () => {
   }, [messages]);
 
   const handleCreateSalesPost = async () => {
-    setSalesTabState("chatting");
+    setSalesState("chatting");
     await append({
       role: "user",
       content: SALES_POST_PROMPT,
     });
+    setMessages((prev) => [
+      ...prev,
+      { ...FOLLOW_UP_MESSAGES.afterSalesConfirm, id },
+    ]);
   };
 
   const handleDeclineSalesPost = () => {
-    setSalesTabState("chatting");
+    setSalesState("chatting");
     setMessages((messages) => [
       ...messages,
       {
         id,
         role: "assistant",
-        content:
-          "Selvä, voit kysyä minulta lisätietoja myynnistä chat-kentän kautta.",
+        content: FOLLOW_UP_MESSAGES.afterSalesDecline.content,
       },
     ]);
   };
 
-  const renderTabContent = (tab: TabType) => {
-    const showChatInput = tab !== "myynti" || salesTabState === "chatting";
-    const showSalesButtons =
-      tab === "myynti" && salesTabState === "awaiting_confirmation";
-
-    const chatContainerHeight =
-      tab === "myynti" && salesTabState === "awaiting_confirmation"
-        ? "h-[50vh] md:h-[42vh]"
-        : "h-[52vh] md:h-[65vh]";
-
-    return (
-      <div className="flex flex-col space-y-4">
-        <div
-          ref={chatContainerRef}
-          className={`overflow-y-auto rounded-lg border bg-white md:p-4 transition-all duration-1000 ${chatContainerHeight}`}
-        >
-          <div className="flex flex-col space-y-2">
-            {messages.map((message, index) => (
-              <Message
-                key={index}
-                role={message.role === "user" ? "user" : "assistant"}
-                content={message.content}
-              />
-            ))}
-          </div>
-        </div>
-        {showSalesButtons && (
-          <div className="flex justify-center gap-4">
-            <Button
-              onClick={handleCreateSalesPost}
-              className="w-32"
-              disabled={isLoading}
-            >
-              Kyllä
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDeclineSalesPost}
-              className="w-32"
-              disabled={isLoading}
-            >
-              Ei kiitos
-            </Button>
-          </div>
-        )}
-
-        {showChatInput && (
-          <form
-            onSubmit={handleSubmit}
-            className="flex gap-2 bg-white p-2 rounded-lg border shadow-sm relative"
-          >
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Kirjoita viestisi..."
-              disabled={isLoading}
-              className="flex-grow pr-12 transition-opacity"
-              style={{ opacity: isLoading ? 0.7 : 1 }}
-              aria-label="Chat viesti"
-            />
-
-            {isLoading ? (
-              <Button
-                type="button"
-                onClick={() => stop()}
-                variant="destructive"
-                className="shrink-0 transition-all duration-200 ease-in-out hover:bg-red-600"
-              >
-                <X className="h-4 w-4 mr-2" />
-                <span>Stop</span>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                className="shrink-0 transition-all duration-200 ease-in-out"
-                disabled={!input.trim()}
-                title="Lähetä viesti (Enter)"
-              >
-                <span>Lähetä</span>
-                <ArrowBigRight className="h-4 w-4 ml-2" />
-              </Button>
-            )}
-          </form>
-        )}
-      </div>
-    );
-  };
+  const showChatInput = salesState === "chatting";
+  const showSalesButtons = salesState === "awaiting_confirmation";
+  const chatContainerHeight =
+    salesState === "awaiting_confirmation"
+      ? "h-[50vh] md:h-[42vh]"
+      : "h-[52vh] md:h-[65vh]";
 
   return (
     <PageWrapper>
-      <div className="container mx-auto  max-w-[45rem]">
+      <div className="container mx-auto max-w-[45rem]">
         <Card className="bg-white/90 shadow-xl">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-4 gap-3">
-              <CardTitle className="text-2xl font-bold text-center md:text-left order-1 md:order-2">
+              <CardTitle className="text-3xl font-black text-center md:text-left order-1 md:order-2 text-green-500 tracking-tight gap-1">
                 KalusteArvioBotti
               </CardTitle>
               <div className="flex justify-center md:justify-start order-2 md:order-1">
@@ -226,39 +139,84 @@ const ChatbotPage: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={currentTab}
-              onValueChange={(value) => {
-                if (TABS.includes(value as TabType)) {
-                  if (isLoading) {
-                    stop();
-                  }
-                  setSearchParams({ tab: value });
-                }
-              }}
-              className="space-y-4"
-            >
-              <TabsList className="grid w-full grid-cols-4 tracking-tighter md:tracking-normal text-sm md:text-base">
-                <TabsTrigger disabled={isLoading} value="myynti">
-                  Myynti
-                </TabsTrigger>
-                <TabsTrigger disabled={isLoading} value="lahjoitus">
-                  Lahjoitus
-                </TabsTrigger>
-                <TabsTrigger disabled={isLoading} value="kierrätys">
-                  Kierrätys
-                </TabsTrigger>
-                <TabsTrigger disabled={isLoading} value="kunnostus">
-                  Kunnostus
-                </TabsTrigger>
-              </TabsList>
+            <div className="flex flex-col space-y-4">
+              <div
+                ref={chatContainerRef}
+                className={`overflow-y-auto rounded-lg border bg-white md:p-4 transition-all duration-1000 ${chatContainerHeight}`}
+              >
+                <div className="flex flex-col space-y-2">
+                  {messages
+                    .filter((message) => message.content !== SALES_POST_PROMPT)
+                    .map((message, index) => (
+                      <Message
+                        key={index}
+                        role={message.role === "user" ? "user" : "assistant"}
+                        content={message.content}
+                      />
+                    ))}
+                </div>
+              </div>
 
-              {TABS.map((tab) => (
-                <TabsContent key={tab} value={tab}>
-                  {renderTabContent(tab)}
-                </TabsContent>
-              ))}
-            </Tabs>
+              {showSalesButtons && (
+                <div className="flex justify-center gap-4">
+                  <Button
+                    onClick={handleCreateSalesPost}
+                    className="w-32"
+                    disabled={isLoading}
+                  >
+                    Kyllä
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleDeclineSalesPost}
+                    className="w-32"
+                    disabled={isLoading}
+                  >
+                    Ei kiitos
+                  </Button>
+                </div>
+              )}
+
+              {showChatInput && (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex gap-2 bg-white p-2 rounded-lg border shadow-sm relative"
+                >
+                  <Input
+                    value={input}
+                    onChange={handleInputChange}
+                    placeholder="Kirjoita viestisi..."
+                    disabled={isLoading}
+                    className="flex-grow pr-12 transition-opacity"
+                    style={{ opacity: isLoading ? 0.7 : 1 }}
+                    aria-label="Chat viesti"
+                  />
+
+                  {isLoading ? (
+                    <Button
+                      type="button"
+                      onClick={() => stop()}
+                      variant="destructive"
+                      className="shrink-0 transition-all duration-200 ease-in-out hover:bg-red-600"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      <span>Stop</span>
+                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      className="shrink-0 transition-all duration-200 ease-in-out"
+                      disabled={!input.trim()}
+                      title="Lähetä viesti (Enter)"
+                    >
+                      <span>Lähetä</span>
+                      <ArrowBigRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  )}
+                </form>
+              )}
+            </div>
 
             {messages.length > 1 && (
               <div className="mt-4">
