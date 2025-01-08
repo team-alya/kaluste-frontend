@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useFeedback } from "@/lib/hooks/useFeedback";
-import { getTabInitialMessage, SALES_POST_PROMPT } from "@/prompts/chatPrompt";
+import { FOLLOW_UP_MESSAGES, getTabInitialMessage, SALES_POST_PROMPT } from "@/prompts/chatPrompt";
 import { useFurnitureStore } from "@/stores/furnitureStore";
 import { useChat } from "ai/react";
 import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
@@ -20,19 +20,6 @@ import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 type SalesState = "awaiting_confirmation" | "chatting";
-
-const FOLLOW_UP_MESSAGES = {
-  afterSalesConfirm: {
-    role: "assistant" as const,
-    content:
-      "Yläpuolella on ehdotukseni myynti-ilmoitukseksi. Voit halutessasi kysyä minulta tarkennuksia ilmoitukseen.\n\nVoin myös auttaa sinua huonekalun kierrätykseen tai kunnostukseen liittyvissä kysymyksissä.",
-  },
-  afterSalesDecline: {
-    role: "assistant" as const,
-    content:
-      "Selvä! Jos haluat apua myynnin kanssa myöhemmin, voit kysyä minulta lisätietoja.\n\nVoin myös auttaa sinua löytämään:\n• Lähimmät kierrätyspisteet\n• Kunnostuspalvelut\n• Lisätietoja markkinatilanteesta",
-  },
-};
 
 const ChatbotPage: React.FC = () => {
   const [salesState, setSalesState] = React.useState<SalesState>(
@@ -63,7 +50,10 @@ const ChatbotPage: React.FC = () => {
       {
         id,
         role: "assistant",
-        content: getTabInitialMessage(priceAnalysis || undefined),
+        content: getTabInitialMessage(
+          priceAnalysis || undefined,
+          furnitureResult || undefined
+        ),
       },
     ],
   });
@@ -144,7 +134,7 @@ const ChatbotPage: React.FC = () => {
                 ref={chatContainerRef}
                 className={`overflow-y-auto rounded-lg border bg-white md:p-4 transition-all duration-1000 ${chatContainerHeight}`}
               >
-                <div className="flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2 w-full">
                   {messages
                     .filter((message) => message.content !== SALES_POST_PROMPT)
                     .map((message, index) => (
