@@ -20,8 +20,8 @@ export const useCamera = (): CameraHookReturn => {
 
   useEffect(() => {
     let stream: MediaStream | null = null;
-    console.log('first mount camera');
-    
+    console.log("first mount camera");
+
     if (isCameraOpen) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
@@ -42,8 +42,8 @@ export const useCamera = (): CameraHookReturn => {
 
     return () => {
       if (stream) {
-        console.log('Cleanup camera stream');
-        
+        console.log("Cleanup camera stream");
+
         stream.getTracks().forEach((track) => track.stop());
       }
     };
@@ -55,7 +55,7 @@ export const useCamera = (): CameraHookReturn => {
   };
 
   const captureImage = async (
-    onCapture: (file: File) => void
+    onCapture: (file: File) => void,
   ): Promise<void> => {
     try {
       const capturedImage = camera.current?.takePhoto();

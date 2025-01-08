@@ -1,28 +1,25 @@
-import { useChat } from "ai/react";
-import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
-import React, { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useFeedback } from "../../lib/hooks/useFeedback";
-import {
-  getTabInitialMessage,
-  SALES_POST_PROMPT,
-} from "../../prompts/chatPrompt";
-import { useFurnitureStore } from "../../stores/furnitureStore";
-import { TABS, TabType } from "../../types/chat";
-import { Message } from "../Message";
-import PageWrapper from "../PageWrapper";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import FeedbackForm from "@/components/FeedbackForm";
+import { Message } from "@/components/Message";
+import PageWrapper from "@/components/PageWrapper";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import FeedbackForm from "./FeedbackForm";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFeedback } from "@/lib/hooks/useFeedback";
+import { getTabInitialMessage, SALES_POST_PROMPT } from "@/prompts/chatPrompt";
+import { useFurnitureStore } from "@/stores/furnitureStore";
+import { TABS, TabType } from "@/types/chat";
+import { useChat } from "ai/react";
+import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type SalesTabState = "awaiting_confirmation" | "chatting";
 
@@ -30,9 +27,19 @@ const ChatbotPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = (searchParams.get("tab") as TabType) || "myynti";
   const [salesTabState, setSalesTabState] = React.useState<SalesTabState>(
-    "awaiting_confirmation"
+    "awaiting_confirmation",
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Käytetään muissa kuin myynti-tabissa /location endpointtia, koska se mahdollistaa Google Searchin käytön vastauksissa Geminin avulla.
+  const apiEndpoint = ["lahjoitus", "kierrätys", "kunnostus"].includes(
+    currentTab,
+  )
+    ? "/api/location"
+    : "/api/chat";
+  useEffect(() => {
+    console.log("apiEndpoint", apiEndpoint);
+  }, [apiEndpoint]);
 
   const navigate = useNavigate();
   const { furnitureResult, priceAnalysis } = useFurnitureStore();

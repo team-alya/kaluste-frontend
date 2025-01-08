@@ -1,4 +1,11 @@
+import { BackButton } from "@/components/back-button";
+import LoaderAnimation from "@/components/loader";
+import PageWrapper from "@/components/PageWrapper";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCamera } from "@/lib/hooks/useCamera";
+import { uploadImage } from "@/services/furniture-api";
+import { useFurnitureStore } from "@/stores/furnitureStore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -12,13 +19,6 @@ import {
 import React, { useRef, useState } from "react";
 import { Camera } from "react-camera-pro";
 import { useNavigate } from "react-router-dom";
-import { uploadImage } from "../../services/furniture-api";
-import { useFurnitureStore } from "../../stores/furnitureStore";
-import { BackButton } from "../back-button";
-import LoaderAnimation from "../loader";
-import PageWrapper from "../PageWrapper";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 const fadeAnimation = {
   initial: { opacity: 0 },
@@ -45,7 +45,7 @@ const ImageUploadPage: React.FC = () => {
 
   const navigate = useNavigate();
   const setFurnitureResult = useFurnitureStore(
-    (state) => state.setFurnitureResult
+    (state) => state.setFurnitureResult,
   );
 
   const handleFileInputClick = () => fileInputRef.current?.click();

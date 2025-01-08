@@ -36,13 +36,15 @@ To run the program follow the instructions below:
 
 `npm run dev`
 
-### Notice!
+### Notice
+
+⚠️ **Old implementation pics**
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
 
 ## Images of the user interface
 
-#### Welcome page:
+#### Welcome page
 
 ![image](https://github.com/user-attachments/assets/a0fb099a-a229-4515-8203-b3682c99cf03)
 
@@ -53,3 +55,7 @@ For this app to work with all its functionalities you also need to have the back
 #### Information confirmation page:
 
 ![image](https://github.com/user-attachments/assets/7f6d7b32-837c-45bf-a1d5-311f48bb2098)
+
+## Lisenssi
+
+License - katso [LICENSE](LICENSE) tiedosto lisätietoja varten.

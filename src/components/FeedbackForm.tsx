@@ -1,8 +1,8 @@
 import { Alert } from "@mui/material";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
-import { AlertDescription } from "../ui/alert";
-import { Button } from "../ui/button";
+import { AlertDescription } from "./ui/alert";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Slider } from "../ui/slider";
-import { Textarea } from "../ui/textarea";
+} from "./ui/dialog";
+import { Slider } from "./ui/slider";
+import { Textarea } from "./ui/textarea";
 
 interface FeedbackFormProps {
   isOpen: boolean;

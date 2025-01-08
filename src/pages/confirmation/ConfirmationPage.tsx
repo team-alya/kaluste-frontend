@@ -15,9 +15,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { Alert, AlertDescription } from "../ui/alert";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -25,26 +25,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 
-import { analyzeFurniturePrice } from "../../services/furniture-api";
-import { useFurnitureStore } from "../../stores/furnitureStore";
+import { BackButton } from "@/components/back-button";
+import LoaderAnimation from "@/components/loader";
+import PageWrapper from "@/components/PageWrapper";
+import { analyzeFurniturePrice } from "@/services/furniture-api";
+import { useFurnitureStore } from "@/stores/furnitureStore";
 import {
   furnitureSchema,
   kuntoOptions,
   type FurnitureFormData,
 } from "../../types/furniture";
-import { BackButton } from "../back-button";
-import LoaderAnimation from "../loader";
-import PageWrapper from "../PageWrapper";
 
 const FurniConfirmPage = () => {
   const navigate = useNavigate();
@@ -316,7 +316,7 @@ const FurniConfirmPage = () => {
                                 e.target.value
                                   .split(",")
                                   .map((s) => s.trim())
-                                  .filter(Boolean)
+                                  .filter(Boolean),
                               )
                             }
                             placeholder="Erota materiaalit pilkulla"

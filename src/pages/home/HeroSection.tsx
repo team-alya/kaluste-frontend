@@ -1,9 +1,9 @@
+import PageWrapper from "@/components/PageWrapper";
 import { Button } from "@/components/ui/button";
+import { TextLoop } from "@/components/ui/text-loop";
 import { motion, useAnimation } from "motion/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PageWrapper from "../PageWrapper";
-import { TextLoop } from "../ui/text-loop";
 
 const HeroSection = () => {
   const navigate = useNavigate();
