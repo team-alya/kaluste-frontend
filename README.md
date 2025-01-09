@@ -56,6 +56,11 @@ For this app to work with all its functionalities you also need to have the back
 
 ![image](https://github.com/user-attachments/assets/7f6d7b32-837c-45bf-a1d5-311f48bb2098)
 
+## Price estimation
+- €3.00/month (150 process usage)
+- Model recognition from image (€0.01-0.02)
+- Price estimation (€0.01-0.015) per estimate
+
 ## Lisenssi
 
 License - katso [LICENSE](LICENSE) tiedosto lisätietoja varten.
