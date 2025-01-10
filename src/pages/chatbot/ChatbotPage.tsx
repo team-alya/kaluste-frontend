@@ -72,11 +72,11 @@ const ChatbotPage: React.FC = () => {
     handleFeedbackSubmit,
   } = useFeedback(id, furnitureResult!);
 
-  // useEffect(() => {
-  //   if (!furnitureResult) {
-  //     navigate("/");
-  //   }
-  // }, [furnitureResult, navigate]);
+  useEffect(() => {
+    if (!furnitureResult) {
+      navigate("/");
+    }
+  }, [furnitureResult, navigate]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
