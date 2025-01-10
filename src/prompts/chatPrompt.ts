@@ -75,7 +75,7 @@ export const FOLLOW_UP_MESSAGES = {
   afterSalesConfirm: {
     role: "assistant" as const,
     content: dedent`
- **Myynti-ilmoituksen luonnos on valmis!**
+ **Myynti-ilmoituksen luonnos on valmis! Yläpuolella**
  
  Voit halutessasi kysyä minulta tarkennuksia ilmoitukseen.
  
