@@ -3,7 +3,7 @@ import { FurnitureFormData, PriceAnalysisResponse } from "../types/furniture";
 
 export const getTabInitialMessage = (
   priceAnalysis?: PriceAnalysisResponse | null,
-  furniture?: FurnitureFormData | null
+  furniture?: FurnitureFormData | null,
 ) => {
   if (!priceAnalysis || !furniture) {
     return `Miten voin auttaa sinua tänään?\n\n**Voin auttaa sinua seuraavissa asioissa:**\n\n• Myynti-ilmoituksen laatiminen\n• Lähimmät kierrätyspisteet\n• Kunnostuspalvelut\n• Lisätietoja markkinatilanteesta`;
@@ -81,7 +81,9 @@ export const FOLLOW_UP_MESSAGES = {
  
  **Voin myös auttaa sinua:**
  - Huonekalun kierrätykseen liittyvissä kysymyksissä
- - Kunnostukseen liittyvissä asioissa`,
+ - Kunnostukseen liittyvissä asioissa
+ - Etsimään lähin kierrätyspiste tai kunnostuspalvelu internetistä
+ `,
   },
   afterSalesDecline: {
     role: "assistant" as const,
@@ -94,3 +96,11 @@ export const FOLLOW_UP_MESSAGES = {
  - Markkinatilanteen tarkemmassa analysoinnissa`,
   },
 };
+
+export const createSalesPrompt = dedent`
+Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. 
+    Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. 
+    Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, 
+    mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita. 
+    Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.
+`;

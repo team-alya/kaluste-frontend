@@ -116,20 +116,20 @@ const HeroSection = () => {
                   <p className="text-xs text-muted-foreground/50 font-medium uppercase tracking-wide">
                     Vastuullista huonekalujen kierrätystä
                   </p>
-                  <p className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-[630px] leading-normal font-light">
-                    Olen{" "}
-                    <span className="text-green-light">KalusteArvioBotti.</span>{" "}
-                    Autan sinua{" "}
+                  <div className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-[630px] leading-normal font-light">
+                    <span>Olen </span>
+                    <span className="text-green-light">KalusteArvioBotti.</span>
+                    <span> Autan sinua </span>
                     <TextLoop
                       interval={3.7}
-                      className="text-green-light inline-block w-32 md:w-44  text-start mt-0.5"
+                      className="text-green-light inline-block w-[7rem]  xs:w-[9rem] md:w-[170px] text-start mt-0.5"
                     >
                       <span className="block">arviomainaan</span>
                       <span className="block">kierrättämään</span>
                       <span className="block">uudistamaan</span>
                     </TextLoop>
-                    käytetyn kalusteen.
-                  </p>
+                    <span> käytetyn kalusteen.</span>
+                  </div>
                 </div>
               </motion.div>
 

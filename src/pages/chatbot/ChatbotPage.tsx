@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useFeedback } from "@/lib/hooks/useFeedback";
-import { FOLLOW_UP_MESSAGES, getTabInitialMessage, SALES_POST_PROMPT } from "@/prompts/chatPrompt";
+import {
+  FOLLOW_UP_MESSAGES,
+  getTabInitialMessage,
+  SALES_POST_PROMPT,
+} from "@/prompts/chatPrompt";
 import { useFurnitureStore } from "@/stores/furnitureStore";
 import { useChat } from "ai/react";
 import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
@@ -23,12 +27,14 @@ type SalesState = "awaiting_confirmation" | "chatting";
 
 const ChatbotPage: React.FC = () => {
   const [salesState, setSalesState] = React.useState<SalesState>(
-    "awaiting_confirmation"
+    "awaiting_confirmation",
   );
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { furnitureResult, priceAnalysis } = useFurnitureStore();
+
   const id = `${furnitureResult?.requestId}`;
+  const apiRoute = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/webchat`;
 
   const {
     messages,
@@ -40,7 +46,7 @@ const ChatbotPage: React.FC = () => {
     isLoading,
     stop,
   } = useChat({
-    api: `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/chat`,
+    api: apiRoute,
     id: id,
     body: {
       requestId: furnitureResult?.requestId,
@@ -52,7 +58,7 @@ const ChatbotPage: React.FC = () => {
         role: "assistant",
         content: getTabInitialMessage(
           priceAnalysis || undefined,
-          furnitureResult || undefined
+          furnitureResult || undefined,
         ),
       },
     ],
@@ -93,13 +99,9 @@ const ChatbotPage: React.FC = () => {
 
   const handleDeclineSalesPost = () => {
     setSalesState("chatting");
-    setMessages((messages) => [
-      ...messages,
-      {
-        id,
-        role: "assistant",
-        content: FOLLOW_UP_MESSAGES.afterSalesDecline.content,
-      },
+    setMessages((prev) => [
+      ...prev,
+      { ...FOLLOW_UP_MESSAGES.afterSalesDecline, id },
     ]);
   };
 

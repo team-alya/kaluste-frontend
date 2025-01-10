@@ -7,7 +7,7 @@ Frontend application for the Älyä-hanke KalusteArvio-project. The app uses AI 
 1. Upload furniture image for AI analysis
 2. Validate and edit detected furniture information
 3. Get AI-powered price estimates and recommendations
-4. Chat with AI assistant in different modes (sell, donate, recycle, repair)
+4. Chat with AI assistant
 
 ## Tech Stack
 
@@ -25,20 +25,23 @@ To run the program follow the instructions below:
 
 ` git clone https://github.com/team-alya/kaluste-frontend.git`
 
-**2. Change to the correct directory:**
-
-` cd kaluste-frontend`
-**3. Install dependencies:**
+**2. Install dependencies:**
 
 ` npm install`
 
-**4. Start the app:**
+**3. Copy envs:**
+
+```bash
+cp .env.example .env
+```
+
+**3. Start the app:**
 
 `npm run dev`
 
 ### Notice
 
-⚠️ **Old implementation pics**
+⚠️ **Old implementation pics - corresponds to git TAG v1.0.**
 
 For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
 

@@ -1,3 +1,4 @@
+import { createSalesPrompt } from "@/prompts/chatPrompt";
 import {
   ChatApiResponse,
   LocationApiResponse,
@@ -51,12 +52,7 @@ export const sendLocationRequest = async (
 export const createSalesPost = async (
   requestId: string,
 ): Promise<ChatApiResponse> => {
-  const message = `Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. 
-    Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. 
-    Ilmoituksen tulee olla helposti luettavissa ja houkutteleva potentiaalisille ostajille, 
-    mutta älä käytä erikoismerkkejä, kuten tähtiä tai emojeita. 
-    Kirjoita ilmoitus asiallisella ja myyntiin sopivalla tyylillä.`;
-
+  const message = createSalesPrompt;
   return sendMessage(requestId, message);
 };
 

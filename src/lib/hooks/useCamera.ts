@@ -20,7 +20,6 @@ export const useCamera = (): CameraHookReturn => {
 
   useEffect(() => {
     let stream: MediaStream | null = null;
-    console.log("first mount camera");
 
     if (isCameraOpen) {
       navigator.mediaDevices
@@ -42,8 +41,6 @@ export const useCamera = (): CameraHookReturn => {
 
     return () => {
       if (stream) {
-        console.log("Cleanup camera stream");
-
         stream.getTracks().forEach((track) => track.stop());
       }
     };
