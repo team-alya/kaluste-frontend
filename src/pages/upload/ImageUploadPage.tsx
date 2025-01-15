@@ -1,6 +1,7 @@
 import { BackButton } from "@/components/back-button";
 import LoaderAnimation from "@/components/loader";
 import PageWrapper from "@/components/PageWrapper";
+import PhotoGuide from "@/components/PhotoGuide";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCamera } from "@/lib/hooks/useCamera";
@@ -103,13 +104,7 @@ const ImageUploadPage: React.FC = () => {
                   className="space-y-6"
                   {...fadeAnimation}
                 >
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex justify-center mx-auto w-fit gap-3">
-                    <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-blue-700">
-                      Varmista, että kaluste on hyvin valaistu ja koko huonekalu
-                      näkyy kuvassa.
-                    </p>
-                  </div>
+                  <PhotoGuide />
 
                   <AnimatePresence mode="wait">
                     {!isCameraOpen ? (
@@ -235,9 +230,9 @@ const ImageUploadPage: React.FC = () => {
                   className="space-y-6"
                   {...fadeAnimation}
                 >
-                  <div className="bg-blue-50 px-4 py-3 rounded-lg border mx-auto border-blue-100 mb-6 flex items-center gap-2 w-fit">
-                    <Info className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                    <p className="text-sm text-blue-700">
+                  <div className="bg-green-50 px-4 py-3 rounded-lg border mx-auto border-green-100 mb-6 flex items-center gap-2 w-fit">
+                    <Info className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <p className="text-sm text-black font-medium">
                       Tarkista, että kaluste näkyy kuvassa selkeästi ennen
                       lähettämistä
                     </p>
