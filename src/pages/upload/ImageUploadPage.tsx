@@ -1,4 +1,3 @@
-import { BackButton } from "@/components/back-button";
 import LoaderAnimation from "@/components/loader";
 import PageWrapper from "@/components/PageWrapper";
 import PhotoGuide from "@/components/PhotoGuide";
@@ -10,6 +9,7 @@ import { useFurnitureStore } from "@/stores/furnitureStore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
+  ArrowLeft,
   CameraIcon,
   ImagePlus,
   Info,
@@ -85,7 +85,13 @@ const ImageUploadPage: React.FC = () => {
           <CardHeader className="bg-primary/5 border-b">
             <div className="flex items-center justify-between relative ">
               <div className="z-10">
-                <BackButton />
+                <button
+                  onClick={() => navigate("/")}
+                  className="p-2 text-green-light hover:text-green-dark transition-colors"
+                  aria-label="Go back"
+                >
+                  <ArrowLeft size={24} />
+                </button>
               </div>
               <CardTitle className="w-full sm:absolute sm:left-1/2 sm:-translate-x-1/2 text-2xl font-bold flex items-center justify-center gap-2 whitespace-nowrap">
                 <ImagePlus className="h-6 w-6 text-primary" />
