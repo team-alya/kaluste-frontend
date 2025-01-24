@@ -59,10 +59,19 @@ export const getTabInitialMessage = (
   **Huonekalun tiedot:**${mittatiedot}${materiaalitText}${kuntoText}${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
 
   ---
-
-  Haluatko, että laadin sinulle myynti-ilmoituksen pohjan?
   `;
 };
+
+export const SALES_QUESTION_MESSAGE = {
+  role: "assistant" as const,
+  content: "Haluatko, että laadin sinulle myynti-ilmoituksen pohjan?",
+};
+
+export const FOLLOW_UP_QUESTION = {
+  role: "assistant" as const,
+  content: "Voinko auttaa vielä jotenkin?",
+};
+
 export const SALES_POST_PROMPT = dedent`
   Luo myynti-ilmoitus kalusteelle, jossa annetaan selkeä ja myyvä kuvaus. 
   Sisällytä ilmoitukseen kalusteen nimi, hinta, väri, koko(pituus, leveys, korkeus) ja kunto. 
@@ -74,15 +83,14 @@ export const SALES_POST_PROMPT = dedent`
 export const FOLLOW_UP_MESSAGES = {
   afterSalesConfirm: {
     role: "assistant" as const,
-    content: dedent`
- **Myynti-ilmoituksen luonnos on valmis! Yläpuolella**
- 
+    content: dedent` 
  Voit halutessasi kysyä minulta tarkennuksia ilmoitukseen.
  
  **Voin myös auttaa sinua:**
  - Huonekalun kierrätykseen liittyvissä kysymyksissä
  - Kunnostukseen liittyvissä asioissa
  - Etsimään lähin kierrätyspiste tai kunnostuspalvelu internetistä
+ - Miten muuten voin auttaa? Voin auttaa esimerkiksi kierrätykseen ja kunnostukseen liittyvissä asioissa.
  `,
   },
   afterSalesDecline: {

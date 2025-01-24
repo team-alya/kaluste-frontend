@@ -20,15 +20,19 @@ export const Message = ({
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
     >
-      <div className="size-[24px] flex flex-col justify-center items-center flex-shrink-0 text-zinc-400">
+      <div
+        className={`size-[24px] flex flex-col justify-center items-center flex-shrink-0 ${
+          isUser ? "text-blue-500" : "text-green-500"
+        }`}
+      >
         {isUser ? <UserIcon /> : <BotIcon />}
       </div>
 
       <div
-        className={`flex flex-col gap-6 w-full p-4 rounded-lg ${
+        className={`flex flex-col gap-6 w-full p-4 rounded-lg shadow-sm ${
           isUser
-            ? "bg-gray-50/80 border border-gray-100 md:max-w-[85%] ml-auto"
-            : "bg-green-50/50 border border-green-100 md:max-w-[85%]"
+            ? "bg-blue-50 border border-blue-100 md:max-w-[85%] ml-auto hover:bg-blue-50/80 transition-colors"
+            : "bg-green-50 border border-green-100 md:max-w-[85%] hover:bg-green-50/80 transition-colors"
         }`}
       >
         <div className="text-zinc-800 dark:text-zinc-300 flex flex-col gap-4 tracking-tighter md:tracking-normal">

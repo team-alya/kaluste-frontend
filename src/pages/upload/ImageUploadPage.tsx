@@ -11,7 +11,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   CameraIcon,
-  ImageIcon,
   ImagePlus,
   Info,
   Upload,
@@ -113,10 +112,6 @@ const ImageUploadPage: React.FC = () => {
                         className="space-y-4"
                         {...fadeAnimation}
                       >
-                        <div className="flex items-center justify-center gap-2 text-secondary-foreground">
-                          <ImageIcon className="h-5 w-5" />
-                          <span className="font-medium">Esimerkki kuva</span>
-                        </div>
                         <div className="relative group">
                           <img
                             src={"/replica-flux-pro.jpg"}

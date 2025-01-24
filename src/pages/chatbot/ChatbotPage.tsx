@@ -14,12 +14,14 @@ import { Input } from "@/components/ui/input";
 import { useFeedback } from "@/lib/hooks/useFeedback";
 import {
   FOLLOW_UP_MESSAGES,
+  FOLLOW_UP_QUESTION,
   getTabInitialMessage,
   SALES_POST_PROMPT,
+  SALES_QUESTION_MESSAGE,
 } from "@/prompts/chatPrompt";
 import { useFurnitureStore } from "@/stores/furnitureStore";
 import { useChat } from "ai/react";
-import { ArrowBigRight, HomeIcon, Loader2, X } from "lucide-react";
+import { HomeIcon, Loader2, X } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -61,7 +63,25 @@ const ChatbotPage: React.FC = () => {
           furnitureResult || undefined,
         ),
       },
+      {
+        id,
+        ...SALES_QUESTION_MESSAGE,
+      },
     ],
+    onFinish: () => {
+      // Add follow-up question only after 6 messages
+      if (messages.length > 6) {
+        setTimeout(() => {
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              ...FOLLOW_UP_QUESTION,
+              id: `${id}_follow_up_${prevMessages.length}`,
+            },
+          ]);
+        }, 1000);
+      }
+    },
   });
 
   const {
@@ -122,7 +142,7 @@ const ChatbotPage: React.FC = () => {
                 KalusteArvioBotti
               </CardTitle>
               <div className="flex justify-center md:justify-start order-2 md:order-1">
-                <Button variant="outline" onClick={() => navigate("/")}>
+                <Button variant="outline" onClick={() => navigate("/upload")}>
                   <HomeIcon className="h-4 w-4 mr-2" />
                   Alkuun
                 </Button>
@@ -203,7 +223,6 @@ const ChatbotPage: React.FC = () => {
                       title="Lähetä viesti (Enter)"
                     >
                       <span>Lähetä</span>
-                      <ArrowBigRight className="h-4 w-4 ml-2" />
                     </Button>
                   )}
                 </form>

@@ -108,27 +108,24 @@ const HeroSection = () => {
                   },
                 }}
               >
-                <h1 className="text-green-light text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                <h1 className="text-green-light text-5xl lg:text-6xl font-bold tracking-tight">
                   KalusteArvio.
                 </h1>
 
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground/50 font-medium uppercase tracking-wide">
-                    Vastuullista huonekalujen kierrätystä
-                  </p>
-                  <div className="text-xl sm:text-2xl md:text-3xl text-muted-foreground max-w-[630px] leading-normal font-light">
-                    <span>Olen </span>
-                    <span className="text-green-light">KalusteArvioBotti.</span>
-                    <span> Autan sinua </span>
-                    <TextLoop
-                      interval={3.7}
-                      className="text-green-light inline-block w-[7rem]  xs:w-[9rem] md:w-[170px] text-start mt-0.5"
-                    >
-                      <span className="block">arviomainaan</span>
-                      <span className="block">kierrättämään</span>
-                      <span className="block">uudistamaan</span>
-                    </TextLoop>
-                    <span> käytetyn kalusteen.</span>
+                  <div className="text-2xl md:text-3xl text-muted-foreground max-w-[630px] leading-normal font-light flex flex-col">
+                    <div className="flex items-center">
+                      <span>Autan sinua</span>
+                      <TextLoop
+                        interval={3.7}
+                        className="text-green-light inline-block w-[7rem] xs:w-[9rem] md:w-[170px] text-start ml-2"
+                      >
+                        <span className="block">arvioimaan</span>
+                        <span className="block">kierrättämään</span>
+                        <span className="block">uudistamaan</span>
+                      </TextLoop>
+                    </div>
+                    <span>käytetyn kalusteen.</span>
                   </div>
                 </div>
               </motion.div>
