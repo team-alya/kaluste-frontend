@@ -17,21 +17,24 @@ export const useCamera = (): CameraHookReturn => {
   const camera = useRef<CameraType | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
-    let retryTimeout: NodeJS.Timeout;
-
     const initCamera = async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
+        // Sulje vanha striimi, jos sellainen on
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: "environment", // takakamera
+            facingMode: "environment",
           },
         });
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
+        streamRef.current = stream;
         setCameraError(null);
       } catch (error) {
         if (!(error instanceof DOMException)) {
@@ -48,13 +51,6 @@ export const useCamera = (): CameraHookReturn => {
           setCameraError("Kameran käyttöoikeus evätty");
         } else {
           setCameraError("Kameraan ei saada yhteyttä");
-
-          // Jos kyseessä on muu virhe, yritetään uudelleen pienellä viiveellä
-          retryTimeout = setTimeout(() => {
-            if (isCameraOpen) {
-              initCamera();
-            }
-          }, 1000);
         }
       }
     };
@@ -64,21 +60,31 @@ export const useCamera = (): CameraHookReturn => {
     }
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-      if (retryTimeout) {
-        clearTimeout(retryTimeout);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+        streamRef.current = null;
       }
     };
   }, [isCameraOpen]);
 
   const closeCamera = () => {
-    const videoElement = document.querySelector("video");
-    if (videoElement && videoElement.srcObject) {
-      const stream = videoElement.srcObject as MediaStream;
-      stream.getTracks().forEach((track) => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+      streamRef.current = null;
     }
+
+    const videoElements = document.querySelectorAll("video");
+    videoElements.forEach((videoElement) => {
+      if (videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+        videoElement.srcObject = null;
+      }
+    });
 
     setIsCameraOpen(false);
     setCameraError(null);
