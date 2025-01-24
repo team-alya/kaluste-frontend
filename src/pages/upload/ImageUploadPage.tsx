@@ -41,11 +41,11 @@ const ImageUploadPage: React.FC = () => {
     closeCamera,
     captureImage,
   } = useCamera();
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const setFurnitureResult = useFurnitureStore(
-    (state) => state.setFurnitureResult
+    (state) => state.setFurnitureResult,
   );
 
   const handleFileInputClick = () => fileInputRef.current?.click();
