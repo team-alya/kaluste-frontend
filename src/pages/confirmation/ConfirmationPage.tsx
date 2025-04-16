@@ -51,7 +51,8 @@ const FurniConfirmPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { furnitureResult, setPriceAnalysis } = useFurnitureStore();
+  const { furnitureResult, setPriceAnalysis, setFurnitureResult } =
+    useFurnitureStore();
 
   const form = useForm<FurnitureFormData>({
     resolver: zodResolver(furnitureSchema),
@@ -76,12 +77,17 @@ const FurniConfirmPage = () => {
       return;
     }
   }, [furnitureResult, navigate]);
-
+  // This should fix error that priceanalysis dont update as it should
   const onSubmit = async (data: FurnitureFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      // Päivitä ensin furniture data storeen
+      // useFurnitureStore.getState().setFurnitureResult(data);
+      // TAI voit hakea funktion storesta
+      setFurnitureResult(data);
+
       const priceAnalysis = await analyzeFurniturePrice(data);
       setPriceAnalysis(priceAnalysis);
       navigate("/chatbotpage");
@@ -316,7 +322,7 @@ const FurniConfirmPage = () => {
                                 e.target.value
                                   .split(",")
                                   .map((s) => s.trim())
-                                  .filter(Boolean),
+                                  .filter(Boolean)
                               )
                             }
                             placeholder="Erota materiaalit pilkulla"
