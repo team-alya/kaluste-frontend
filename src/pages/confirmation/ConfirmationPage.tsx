@@ -83,9 +83,6 @@ const FurniConfirmPage = () => {
     setError(null);
 
     try {
-      // Päivitä ensin furniture data storeen
-      // useFurnitureStore.getState().setFurnitureResult(data);
-      // TAI voit hakea funktion storesta
       setFurnitureResult(data);
 
       const priceAnalysis = await analyzeFurniturePrice(data);
@@ -238,7 +235,7 @@ const FurniConfirmPage = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-sm">
-                              Pituus (cm)
+                              Syvyys (cm)
                             </FormLabel>
                             <FormControl>
                               <Input
