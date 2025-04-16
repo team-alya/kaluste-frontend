@@ -1,10 +1,17 @@
 import { FurnitureFormData, PriceAnalysisResponse } from "../types/furniture";
+import * as mockApi from "./furniture-api-mock";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Set to true to use mock data instead of real API calls
+const USE_MOCK_API = false;
 
 export const uploadImage = async (
   imageFile: File,
 ): Promise<FurnitureFormData> => {
+  if (USE_MOCK_API) {
+    return mockApi.uploadImage(imageFile);
+  }
+
   const formData = new FormData();
   formData.append("image", imageFile);
 
@@ -31,6 +38,10 @@ export const uploadImage = async (
 export const analyzeFurniturePrice = async (
   furnitureData: FurnitureFormData,
 ): Promise<PriceAnalysisResponse> => {
+  if (USE_MOCK_API) {
+    return mockApi.analyzeFurniturePrice(furnitureData);
+  }
+
   const response = await fetch(`${API_URL}/api/price`, {
     method: "POST",
     headers: {

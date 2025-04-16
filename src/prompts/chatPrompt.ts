@@ -20,7 +20,7 @@ export const getTabInitialMessage = (
 
   const huonekalunTiedot = `${furniture.merkki} ${furniture.malli}`;
 
-  const mittatiedot = `\n\n**Mitat:** ${furniture.mitat.leveys} × ${furniture.mitat.korkeus} × ${furniture.mitat.pituus} cm`;
+  const mittatiedot = `\n\n**Mitat:** ${furniture.mitat.pituus} × ${furniture.mitat.korkeus} × ${furniture.mitat.leveys} cm`;
 
   const materiaalitText = furniture.materiaalit.length
     ? `\n**Materiaalit:** ${furniture.materiaalit.join(", ")}`

@@ -8,6 +8,7 @@ import {
   Loader2,
   PackageCheck,
   PaintBucket,
+  Plus,
   Ruler,
   Tag,
 } from "lucide-react";
@@ -50,7 +51,7 @@ const FurniConfirmPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [inputValue, setInputValue] = useState("");
   const { furnitureResult, setPriceAnalysis, setFurnitureResult } =
     useFurnitureStore();
 
@@ -77,7 +78,7 @@ const FurniConfirmPage = () => {
       return;
     }
   }, [furnitureResult, navigate]);
-  // This should fix error that priceanalysis dont update as it should
+
   const onSubmit = async (data: FurnitureFormData) => {
     setIsLoading(true);
     setError(null);
@@ -94,6 +95,12 @@ const FurniConfirmPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Function to add a new material
+  const addMaterial = (currentValue: string, materials: string[]) => {
+    if (!currentValue.trim()) return materials;
+    return [...materials, currentValue.trim()];
   };
 
   if (error) {
@@ -304,31 +311,78 @@ const FurniConfirmPage = () => {
                   <FormField
                     control={form.control}
                     name="materiaalit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Columns className="h-4 w-4" />
-                          Materiaalit
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            value={field.value.join(", ")}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  .split(",")
-                                  .map((s) => s.trim())
-                                  .filter(Boolean)
-                              )
-                            }
-                            placeholder="Erota materiaalit pilkulla"
-                            className="bg-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Columns className="h-4 w-4" />
+                            Materiaalit
+                          </FormLabel>
+                          <div className="flex gap-2">
+                            <FormControl>
+                              <Input
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    if (inputValue.trim()) {
+                                      const updatedMaterials = addMaterial(
+                                        inputValue,
+                                        field.value,
+                                      );
+                                      field.onChange(updatedMaterials);
+                                      setInputValue("");
+                                    }
+                                  }
+                                }}
+                                placeholder="Kirjoita materiaali"
+                                className="bg-white"
+                              />
+                            </FormControl>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                const updatedMaterials = addMaterial(
+                                  inputValue,
+                                  field.value,
+                                );
+                                field.onChange(updatedMaterials);
+                                setInputValue("");
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                              Lisää
+                            </Button>
+                          </div>
+                          {field.value.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {field.value.map((material, index) => (
+                                <div
+                                  key={index}
+                                  className="bg-primary/10 text-primary px-2 py-1 rounded-md text-sm flex items-center gap-1"
+                                >
+                                  {material}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newMaterials = [...field.value];
+                                      newMaterials.splice(index, 1);
+                                      field.onChange(newMaterials);
+                                    }}
+                                    className="ml-1 text-primary/70 hover:text-primary"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
                   />
 
                   <FormField
