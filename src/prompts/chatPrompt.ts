@@ -20,7 +20,7 @@ export const getTabInitialMessage = (
 
   const huonekalunTiedot = `${furniture.merkki} ${furniture.malli}`;
 
-  const mittatiedot = `\n\n**Mitat:** ${furniture.mitat.pituus} × ${furniture.mitat.korkeus} × ${furniture.mitat.leveys} cm`;
+  const mittatiedot = `\n\n**Mitat (Syvyys × Korkeus × Leveys):** ${furniture.mitat.pituus} × ${furniture.mitat.korkeus} × ${furniture.mitat.leveys} cm`;
 
   const materiaalitText = furniture.materiaalit.length
     ? `\n**Materiaalit:** ${furniture.materiaalit.join(", ")}`
@@ -56,7 +56,13 @@ export const getTabInitialMessage = (
   return dedent`
   **Hinta-arvio huonekalulle** ${huonekalunTiedot}: ${hinnatText}€${suositusHintaText}
 
-  **Huonekalun tiedot:**${mittatiedot}${materiaalitText}${kuntoText}${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
+  **Huonekalun tiedot:**${mittatiedot}${
+    /* Add newline before materials if they exist to ensure separation */
+    materiaalitText ? "\n" + materiaalitText : ""
+  }${
+    /* Add newline before condition if it exists and follows materials or dimensions */
+    kuntoText ? "\n" + kuntoText : ""
+  }${perustelut}${myyntiaikaText}${markkinatilanneText}${myyntikanavat}
 
   ---
   `;
