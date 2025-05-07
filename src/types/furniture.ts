@@ -11,6 +11,24 @@ export const kuntoOptions = [
 
 export type KuntoType = (typeof kuntoOptions)[number];
 
+// AI model options and reasoning effort options
+export const modelOptions = [
+  "all",
+  "gpt4-1",
+  "o3",
+  "claude",
+  "gemini-2-5",
+] as const;
+export const reasoningEffortOptions = ["low", "medium", "high"] as const;
+
+export type ModelType = (typeof modelOptions)[number];
+export type ReasoningEffortType = (typeof reasoningEffortOptions)[number];
+
+export interface AIModelOptions {
+  model: ModelType;
+  reasoningEffort?: ReasoningEffortType;
+}
+
 export const furnitureSchema = z.object({
   requestId: z.string().uuid(),
   merkki: z.string().min(1, "Merkki on pakollinen"),
@@ -29,6 +47,7 @@ export const furnitureSchema = z.object({
       errorMap: () => ({ message: "Valitse kunto listasta" }),
     })
     .default("Ei tiedossa"),
+  usedFallbackRecognition: z.boolean().optional(),
 });
 
 export const priceAnalysisSchema = z.object({

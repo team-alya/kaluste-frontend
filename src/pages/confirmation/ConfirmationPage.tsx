@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AlertCircle,
   ArrowLeft,
   BadgeCheck,
   Box,
@@ -161,6 +162,26 @@ const FurniConfirmPage = () => {
                     </div>
                   </div>
                 </div>
+
+                {furnitureResult?.usedFallbackRecognition && (
+                  <div className="flex justify-center mt-2">
+                    <div className="bg-yellow-50 px-4 py-3 rounded-lg border border-yellow-100 mb-6 w-fit">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-yellow-700">
+                            GPT-4.1-mallia käytettiin tunnistamisessa
+                          </p>
+                          <p className="text-xs text-yellow-600">
+                            Valittu malli ei tunnistanut huonekalun merkkiä ja
+                            mallia, joten käytimme GPT-4.1-mallia arvauksen
+                            tekemiseen. Tarkista tiedot huolellisesti.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid gap-6">
                   <FormField

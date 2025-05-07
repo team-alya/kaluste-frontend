@@ -3,13 +3,29 @@ import PageWrapper from "@/components/PageWrapper";
 import PhotoGuide from "@/components/PhotoGuide";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useCamera } from "@/lib/hooks/useCamera";
 import { uploadImage } from "@/services/furniture-api";
 import { useFurnitureStore } from "@/stores/furnitureStore";
+import { type ModelType, type ReasoningEffortType } from "@/types/furniture";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
   ArrowLeft,
+  Brain,
   CameraIcon,
   ImagePlus,
   Info,
@@ -19,6 +35,20 @@ import {
 import React, { useRef, useState } from "react";
 import { Camera } from "react-camera-pro";
 import { useNavigate } from "react-router-dom";
+
+const modelOptionLabels = [
+  { value: "all", label: "Kaikki mallit" },
+  { value: "gpt4-1", label: "GPT-4.1" },
+  { value: "o3", label: "O3 (Reasoning)" },
+  { value: "claude", label: "Claude-3-7 Sonnet" },
+  { value: "gemini-2-5", label: "Gemini-2.5-Flash" },
+];
+
+const reasoningEffortLabels = [
+  { value: "low", label: "Matala päättelyteho" },
+  { value: "medium", label: "Keskitason päättelyteho" },
+  { value: "high", label: "Korkea päättelyteho" },
+];
 
 const fadeAnimation = {
   initial: { opacity: 0 },
@@ -48,6 +78,10 @@ const ImageUploadPage: React.FC = () => {
     (state) => state.setFurnitureResult,
   );
 
+  const [selectedModel, setSelectedModel] = useState<ModelType>("o3");
+  const [selectedReasoningEffort, setSelectedReasoningEffort] =
+    useState<ReasoningEffortType>("high");
+
   const handleFileInputClick = () => fileInputRef.current?.click();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +99,15 @@ const ImageUploadPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const result = await uploadImage(imageState.file);
+      // Create model options object
+      const modelOptions = {
+        model: selectedModel || "all",
+        ...(selectedModel === "o3" && selectedReasoningEffort
+          ? { reasoningEffort: selectedReasoningEffort }
+          : {}),
+      };
+
+      const result = await uploadImage(imageState.file, modelOptions);
       setFurnitureResult(result);
       navigate("/confirmation", {
         state: { furnitureResult: result },
@@ -245,6 +287,114 @@ const ImageUploadPage: React.FC = () => {
                       alt="Otettu kuva"
                       className="outline outline-2 outline-zinc-200 w-full max-w-md mx-auto rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.01]"
                     />
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-4">
+                      <h3 className="font-medium text-green-800 flex items-center gap-2 mb-2">
+                        <Brain className="h-5 w-5" />
+                        Valitse tekoälymalli
+                      </h3>
+                      <p className="text-sm text-secondary-foreground mb-2">
+                        Voit valita tekoälymallin, jota käytetään kalusteen
+                        ensimmäiseen tunnistukseen. Mikäli valittu malli ei
+                        tunnista huonekalua, annamme parhaan arvauksen GPT-4.1
+                        mallin avulla. Oletuksena käytetään O3-mallia korkealla
+                        päättelyteholla.
+                      </p>
+                      <Separator className="my-4" />
+                      <ul className="text-xs text-secondary-foreground space-y-1 ml-4 list-disc">
+                        <li>
+                          <strong>Kaikki mallit</strong>
+                        </li>
+                        <li>
+                          <strong>GPT-4.1</strong>
+                        </li>
+                        <li>
+                          <strong>O3 (Reasoning)</strong> - Tukee päättelytehon
+                          säätämistä, tarkempi kalustemallien tunnistaja.
+                          Korkeampi päättelyteho parantaa tuloksia mutta
+                          pidentää käsittelyaikaa
+                        </li>
+                        <li>
+                          <strong>Claude-3-7 Sonnet</strong>
+                        </li>
+                        <li>
+                          <strong>Gemini-2.5-Flash</strong>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 sm:px-0">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Select
+                              onValueChange={(value) =>
+                                setSelectedModel(value as ModelType)
+                              }
+                              defaultValue="o3"
+                            >
+                              <SelectTrigger className="w-full sm:w-auto">
+                                <SelectValue placeholder="Valitse tekoälymalli" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {modelOptionLabels.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                  >
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              Valitse tekoälymalli, jota käytetään kalusteen
+                              analysointiin.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      {selectedModel === "o3" && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Select
+                                onValueChange={(value) =>
+                                  setSelectedReasoningEffort(
+                                    value as ReasoningEffortType,
+                                  )
+                                }
+                                defaultValue="high"
+                              >
+                                <SelectTrigger className="w-full sm:w-auto">
+                                  <SelectValue placeholder="Valitse päättelyteho" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {reasoningEffortLabels.map((option) => (
+                                    <SelectItem
+                                      key={option.value}
+                                      value={option.value}
+                                    >
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Valitse päättelyteho, joka vaikuttaa analyysin
+                                tarkkuuteen.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 sm:px-0">

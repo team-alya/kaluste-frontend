@@ -1,4 +1,8 @@
-import { FurnitureFormData, PriceAnalysisResponse } from "../types/furniture";
+import {
+  AIModelOptions,
+  FurnitureFormData,
+  PriceAnalysisResponse,
+} from "../types/furniture";
 import * as mockApi from "./furniture-api-mock";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -7,6 +11,7 @@ const USE_MOCK_API = false;
 
 export const uploadImage = async (
   imageFile: File,
+  modelOptions?: AIModelOptions,
 ): Promise<FurnitureFormData> => {
   if (USE_MOCK_API) {
     return mockApi.uploadImage(imageFile);
@@ -14,6 +19,15 @@ export const uploadImage = async (
 
   const formData = new FormData();
   formData.append("image", imageFile);
+
+  // Add AI model selection options to the form data if provided
+  if (modelOptions?.model) {
+    formData.append("model", modelOptions.model);
+  }
+
+  if (modelOptions?.model === "o3" && modelOptions?.reasoningEffort) {
+    formData.append("reasoningEffort", modelOptions.reasoningEffort);
+  }
 
   const response = await fetch(`${API_URL}/api/image`, {
     method: "POST",
