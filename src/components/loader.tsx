@@ -13,7 +13,12 @@ interface LoaderAnimationProps {
 function LoaderAnimation({
   isLoading,
   text,
-  loadingTexts = ["Tarkistetaan tietoja...", "Prosessoidaan..."],
+  loadingTexts = [
+    "Tarkistetaan tietoja...", 
+    "Prosessoidaan...",
+    "Analysoidaan tietoja tarkemmin...",
+    "Tekoäly muodostaa kokonaiskuvaa..."
+  ],
   finalText = "Pieni hetki vielä...",
 }: LoaderAnimationProps) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
