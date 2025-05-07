@@ -1,70 +1,66 @@
-# KalusteArvio Frontend
+# Arvolaskuri Frontend
 
-Frontend application for the Älyä-hanke KalusteArvio-project. The app uses AI to analyze furniture images and provide recommendations for selling, donating, recycling, or repairing used furniture.
+Frontend application for the Älyä project's Arvolaskuri. The application uses AI to identify furniture from images and provides users with information about furniture pricing and advice on recycling and circular economy.
 
 ## Core Features
 
-1. Upload furniture image for AI analysis
-2. Validate and edit detected furniture information
-3. Get AI-powered price estimates and recommendations
-4. Chat with AI assistant
+1. Upload and analyze furniture images using AI
+2. Select AI model for recognition (O3, GPT-4.1, Claude-3-7, Gemini-2.5)
+3. Verify and edit identified furniture information
+4. Get AI-based price estimates and recommendations
+5. Discuss recycling and circular economy topics with an AI chatbot
 
-## Tech Stack
+## Technical Implementation
 
 - **React + TypeScript + Vite**
-- **State Management**: Zustand for global state (furniture details and price analysis)
-- **Chat Interface**: Vercel AI SDK (useChat hook) for streaming AI responses
-- **Form Handling**: React Hook Form + Zod validation
+- **State Management**: Zustand (furniture data and price analysis)
+- **Chat UI**: Vercel AI SDK (useChat hook) for streaming responses
+- **Forms**: React Hook Form + Zod validation
 - **UI**: Tailwind CSS + Shadcn/UI components
 
 ## Installation
 
-To run the program follow the instructions below:
+Follow these instructions to install the application:
 
 **1. Clone the Github repository:**
 
-` git clone https://github.com/team-alya/kaluste-frontend.git`
+```
+git clone https://github.com/team-alya/kaluste-frontend.git
+```
 
 **2. Install dependencies:**
 
-` npm install`
+```
+npm install
+```
 
-**3. Copy envs:**
+**3. Copy environment variables:**
 
 ```bash
 cp .env.example .env
 ```
 
-**3. Start the app:**
+**4. Start the application:**
 
-`npm run dev`
+```
+npm run dev
+```
 
-### Notice
+### Note
 
-⚠️ **Old implementation pics - corresponds to git TAG v1.0.**
+The application requires a backend service, which you can find documented here:
+https://github.com/team-alya/kaluste-backend
 
-For this app to work with all its functionalities you also need to have the back-end set up which can be found with its own documentation here: https://github.com/team-alya/kaluste-backend.
+## Application Use Case
 
-## Images of the user interface
+Value Calculator is an application that allows users to:
 
-#### Welcome page
+1. Take or upload a picture of furniture
+2. Select which AI model to use for recognition
+3. Verify and correct the furniture details identified by AI
+4. Get a price estimate for the furniture
+5. Ask the chatbot for additional information about recycling, reuse, and circular economy
 
-![image](https://github.com/user-attachments/assets/a0fb099a-a229-4515-8203-b3682c99cf03)
+## License
 
-#### Image upload page:
-
-![image](https://github.com/user-attachments/assets/5141177c-e5f3-49eb-8e04-ef476624e90b)
-
-#### Information confirmation page:
-
-![image](https://github.com/user-attachments/assets/7f6d7b32-837c-45bf-a1d5-311f48bb2098)
-
-## Price estimation
-
-- €3.00/month (150 process usage)
-- Model recognition from image (€0.01-0.02)
-- Price estimation (€0.01-0.015) per estimate
-
-## Lisenssi
-
-License - katso [LICENSE](LICENSE) tiedosto lisätietoja varten.
+See the [LICENSE](LICENSE) file for more information.
