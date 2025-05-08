@@ -21,7 +21,7 @@ function LoaderAnimation({
     "Tekoäly muodostaa kokonaiskuvaa..."
   ],
   finalText = "Pieni hetki vielä...",
-  longWaitText = "Tekoäly miettii vielä... Tämä näyttää vaativan tavallista enemmän pohdintaa! 🤔",
+  longWaitText = "Tekoäly miettii vielä...\nTämä näyttää vaativan tavallista enemmän pohdintaa! 🤔",
 }: LoaderAnimationProps) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showLongWaitText, setShowLongWaitText] = useState(false);
