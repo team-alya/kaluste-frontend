@@ -8,6 +8,7 @@ interface LoaderAnimationProps {
   text: string;
   loadingTexts?: string[];
   finalText?: string;
+  longWaitText?: string;
 }
 
 function LoaderAnimation({
@@ -20,12 +21,15 @@ function LoaderAnimation({
     "Tekoäly muodostaa kokonaiskuvaa..."
   ],
   finalText = "Pieni hetki vielä...",
+  longWaitText = "Tekoäly miettii vielä... Tämä näyttää vaativan tavallista enemmän pohdintaa! 🤔",
 }: LoaderAnimationProps) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [showLongWaitText, setShowLongWaitText] = useState(false);
   const allTexts = [text, ...loadingTexts, finalText];
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    let longWaitTimer: NodeJS.Timeout;
 
     if (isLoading && currentTextIndex < allTexts.length - 1) {
       timer = setTimeout(() => {
@@ -33,14 +37,22 @@ function LoaderAnimation({
       }, 5000);
     }
 
+    if (isLoading && !showLongWaitText) {
+      longWaitTimer = setTimeout(() => {
+        setShowLongWaitText(true);
+      }, 60000); // 60000ms = 1min
+    }
+
     if (!isLoading) {
       setCurrentTextIndex(0);
+      setShowLongWaitText(false);
     }
 
     return () => {
       if (timer) clearTimeout(timer);
+      if (longWaitTimer) clearTimeout(longWaitTimer);
     };
-  }, [isLoading, currentTextIndex, allTexts.length]);
+  }, [isLoading, currentTextIndex, allTexts.length, showLongWaitText]);
 
   return (
     <div>
@@ -56,16 +68,16 @@ function LoaderAnimation({
                 style={{ width: "100%", height: "100%" }}
               />
             </div>
-            <div className="min-h-[1.5rem] text-center">
+            <div className="min-h-[3rem] text-center">
               <AnimatePresence mode="wait">
                 <motion.p
-                  key={currentTextIndex}
+                  key={currentTextIndex + (showLongWaitText ? "-long" : "")}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="text-sm font-medium text-gray-600"
                 >
-                  {allTexts[currentTextIndex]}
+                  {showLongWaitText ? longWaitText : allTexts[currentTextIndex]}
                 </motion.p>
               </AnimatePresence>
             </div>
