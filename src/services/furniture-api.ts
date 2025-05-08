@@ -11,7 +11,7 @@ const USE_MOCK_API = false;
 
 export const uploadImage = async (
   imageFile: File,
-  modelOptions?: AIModelOptions,
+  modelOptions?: AIModelOptions
 ): Promise<FurnitureFormData> => {
   if (USE_MOCK_API) {
     return mockApi.uploadImage(imageFile);
@@ -32,6 +32,7 @@ export const uploadImage = async (
   const response = await fetch(`${API_URL}/api/image`, {
     method: "POST",
     body: formData,
+    cache: "no-store",
     headers: {
       Accept: "application/json",
     },
@@ -41,7 +42,7 @@ export const uploadImage = async (
     const errorText = await response.text();
     console.error("Server error response:", errorText);
     throw new Error(
-      `HTTP error! status: ${response.status}, message: ${errorText}`,
+      `HTTP error! status: ${response.status}, message: ${errorText}`
     );
   }
 
@@ -50,7 +51,7 @@ export const uploadImage = async (
 };
 
 export const analyzeFurniturePrice = async (
-  furnitureData: FurnitureFormData,
+  furnitureData: FurnitureFormData
 ): Promise<PriceAnalysisResponse> => {
   if (USE_MOCK_API) {
     return mockApi.analyzeFurniturePrice(furnitureData);
